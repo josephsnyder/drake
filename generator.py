@@ -46,7 +46,7 @@ arithmetic = """
 """
 
 constructor = """    .def(py::init<{}>(), {})\n"""
-member_func = """    .def{static}(\"{fun_name}\", {classname}, {args}, doc.{}.{fun_name}.doc)\n"""
+member_func = """    .def{static}(\"{fun_name}\", {classname}, {args}, doc.{classname_doc}.{fun_name}.doc)\n"""
 member_func_arg = """ py::arg(\"{}\")"""
 overload_template = """py::overload_cast<{arg_types}>({classname}),"""
 wrap_header = """#ifndef TMP_WRAPPING_HEADER
@@ -125,6 +125,7 @@ def write_class_data(class_data):
         fun_name=member_function.name,
         classname=signature,
         args=arg_string,
+        classname_doc=member_function.parent.name,
         doc_string="")
   for operator in class_data.operators():
     continue
@@ -147,17 +148,16 @@ def find_classes(src, src_dict, res_dict):
         for className in data:
           if len(data[className]["inst"]):
             for instantiation in data[className]["inst"]:
-                res_dict['instantiate'] += ("   typedef {}<{}> {};\n").format(className, instantiation, className.split("::")[-1]+instantiation.split("::")[-1])
-                res_dict['typedefs'] += ("  template class {}<{}>;\n").format(className, instantiation)
+                res_dict['instantiate'].append(("   typedef {}<{}> {};\n").format(className, instantiation, className.split("::")[-1]+instantiation.split("::")[-1]))
+                res_dict['typedefs'].append(("  template class {}<{}>;\n").format(className, instantiation))
                 res_dict['decls'].append("%s<%s>" % (className.split("::")[-1],
                                                      instantiation.split("::")[-1]))
           else:
-            res_dict['instantiate'] += ("   typedef {} {};\n").format(
-              className, className.split("::")[-1])
+            res_dict['instantiate'].append(("   typedef {} {};\n").format(
+              className, className.split("::")[-1]))
             res_dict['decls'].append(className.split("::")[-1])
-
-          res_dict['includes'].append(src)
-          res_dict["#include"] += "  #include \"%s\"\n" % data[className]["file"]
+          res_dict["#include"].append("#include \"%s\"\n" % data[className]["file"])
+          res_dict['out_names'].append("%s_py.cpp" % className.split("::")[-1])
       else:
           res_dict["namespaces"].append(key)
           res_dict = find_classes(os.path.join(src, key), data, res_dict)
@@ -166,20 +166,25 @@ def find_classes(src, src_dict, res_dict):
 def parse(options):
   # init the pygccxml stuff
   # Adapted from CPPWG: https://github.com/jmsgrogan/cppwg/blob/265117455ed57eb250643a28ea6029c2bccf3ab3/cppwg/parsers/source_parser.py#L24
-  input = json.load(open(options.json_path))
-  results = {"includes": [], "namespaces": [], "typedefs": "", "#include": "", 'instantiate': "", "decls": []}
-  results = find_classes(options.source_dir, input, results)
-  results['includes'].append(
-    "/home/softhat/.cache/bazel/_bazel_softhat/f609cd39646d462a4a64447c03bad13a/external/eigen/")
-  results['includes'].append(
-    "/home/softhat/.cache/bazel/_bazel_softhat/f609cd39646d462a4a64447c03bad13a/external/fmt/include/")
-  results['includes'].append("..")
+  results = {"includes": [],
+             "namespaces": [],
+             "typedefs": [],
+             "#include": [],
+             'instantiate': [],
+             "decls": [],
+             "out_names": []}
+  for found_input_file in glob.glob("**/wrapper_input.json", recursive=True):
+    results = find_classes(options.source_dir, json.load(open(found_input_file, "r")), results)
+    results["includes"].append(os.path.dirname(found_input_file))
+  if options.no_generation:
+    print(results["out_names"])
+    return
   castxml_config = pygccxml.parser.xml_generator_configuration_t(xml_generator_path=options.castxml_path,
                                                 xml_generator="castxml",
                                                 cflags="-std=c++1z",
                                                 include_paths=results["includes"])
   with open("wrapper.hpp", "w") as file:
-    file .write(wrap_header % (results["#include"], results['typedefs'], "drake_wrap", results['instantiate']))
+    file.write(wrap_header % (" ".join(results["#include"]), " ".join(results['typedefs']), "drake_wrap", " ".join(results['instantiate']) ))
   total = pygccxml.parser.parse(["wrapper.hpp"], castxml_config, compilation_mode=pygccxml.parser.COMPILATION_MODE.ALL_AT_ONCE)
 
   # Reads in JSON of namespaces with exclusions and inclusions.
@@ -203,12 +208,12 @@ def parse(options):
 
 arg = ArgumentParser()
 arg.add_argument("-s", "--source", action="store", dest="source_dir")
-arg.add_argument(
-  "-j",
-  "--input_json",
-  action="store",
-          dest="json_path",
-  help="Path to input JSON file of namespaces")
+#arg.add_argument(
+#  "-j",
+#  "--input_json",
+#  action="store",
+#          dest="json_path",
+#  help="Path to input JSON file of namespaces")
 arg.add_argument(
   "-g",
   "--castxml-path",
@@ -216,5 +221,13 @@ arg.add_argument(
   dest="castxml_path",
   help="Path to castxml",
   required=True)
+arg.add_argument('--includes', '-i', type=str,
+                    help='Path to the includes directory.',
+                    action="append",
+                    default=[])
+arg.add_argument('--no-generation', '-n',
+                    help='Only print name of files to be generated',
+                    dest="no_generation",
+                    action='store_true', required=False)
 options = arg.parse_args()
 parse(options)

@@ -1,0 +1,9 @@
+{
+  "classes": {
+    "drake::math::RigidTransform": {
+      "file":"rigid_transform.h",
+      "inst": ["double", "drake::AutoDiffXd"]
+    }
+  }
+
+}

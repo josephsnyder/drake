@@ -1,0 +1,18 @@
+{
+  "classes": {
+      "drake::Polynomial": {
+        "file": "polynomial.h",
+        "inst": [
+          "double"
+        ]
+      }
+    },
+    "symbolic": {
+      "classes": {
+        "drake::symbolic::CodeGenVisitor": {
+          "file": "symbolic_codegen.h",
+          "inst": []
+        }
+      }
+    }
+}

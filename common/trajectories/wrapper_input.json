@@ -1,22 +1,5 @@
 {
-  "common": {
-    "classes": {
-      "Polynomial": {
-        "file": "polynomial.h",
-        "inst": [
-          "double"
-        ]
-      }
-    },
-    "symbolic": {
-      "classes": {
-        "drake::symbolic::CodeGenVisitor": {
-          "file": "symbolic_codegen.h",
-          "inst": []
-        }
-      }
-    },
-    "trajectories": {
+  "trajectories": {
       "classes": {
         "drake::trajectories::PiecewisePolynomial": {
           "file": "piecewise_polynomial.h",
@@ -44,13 +27,4 @@
         }
       }
     }
-  },
-  "math": {
-    "classes": {
-      "drake::math::RigidTransform": {
-        "file":"rigid_transform.h",
-        "inst": ["double", "drake::AutoDiffXd"]
-      }
-    }
-  }
 }
