@@ -47,7 +47,7 @@ arithmetic = """
 
 constructor = """    .def(py::init<{}>(), {})\n"""
 member_func = """    .def{static}(\"{fun_name}\", {classname}, {args}, doc.{classname_doc}.{fun_name}.doc)\n"""
-member_func_arg = """ py::arg(\"{}\")"""
+member_func_arg = """ py::arg(\"{}\") {}"""
 overload_template = """py::overload_cast<{arg_types}>({classname}),"""
 wrap_header = """#ifndef TMP_WRAPPING_HEADER
 #define TMP_WRAPPING_HEADER
@@ -111,7 +111,8 @@ def write_class_data(class_data):
       arg_string = ""
       signature  = ""
       for arg in version.arguments:
-        arg_string += member_func_arg.format(arg.name) + ','
+        arg_string += member_func_arg.format(arg.name,
+                                             "= %s" % arg.default_value if arg.default_value else "") + ','
       if overload_flag:
         arg_types = ""
         for arg_type in version.argument_types:
@@ -125,7 +126,7 @@ def write_class_data(class_data):
         fun_name=member_function.name,
         classname=signature,
         args=arg_string,
-        classname_doc=member_function.parent.name,
+        classname_doc=member_function.parent.name.split("<")[0],
         doc_string="")
   for operator in class_data.operators():
     continue
@@ -187,7 +188,7 @@ def parse(options):
   castxml_config = pygccxml.parser.xml_generator_configuration_t(xml_generator_path=options.castxml_path,
                                                 xml_generator="castxml",
                                                 cflags="-std=c++1z",
-                                                include_paths=results["includes"])
+                                                include_paths=results["includes"]+ options.includes)
   with open("wrapper.hpp", "w") as file:
     file.write(wrap_header % (" ".join(results["#include"]), " ".join(results['typedefs']), "drake_wrap", " ".join(results['instantiate']) ))
   total = pygccxml.parser.parse(["wrapper.hpp"], castxml_config, compilation_mode=pygccxml.parser.COMPILATION_MODE.ALL_AT_ONCE)
