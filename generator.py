@@ -173,7 +173,12 @@ def parse(options):
              'instantiate': [],
              "decls": [],
              "out_names": []}
-  for found_input_file in glob.glob("**/wrapper_input.json", recursive=True):
+  files_to_parse = []
+  if options.json_path:
+    files_to_parse.append(options.json_path)
+  else:
+    files_to_parse = glob.glob("**/wrapper_input.json", recursive=True)
+  for found_input_file in files_to_parse:
     results = find_classes(options.source_dir, json.load(open(found_input_file, "r")), results)
     results["includes"].append(os.path.dirname(found_input_file))
   if options.no_generation:
@@ -208,12 +213,14 @@ def parse(options):
 
 arg = ArgumentParser()
 arg.add_argument("-s", "--source", action="store", dest="source_dir")
-#arg.add_argument(
-#  "-j",
-#  "--input_json",
-#  action="store",
-#          dest="json_path",
-#  help="Path to input JSON file of namespaces")
+arg.add_argument(
+  "-j",
+  "--input_json",
+  action="store",
+  dest="json_path",
+  help="Path to input JSON file of namespaces",
+  required=False,
+  default="",)
 arg.add_argument(
   "-g",
   "--castxml-path",
