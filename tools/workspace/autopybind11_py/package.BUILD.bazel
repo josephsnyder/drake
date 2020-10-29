@@ -1,0 +1,15 @@
+# -*- python -*-
+
+load("@drake//tools/skylark:py.bzl", "py_library")
+
+licenses(["notice"])  # BSD-3-Clause
+
+package(
+    default_visibility = ["//visibility:public"],
+)
+
+py_library(
+    name = "autopybind11",
+    srcs = glob(["autopybind11/*"]),
+    visibility = ["//visibility:public"],
+)
