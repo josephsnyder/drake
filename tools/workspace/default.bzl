@@ -15,6 +15,7 @@ load("@drake//tools/workspace/cds:repository.bzl", "cds_repository")
 load("@drake//tools/workspace/clang_cindex_python3:repository.bzl", "clang_cindex_python3_repository")  # noqa
 load("@drake//tools/workspace/com_jidesoft_jide_oss:repository.bzl", "com_jidesoft_jide_oss_repository")  # noqa
 load("@drake//tools/workspace/commons_io:repository.bzl", "commons_io_repository")  # noqa
+load("@drake//tools/workspace/configargparse_py:repository.bzl", "configargparse_repository")  # noqa
 load("@drake//tools/workspace/csdp:repository.bzl", "csdp_repository")
 load("@drake//tools/workspace/doxygen:repository.bzl", "doxygen_repository")
 load("@drake//tools/workspace/drake_visualizer:repository.bzl", "drake_visualizer_repository")  # noqa
@@ -67,6 +68,7 @@ load("@drake//tools/workspace/pycps:repository.bzl", "pycps_repository")
 load("@drake//tools/workspace/pygame_py:repository.bzl", "pygame_py_repository")  # noqa
 load("@drake//tools/workspace/pygccxml_py:repository.bzl", "pygccxml_py_repository")  # noqa
 load("@drake//tools/workspace/python:repository.bzl", "python_repository")
+load("@drake//tools/workspace/pyyaml_py:repository.bzl", "pyyaml_repository")
 load("@drake//tools/workspace/qdldl:repository.bzl", "qdldl_repository")
 load("@drake//tools/workspace/ros_xacro:repository.bzl", "ros_xacro_repository")  # noqa
 load("@drake//tools/workspace/rules_pkg:repository.bzl", "rules_pkg_repository")  # noqa
@@ -82,6 +84,7 @@ load("@drake//tools/workspace/suitesparse:repository.bzl", "suitesparse_reposito
 load("@drake//tools/workspace/tinyobjloader:repository.bzl", "tinyobjloader_repository")  # noqa
 load("@drake//tools/workspace/tinyxml2:repository.bzl", "tinyxml2_repository")
 load("@drake//tools/workspace/tinyxml:repository.bzl", "tinyxml_repository")
+load("@drake//tools/workspace/toposort_py:repository.bzl", "toposort_repository")
 load("@drake//tools/workspace/uritemplate_py:repository.bzl", "uritemplate_py_repository")  # noqa
 load("@drake//tools/workspace/vtk:repository.bzl", "vtk_repository")
 load("@drake//tools/workspace/x11:repository.bzl", "x11_repository")
@@ -124,6 +127,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         com_jidesoft_jide_oss_repository(name = "com_jidesoft_jide_oss", mirrors = mirrors)  # noqa
     if "commons_io" not in excludes:
         commons_io_repository(name = "commons_io", mirrors = mirrors)
+    if "ConfigArgParse" not in excludes:
+        configargparse_repository(name = "ConfigArgParse", mirrors = mirrors)
     if "csdp" not in excludes:
         csdp_repository(name = "csdp", mirrors = mirrors)
     if "doxygen" not in excludes:
@@ -230,6 +235,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         pygccxml_py_repository(name = "pygccxml_py", mirrors = mirrors)
     if "python" not in excludes:
         python_repository(name = "python")
+    if "PyYAML" not in excludes:
+        pyyaml_repository(name = "PyYAML", mirrors = mirrors)
     if "qdldl" not in excludes:
         qdldl_repository(name = "qdldl", mirrors = mirrors)
     if "ros_xacro" not in excludes:
@@ -260,6 +267,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         tinyxml2_repository(name = "tinyxml2")
     if "tinyxml" not in excludes:
         tinyxml_repository(name = "tinyxml")
+    if "toposort" not in excludes:
+        toposort_repository(name = "toposort", mirrors = mirrors)
     if "uritemplate_py" not in excludes:
         uritemplate_py_repository(name = "uritemplate_py", mirrors = mirrors)
     if "vtk" not in excludes:

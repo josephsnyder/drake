@@ -53,6 +53,24 @@ drake_py_library(
     ],
 )
 
+drake_py_binary(
+    name = "autopybind11_example",
+    srcs = ["autopybind11_example.py"],
+    data = [
+        "@autopybind11",
+        "@pygccxml_py",
+        "@ConfigArgParse",
+        "@PyYAML",
+        "@toposort",
+        "@castxml//:castxml_bin",
+        "//tools/lint:util.py",
+        "//tools/lint:find_data.py",
+    ],
+    deps = [
+        # "//bindings/pydrake:generate_pybind_documentation_header",
+    ]
+)
+
 generate_pybind_documentation_header(
     name = "generate_pybind_documentation_header",
     out = "documentation_pybind.h",
@@ -551,20 +569,6 @@ drake_py_binary(
     ],
 )
 
-drake_py_binary(
-    name = "autopybind11_example",
-    srcs = ["autopybind11_example.py"],
-    data = [
-        "@autopybind11",
-        "@pygccxml_py",
-        "@castxml//:castxml_bin",
-        "//tools/lint:util.py",
-        "//tools/lint:find_data.py",
-    ],
-    deps = [
-        ":generate_pybind_documentation_header",
-    ]
-)
 
 drake_py_unittest(
     name = "parse_models_test",

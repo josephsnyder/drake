@@ -14,7 +14,7 @@ _AUTOPYBIND = "external/autopybind11"
 def _make_autopybind_command():
     """Returns a list starting with the buildifier executable, followed by any
     required default arguments."""
-    return ["python", "-m",
+    return ["python3", "-m",
         "external.autopybind11.autopybind11"]
 
 
@@ -44,6 +44,9 @@ def main(workspace_name="drake"):
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = find_data(_AUTOPYBIND) + os.pathsep + my_env["PYTHONPATH"]
     my_env["PYTHONPATH"] = find_data("drake") + os.pathsep + my_env["PYTHONPATH"]
+    my_env["PYTHONPATH"] = find_data("PyYAML") + os.pathsep + my_env["PYTHONPATH"]
+    my_env["PYTHONPATH"] = find_data("toposort") + os.pathsep + my_env["PYTHONPATH"]
+    my_env["PYTHONPATH"] = find_data("ConfigArgParse") + os.pathsep + my_env["PYTHONPATH"]
 
     # Process --help.
     if "--help" in argv or "-help" in argv:
