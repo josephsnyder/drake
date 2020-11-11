@@ -14,7 +14,7 @@ _AUTOPYBIND = "external/autopybind11"
 def _make_autopybind_command():
     """Returns a list starting with the buildifier executable, followed by any
     required default arguments."""
-    return ["python3", "-m",
+    return [sys.executable, "-m",
         "external.autopybind11.autopybind11"]
 
 
