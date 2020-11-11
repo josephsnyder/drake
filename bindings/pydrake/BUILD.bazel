@@ -60,7 +60,6 @@ drake_py_binary(
         "@autopybind11",
         "@pygccxml_py",
         "@ConfigArgParse",
-        "@PyYAML",
         "@toposort",
         "@castxml//:castxml_bin",
         "//tools/lint:util.py",
