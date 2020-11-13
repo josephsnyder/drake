@@ -42,6 +42,7 @@ def main(workspace_name="drake"):
     # Find the wrapped tool.
     tool_cmds = _make_autopybind_command()
     my_env = os.environ.copy()
+    print(my_env["PYTHONPATH"])
     my_env["PYTHONPATH"] = find_data(_AUTOPYBIND) + os.pathsep + my_env["PYTHONPATH"]
     my_env["PYTHONPATH"] = find_data("drake") + os.pathsep + my_env["PYTHONPATH"]
     my_env["PYTHONPATH"] = find_data("toposort") + os.pathsep + my_env["PYTHONPATH"]

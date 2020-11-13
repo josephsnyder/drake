@@ -21,6 +21,7 @@ load(
     "generate_pybind_documentation_header",
     "get_drake_py_installs",
     "get_pybind_package_info",
+    "autopybind11_example",
 )
 load("//bindings/pydrake:pydrake.bzl", "add_lint_tests_pydrake")
 
@@ -53,23 +54,28 @@ drake_py_library(
     ],
 )
 
-drake_py_binary(
+autopybind11_example(
     name = "autopybind11_example",
-    srcs = ["autopybind11_example.py"],
+    yaml = "drake_example.yml",
+    out = "test.cpp",
+    castxml = "@castxml//:castxml_bin",
+    targets = [
+        "//tools/install/libdrake:drake_headers",
+        "//examples/compass_gait:compass_gait",
+        "//examples/manipulation_station:manipulation_station",
+        "//examples/manipulation_station:manipulation_station_hardware_interface",  # noqa
+        "//examples/pendulum:pendulum_plant",
+        "//examples/quadrotor:quadrotor_plant",
+        "//examples/rimless_wheel:rimless_wheel",
+        "//examples/van_der_pol:van_der_pol",
+    ],
     data = [
         "@autopybind11",
         "@pygccxml_py",
         "@ConfigArgParse",
         "@toposort",
-        "@castxml//:castxml_bin",
-        "//tools/lint:util.py",
-        "//tools/lint:find_data.py",
     ],
-    deps = [
-        # "//bindings/pydrake:generate_pybind_documentation_header",
-    ]
 )
-
 generate_pybind_documentation_header(
     name = "generate_pybind_documentation_header",
     out = "documentation_pybind.h",

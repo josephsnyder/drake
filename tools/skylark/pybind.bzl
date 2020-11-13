@@ -341,6 +341,35 @@ def _collect_cc_header_info(targets):
         package_headers = depset(transitive = package_headers_depsets),
     )
 
+def _autopybind11_example_impl(ctx):
+    targets = _collect_cc_header_info(ctx.attr.targets)
+
+    args = ctx.actions.args()
+    args.add("-m")
+    args.add("autopybind11")
+    # Set some defaults:
+    # Stage should always be 2
+    args.add("-s")
+    args.add("2")
+    # Sensible defaults
+    args.add("--module_name")
+    args.add("drake")
+    #out_dir = os.path.join(os.getcwd(), "autopybind11-out")
+    #if not os.path.isdir(out_dir):
+    #    os.makedirs(out_dir)
+    args.add("-o")
+    args.add("./autopybind-out")
+    # Find CastXML as a repository
+    args.add("--castxml")
+    args.add(ctx.executable.castxml)
+    args.add("-y")
+    args.add(ctx.attr.yaml)
+    ctx.actions.run(
+        arguments = [args],
+        executable = "python3",
+        outputs = [ctx.outputs.out]
+    )
+
 def _generate_pybind_documentation_header_impl(ctx):
     targets = _collect_cc_header_info(ctx.attr.targets)
 
@@ -378,12 +407,33 @@ def _generate_pybind_documentation_header_impl(ctx):
         outputs = outputs,
         inputs = depset(transitive = [
             targets.transitive_headers,
-            target_deps.transitive_headers,
         ]),
         arguments = [args],
-        executable = ctx.executable._mkdoc,
+        executable = ctx.executable._apb,
     )
 
+autopybind11_example = rule(
+    implementation = _autopybind11_example_impl,
+    attrs = {
+        "yaml": attr.string(mandatory = True),
+        "out": attr.output(mandatory = True),
+        "data": attr.label_list(),
+        "targets": attr.label_list(
+            mandatory = True,
+        ),
+        "_apb": attr.label(
+                allow_files = True,
+                cfg = "host",
+                executable = True,
+            ),
+        "castxml": attr.label(
+                allow_files = True,
+                cfg = "host",
+                executable = True,
+            ),
+    },
+    output_to_genfiles = False,
+)
 # Generates a header that defines variables containing a representation of the
 # contents of Doxygen comments for each class, function, etc. in the
 # transitive headers of the given targets.
