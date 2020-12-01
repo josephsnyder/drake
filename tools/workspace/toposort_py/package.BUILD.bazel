@@ -6,6 +6,6 @@ licenses(["notice"])  # BSD-2-Clause
 
 py_library(
     name = "toposort",
-    srcs = glob(["*.py"]),
+    srcs = glob(["toposort/**/*.py"]),
     visibility = ["//visibility:public"],
 )
