@@ -40,8 +40,6 @@ def main(workspace_name="drake"):
     my_env = os.environ.copy()
     my_env["PYTHONPATH"] = find_data(_AUTOPYBIND) + \
         os.pathsep + my_env["PYTHONPATH"]
-    my_env["PYTHONPATH"] = find_data("toposort") +\
-        os.pathsep + my_env["PYTHONPATH"]
     # Process --help.
     if "--help" in argv or "-help" in argv:
         return _help(tool_cmds + argv, my_env)
