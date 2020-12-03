@@ -306,24 +306,6 @@ def drake_pybind_cc_googletest(
         allow_import_unittest = True,
     )
 
-#  This rule captures information from _collect_cc_header_info
-#  and writes the information that AutoPyBind11 uses to properly search
-#  and comb the desired code.
-def _write_cc_header_info_impl(ctx):
-    data = _collect_cc_header_info(ctx.attr.targets)
-    out = ctx.actions.declare_file("response.rsp")
-    rsp_content = "c_std: -std=c++17\n"
-    rsp_content += "defines: {}\n".format(";".join(data.define_list))
-    rsp_content += "includes: {}".format(";".join(data.include_list))
-    ctx.actions.write(
-        output = out,
-        content = rsp_content,
-    )
-    return [DefaultInfo(
-        files = depset([out]),
-        data_runfiles = ctx.runfiles(files = [out]),
-    )]
-
 def _collect_cc_header_info(targets):
     compile_flags = []
     define_list = []
@@ -371,12 +353,42 @@ def _collect_cc_header_info(targets):
         package_headers = depset(transitive = package_headers_depsets),
     )
 
-write_cc_header_info = rule(
+def _generate_autopybind11_rsp_file_impl(ctx):
+    data = _collect_cc_header_info(ctx.attr.targets)
+    rsp_content = "c_std: -std=c++17\n"
+    rsp_content += "defines: {}\n".format(";".join(data.define_list))
+    rsp_content += "includes: {}".format(";".join(data.include_list))
+    ctx.actions.write(
+        output = ctx.outputs.rsp_file,
+        content = rsp_content,
+    )
+
+    # TODO(eric, joe, jamie?): Generate tarfile of `data.package_headers`.
+    fail("SEE TODO")
+
+    outs = [
+        ctx.outputs.rsp_file,
+        ctx.outputs.headers_archive,
+    ]
+    return [DefaultInfo(
+        files = depset(outs),
+        data_runfiles = ctx.runfiles(files = outs),
+    )]
+
+"""
+This rule captures information from _collect_cc_header_info
+and writes the information that AutoPyBind11 uses to properly search
+and comb the desired code.
+"""
+generate_autopybind11_rsp_file = rule(
     attrs = {
         "targets": attr.label_list(mandatory = True),
+        "rsp_file": attr.output(mandatory = True),
+        # N.B. We use an archive so we only need to declare one output for
+        # Bazel to communicate to our example program.
+        "headers_archive": attr.output(mandatory = True),
     },
-    implementation = _write_cc_header_info_impl,
-    fragments = ["rsp"],
+    implementation = _generate_autopybind11_rsp_file_impl,
     output_to_genfiles = True,
 )
 
