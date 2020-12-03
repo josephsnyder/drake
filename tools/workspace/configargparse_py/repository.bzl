@@ -2,7 +2,7 @@
 
 load("@drake//tools/workspace:pypi.bzl", "pypi_archive")
 
-def configargparse_repository(
+def configargparse_py_repository(
         name,
         mirrors = None):
     pypi_archive(

@@ -2,7 +2,7 @@
 
 load("@drake//tools/workspace:pypi.bzl", "pypi_archive")
 
-def toposort_repository(
+def toposort_py_repository(
         name,
         mirrors = None):
     pypi_archive(
