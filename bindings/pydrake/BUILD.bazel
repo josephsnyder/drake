@@ -89,10 +89,10 @@ drake_py_binary(
         "@castxml//:castxml_bin",
     ],
     deps = [
-        "@ConfigArgParse",
-        "@autopybind11",
+        "@configargparse_py",
+        "@autopybind11_py",
         "@pygccxml_py",
-        "@toposort",
+        "@toposort_py",
     ],
 )
 

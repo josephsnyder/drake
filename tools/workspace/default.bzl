@@ -16,7 +16,7 @@ load("@drake//tools/workspace/clang_cindex_python3:repository.bzl", "clang_cinde
 load("@drake//tools/workspace/com_jidesoft_jide_oss:repository.bzl", "com_jidesoft_jide_oss_repository")  # noqa
 load("@drake//tools/workspace/common_robotics_utilities:repository.bzl", "common_robotics_utilities_repository")  # noqa
 load("@drake//tools/workspace/commons_io:repository.bzl", "commons_io_repository")  # noqa
-load("@drake//tools/workspace/configargparse_py:repository.bzl", "configargparse_repository")  # noqa
+load("@drake//tools/workspace/configargparse_py:repository.bzl", "configargparse_py_repository")  # noqa
 load("@drake//tools/workspace/csdp:repository.bzl", "csdp_repository")
 load("@drake//tools/workspace/double_conversion:repository.bzl", "double_conversion_repository")  # noqa
 load("@drake//tools/workspace/doxygen:repository.bzl", "doxygen_repository")
@@ -85,7 +85,7 @@ load("@drake//tools/workspace/suitesparse:repository.bzl", "suitesparse_reposito
 load("@drake//tools/workspace/tinyobjloader:repository.bzl", "tinyobjloader_repository")  # noqa
 load("@drake//tools/workspace/tinyxml2:repository.bzl", "tinyxml2_repository")
 load("@drake//tools/workspace/tinyxml:repository.bzl", "tinyxml_repository")
-load("@drake//tools/workspace/toposort_py:repository.bzl", "toposort_repository")  # noqa
+load("@drake//tools/workspace/toposort_py:repository.bzl", "toposort_py_repository")  # noqa
 load("@drake//tools/workspace/uritemplate_py:repository.bzl", "uritemplate_py_repository")  # noqa
 load("@drake//tools/workspace/voxelized_geometry_tools:repository.bzl", "voxelized_geometry_tools_repository")  # noqa
 load("@drake//tools/workspace/vtk:repository.bzl", "vtk_repository")
@@ -103,8 +103,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
           be useful if a WORKSPACE file has already supplied its own external
           of a given name.
     """
-    if "autopybind11" not in excludes:
-        autopybind11_py_repository(name = "autopybind11", mirrors = mirrors)
+    if "autopybind11_py" not in excludes:
+        autopybind11_py_repository(name = "autopybind11_py", mirrors = mirrors)
     if "bazel_skylib" not in excludes:
         bazel_skylib_repository(name = "bazel_skylib", mirrors = mirrors)
     if "blas" not in excludes:
@@ -131,8 +131,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         common_robotics_utilities_repository(name = "common_robotics_utilities", mirrors = mirrors)  # noqa
     if "commons_io" not in excludes:
         commons_io_repository(name = "commons_io", mirrors = mirrors)
-    if "ConfigArgParse" not in excludes:
-        configargparse_repository(name = "ConfigArgParse", mirrors = mirrors)
+    if "configargparse_py" not in excludes:
+        configargparse_py_repository(name = "configargparse_py", mirrors = mirrors)
     if "csdp" not in excludes:
         csdp_repository(name = "csdp", mirrors = mirrors)
     if "double_conversion" not in excludes:
@@ -271,8 +271,8 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         tinyxml2_repository(name = "tinyxml2")
     if "tinyxml" not in excludes:
         tinyxml_repository(name = "tinyxml")
-    if "toposort" not in excludes:
-        toposort_repository(name = "toposort", mirrors = mirrors)
+    if "toposort_py" not in excludes:
+        toposort_py_repository(name = "toposort_py", mirrors = mirrors)
     if "uritemplate_py" not in excludes:
         uritemplate_py_repository(name = "uritemplate_py", mirrors = mirrors)
     if "voxelized_geometry_tools" not in excludes:
