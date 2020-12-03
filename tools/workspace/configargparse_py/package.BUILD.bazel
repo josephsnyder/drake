@@ -5,7 +5,7 @@ load("@drake//tools/skylark:py.bzl", "py_library")
 licenses(["notice"])  # BSD-2-Clause
 
 py_library(
-    name = "ConfigArgParse",
+    name = "configargparse_py",
     srcs = glob(["*.py"]),
     visibility = ["//visibility:public"],
 )
