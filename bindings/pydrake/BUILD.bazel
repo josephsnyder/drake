@@ -74,7 +74,7 @@ filegroup(
     name = "autopybind11_example_inputs",
     data = [
         "autopybind11_example.rsp",
-        "autopybind11_example.yaml"
+        "autopybind11_example.yaml",
         "autopybind11_example_headers.tar",
     ],
 )
