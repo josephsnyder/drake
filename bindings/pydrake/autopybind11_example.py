@@ -6,6 +6,7 @@ Please see the neighboring README.md for more information.
 """
 
 from contextlib import contextmanager
+import argparse
 import tarfile
 from tempfile import TemporaryDirectory
 import os
@@ -28,11 +29,12 @@ def extract_archive_tempdir(archive, *, dir=None, prefix=None):
         dir = os.environ.get("TEST_TMPDIR")
     with TemporaryDirectory(dir=dir, prefix=prefix) as tmp_dir:
         with tarfile.open(archive, "r") as tar:
+            import pdb; pdb.set_trace()
             tar.extractall(path=tmp_dir)
             yield str(tmp_dir)
 
 
-def run_autopyinbd11(output_dir):
+def run_autopybind11(output_dir):
     castxml_bin = find_data("external/castxml/castxml_bin")
     config_file = find_data("bindings/pydrake/autopybind11_example.yaml")
     response_file = find_data("bindings/pydrake/autopybind11_example.rsp")
@@ -59,9 +61,10 @@ def run_autopyinbd11(output_dir):
 
     # Since we're connecting a genrule with a proper binary, we must "simulate"
     # the genfiles directory.
-    with extract_archive_tempdir(headers_tar) as headers_dir:       
+    with extract_archive_tempdir(headers_tar) as headers_dir:
         result = run(
             argv, cwd=headers_dir, check=True, stdout=PIPE, stderr=STDOUT,
+            env=os.environ.copy()
         )
 
     if result.returncode != 0:
@@ -73,10 +76,10 @@ def run_autopyinbd11(output_dir):
 def main():
     parser = argparse.ArgumentParser()
     parser.add_argument(
-        "--output_dir", type=str, requireq=True,
+        "--output_dir", type=str, required=True,
         help="Outputs all generated artifcats this directory. Creates the "
              "directory if it does not exist.")
-    args = parser.parser_args()
+    args = parser.parse_args()
     run_autopybind11(args.output_dir)
 
 

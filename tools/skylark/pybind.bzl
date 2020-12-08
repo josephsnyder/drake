@@ -1,6 +1,7 @@
 # -*- python -*-
 
 load("//tools/skylark:py.bzl", "py_library")
+
 load("@cc//:compiler.bzl", "COMPILER_ID")
 
 # @see bazelbuild/bazel#3493 for needing `@drake//` when loading `install`.
@@ -362,13 +363,21 @@ def _generate_autopybind11_rsp_file_impl(ctx):
         output = ctx.outputs.rsp_file,
         content = rsp_content,
     )
+    arguments = ["-output", ctx.outputs.header_archive.path,
+                 "--file"]
 
-    # TODO(eric, joe, jamie?): Generate tarfile of `data.package_headers`.
-    fail("SEE TODO")
+    for file in data.package_headers.to_list():
+        arguments.append(file.path)
+
+    ctx.actions.run(
+        executable = ctx.executable.build_tar,
+        arguments = arguments,
+        outputs = [ctx.outputs.header_archive],
+    )
 
     outs = [
         ctx.outputs.rsp_file,
-        ctx.outputs.headers_archive,
+        ctx.outputs.header_archive,
     ]
     return [DefaultInfo(
         files = depset(outs),
@@ -386,7 +395,12 @@ generate_autopybind11_rsp_file = rule(
         "rsp_file": attr.output(mandatory = True),
         # N.B. We use an archive so we only need to declare one output for
         # Bazel to communicate to our example program.
-        "headers_archive": attr.output(mandatory = True),
+        "header_archive": attr.output(mandatory = True),
+        "build_tar": attr.label(
+            default=Label("@bazel_tools//tools/build_defs/pkg:build_tar"),
+            cfg="host",
+            executable=True,
+            allow_files=True),
     },
     implementation = _generate_autopybind11_rsp_file_impl,
     output_to_genfiles = True,
