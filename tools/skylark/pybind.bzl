@@ -1,6 +1,7 @@
 # -*- python -*-
 
 load("//tools/skylark:py.bzl", "py_library")
+
 load("@cc//:compiler.bzl", "COMPILER_ID")
 
 # @see bazelbuild/bazel#3493 for needing `@drake//` when loading `install`.
@@ -306,24 +307,6 @@ def drake_pybind_cc_googletest(
         allow_import_unittest = True,
     )
 
-#  This rule captures information from _collect_cc_header_info
-#  and writes the information that AutoPyBind11 uses to properly search
-#  and comb the desired code.
-def _write_cc_header_info_impl(ctx):
-    data = _collect_cc_header_info(ctx.attr.targets)
-    out = ctx.actions.declare_file("response.rsp")
-    rsp_content = "c_std: -std=c++17\n"
-    rsp_content += "defines: {}\n".format(";".join(data.define_list))
-    rsp_content += "includes: {}".format(";".join(data.include_list))
-    ctx.actions.write(
-        output = out,
-        content = rsp_content,
-    )
-    return [DefaultInfo(
-        files = depset([out]),
-        data_runfiles = ctx.runfiles(files = [out]),
-    )]
-
 def _collect_cc_header_info(targets):
     compile_flags = []
     define_list = []
@@ -371,12 +354,55 @@ def _collect_cc_header_info(targets):
         package_headers = depset(transitive = package_headers_depsets),
     )
 
-write_cc_header_info = rule(
+def _generate_autopybind11_rsp_file_impl(ctx):
+    data = _collect_cc_header_info(ctx.attr.targets)
+    rsp_content = "c_std: -std=c++17\n"
+    rsp_content += "defines: {}\n".format(";".join(data.define_list))
+    rsp_content += "includes: {}".format(";".join(data.include_list))
+    ctx.actions.write(
+        output = ctx.outputs.rsp_file,
+        content = rsp_content,
+    )
+    arguments = ["-output", ctx.outputs.header_archive.path,
+                 "--file"]
+
+    for file in data.package_headers.to_list():
+        arguments.append(file.path)
+
+    ctx.actions.run(
+        executable = ctx.executable.build_tar,
+        arguments = arguments,
+        outputs = [ctx.outputs.header_archive],
+    )
+
+    outs = [
+        ctx.outputs.rsp_file,
+        ctx.outputs.header_archive,
+    ]
+    return [DefaultInfo(
+        files = depset(outs),
+        data_runfiles = ctx.runfiles(files = outs),
+    )]
+
+"""
+This rule captures information from _collect_cc_header_info
+and writes the information that AutoPyBind11 uses to properly search
+and comb the desired code.
+"""
+generate_autopybind11_rsp_file = rule(
     attrs = {
         "targets": attr.label_list(mandatory = True),
+        "rsp_file": attr.output(mandatory = True),
+        # N.B. We use an archive so we only need to declare one output for
+        # Bazel to communicate to our example program.
+        "header_archive": attr.output(mandatory = True),
+        "build_tar": attr.label(
+            default=Label("@bazel_tools//tools/build_defs/pkg:build_tar"),
+            cfg="host",
+            executable=True,
+            allow_files=True),
     },
-    implementation = _write_cc_header_info_impl,
-    fragments = ["rsp"],
+    implementation = _generate_autopybind11_rsp_file_impl,
     output_to_genfiles = True,
 )
 

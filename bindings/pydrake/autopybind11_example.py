@@ -1,73 +1,87 @@
-import os
-import re
-import subprocess
-import sys
-from subprocess import Popen, PIPE, STDOUT
+"""
+This provides a very concrete usage of `autopybind11` to be used for Drake
+symbols during development under Bazel.
 
+Please see the neighboring README.md for more information.
+"""
+
+from contextlib import contextmanager
+import argparse
+import tarfile
+from tempfile import TemporaryDirectory
+import os
+import sys
+from subprocess import run, PIPE, STDOUT
+
+# TODO(eric.cousineau): Use Bazel's runfiles / Rlocation for proper resource
+# finding.
 from drake.tools.lint.find_data import find_data
 
 
-# These match data=[] in our BUILD.bazel file.
-_AUTOPYBIND = "external/autopybind11"
+@contextmanager
+def extract_archive_tempdir(archive, *, dir=None, prefix=None):
+    """
+    Extracts an archive to a temporary directory.
+
+    If `dir` is None, then it will try to resolve to $TEST_TMPDIR.
+    """
+    if dir is None:
+        dir = os.environ.get("TEST_TMPDIR")
+    with TemporaryDirectory(dir=dir, prefix=prefix) as tmp_dir:
+        with tarfile.open(archive, "r") as tar:
+            import pdb; pdb.set_trace()
+            tar.extractall(path=tmp_dir)
+            yield str(tmp_dir)
 
 
-def _make_autopybind_command():
-    """Returns a list starting with the buildifier executable, followed by any
-    required default arguments."""
-    return [sys.executable, "-m", "autopybind11"]
+def run_autopybind11(output_dir):
+    castxml_bin = find_data("external/castxml/castxml_bin")
+    config_file = find_data("bindings/pydrake/autopybind11_example.yaml")
+    response_file = find_data("bindings/pydrake/autopybind11_example.rsp")
+    headers_tar = find_data("bindings/pydrake/autopybind11_example_headers.tar")
+
+    if not os.path.isdir(output_dir):
+        os.makedirs(output_dir)
+
+    argv = [
+        sys.executable,
+        "-m",
+        "autopybind11",
+        "--stage=2",
+        "--module_name=pydrake",
+        "--castxml",
+        castxml_bin,
+        "-o",
+        output_dir,
+        "-y",
+        config_file,
+        "-rs",
+        response_file,
+    ]
+
+    # Since we're connecting a genrule with a proper binary, we must "simulate"
+    # the genfiles directory.
+    with extract_archive_tempdir(headers_tar) as headers_dir:
+        result = run(
+            argv, cwd=headers_dir, check=True, stdout=PIPE, stderr=STDOUT,
+            env=os.environ.copy()
+        )
+
+    if result.returncode != 0:
+        print(result.stdout, file=sys.stderr)
+        sys.exit(1)
+    print(f"Wrote files to: {output_dir}")
 
 
-def _help(command, my_env):
-    """Perform the --help operation (display output) and return an exitcode."""
-    process = Popen(command, stdout=PIPE, stderr=STDOUT,
-                    env=my_env)
-    stdout, _ = process.communicate()
-    lines = stdout.splitlines()
-    # Edit the first line to allow "--all" as a disjunction from "files...",
-    # and make one or the other required.
-    # head = re.sub(r'\[(files\.\.\.)\]', r'<\1 | --all>', lines.pop(0))
-    for line in lines:
-        print(line)
-    return process.returncode
-
-
-def main(workspace_name="drake"):
-    # Slice out our overlay command-line argument "--all".
-    argv = sys.argv[1:]
-
-    # Find the wrapped tool.
-    tool_cmds = _make_autopybind_command()
-    my_env = os.environ.copy()
-    my_env["PYTHONPATH"] = find_data(_AUTOPYBIND) + \
-        os.pathsep + my_env["PYTHONPATH"]
-    # Process --help.
-    if "--help" in argv or "-help" in argv:
-        return _help(tool_cmds + argv, my_env)
-    else:
-        # Set some defaults:
-        # Stage should always be 2
-        argv.append("-s")
-        argv.append("2")
-        # Sensible defaults
-        argv.append("--module_name")
-        argv.append("drake")
-        out_dir = os.path.join(os.getcwd(), "autopybind11-out")
-        if not os.path.isdir(out_dir):
-            os.makedirs(out_dir)
-        argv.append("-o")
-
-        # Find CastXML as a repository
-        argv.append(out_dir)
-        argv.append("--castxml")
-        argv.append(find_data("external/castxml/castxml_bin"))
-
-        process = Popen(tool_cmds + argv, stdout=PIPE, stderr=STDOUT,
-                        env=my_env)
-        stdout, _ = process.communicate()
-        lines = stdout.splitlines()
-        for line in lines:
-            print(line)
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--output_dir", type=str, required=True,
+        help="Outputs all generated artifcats this directory. Creates the "
+             "directory if it does not exist.")
+    args = parser.parse_args()
+    run_autopybind11(args.output_dir)
 
 
 if __name__ == "__main__":
-    sys.exit(main())
+    main()
