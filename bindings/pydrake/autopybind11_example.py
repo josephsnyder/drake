@@ -37,7 +37,7 @@ def run_autopybind11(output_dir):
     castxml_bin = find_data("external/castxml/castxml_bin")
     config_file = find_data("bindings/pydrake/autopybind11_example.yaml")
     response_file = find_data("bindings/pydrake/autopybind11_example.rsp")
-    headers_tar = find_data("bindings/pydrake/autopybind11_example_headers.tar")
+    headers_tar = find_data("bindings/pydrake/autopybind11_example_headers.tar")  # noqa
 
     if not os.path.isdir(output_dir):
         os.makedirs(output_dir)

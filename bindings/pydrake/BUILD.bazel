@@ -17,11 +17,11 @@ load(
     "add_pybind_coverage_data",
     "drake_pybind_cc_googletest",
     "drake_pybind_library",
+    "generate_autopybind11_rsp_file",
     "generate_pybind_coverage",
     "generate_pybind_documentation_header",
     "get_drake_py_installs",
     "get_pybind_package_info",
-    "generate_autopybind11_rsp_file",
 )
 load("//bindings/pydrake:pydrake.bzl", "add_lint_tests_pydrake")
 
@@ -56,8 +56,8 @@ drake_py_library(
 
 generate_autopybind11_rsp_file(
     name = "generate_autopybind11_rsp_file",
-    rsp_file = "autopybind11_example.rsp",
     header_archive = "autopybind11_example_headers.tar",
+    rsp_file = "autopybind11_example.rsp",
     targets = [
         "//tools/install/libdrake:drake_headers",
         "//examples/compass_gait:compass_gait",
@@ -89,8 +89,8 @@ drake_py_binary(
         "@castxml//:castxml_bin",
     ],
     deps = [
-        "@configargparse_py",
         "@autopybind11_py",
+        "@configargparse_py",
         "@pygccxml_py",
         "@toposort_py",
     ],
