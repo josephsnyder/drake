@@ -29,7 +29,6 @@ def extract_archive_tempdir(archive, *, dir=None, prefix=None):
         dir = os.environ.get("TEST_TMPDIR")
     with TemporaryDirectory(dir=dir, prefix=prefix) as tmp_dir:
         with tarfile.open(archive, "r") as tar:
-            import pdb; pdb.set_trace()
             tar.extractall(path=tmp_dir)
             yield str(tmp_dir)
 
