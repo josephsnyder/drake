@@ -7,7 +7,6 @@ load("@drake//tools/workspace/bazel_skylib:repository.bzl", "bazel_skylib_reposi
 load("@drake//tools/workspace/blas:repository.bzl", "blas_repository")
 load("@drake//tools/workspace/boost:repository.bzl", "boost_repository")
 load("@drake//tools/workspace/buildifier:repository.bzl", "buildifier_repository")  # noqa
-load("@drake//tools/workspace/bullet:repository.bzl", "bullet_repository")
 load("@drake//tools/workspace/castxml:repository.bzl", "castxml_repository")
 load("@drake//tools/workspace/cc:repository.bzl", "cc_repository")
 load("@drake//tools/workspace/ccd:repository.bzl", "ccd_repository")
@@ -113,8 +112,6 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
         boost_repository(name = "boost")
     if "buildifier" not in excludes:
         buildifier_repository(name = "buildifier", mirrors = mirrors)
-    if "bullet" not in excludes:
-        bullet_repository(name = "bullet", mirrors = mirrors)
     if "castxml" not in excludes:
         castxml_repository(name = "castxml", mirrors = mirrors)
     if "cc" not in excludes:
