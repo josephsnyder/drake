@@ -354,6 +354,11 @@ def _collect_cc_header_info(targets):
         package_headers = depset(transitive = package_headers_depsets),
     )
 
+def _quote(filename, protect = "="):
+    """Quote the filename, by escaping = by \\= and \\ by \\\\"""
+    # Taken from rules_pkg@0.3.0.
+    return filename.replace("\\", "\\\\").replace(protect, "\\" + protect)
+
 def _generate_autopybind11_rsp_file_impl(ctx):
     data = _collect_cc_header_info(ctx.attr.targets)
     rsp_content = "c_std: -std=c++17\n"
@@ -365,10 +370,13 @@ def _generate_autopybind11_rsp_file_impl(ctx):
     )
 
     args = ctx.actions.args()
-    args.add("-output")
+    # Following suite with usage here:
+    # https://github.com/bazelbuild/rules_pkg/blob/0.3.0/pkg/pkg.bzl#L106-L110
+    args.add("--output")
     args.add(ctx.outputs.header_archive)
-    args.add("--file")
-    args.add_all(data.package_headers)
+    for file in data.package_headers.to_list():
+        p = _quote(file.path)
+        args.add("--file={}={}".format(p, p))
 
     ctx.actions.run(
         executable = ctx.executable.build_tar,
@@ -399,7 +407,7 @@ generate_autopybind11_rsp_file = rule(
         # Bazel to communicate to our example program.
         "header_archive": attr.output(mandatory = True),
         "build_tar": attr.label(
-            default=Label("@bazel_tools//tools/build_defs/pkg:build_tar"),
+            default=Label("@rules_pkg//:build_tar"),
             cfg="host",
             executable=True,
             allow_files=True),
