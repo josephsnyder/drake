@@ -129,7 +129,7 @@ def add_default_repositories(excludes = [], mirrors = DEFAULT_MIRRORS):
     if "commons_io" not in excludes:
         commons_io_repository(name = "commons_io", mirrors = mirrors)
     if "configargparse_py" not in excludes:
-        configargparse_py_repository(name = "configargparse_py", mirrors = mirrors)
+        configargparse_py_repository(name = "configargparse_py", mirrors = mirrors)  # noqa
     if "csdp" not in excludes:
         csdp_repository(name = "csdp", mirrors = mirrors)
     if "double_conversion" not in excludes:
