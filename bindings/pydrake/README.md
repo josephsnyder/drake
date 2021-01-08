@@ -14,7 +14,7 @@ making efforts to automate the minutae. We are working with Kitware to leverage
 To output template bindings to `/tmp/autopybind11`, please run the following:
 
 ```sh
-bazel run /bindings/pydrake:autopybind11_example -- \
+bazel run //bindings/pydrake:autopybind11_example -- \
     --output_dir=/tmp/autopybind11
 ```
 

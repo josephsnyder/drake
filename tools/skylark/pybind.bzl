@@ -363,15 +363,17 @@ def _generate_autopybind11_rsp_file_impl(ctx):
         output = ctx.outputs.rsp_file,
         content = rsp_content,
     )
-    arguments = ["-output", ctx.outputs.header_archive.path,
-                 "--file"]
 
-    for file in data.package_headers.to_list():
-        arguments.append(file.path)
+    args = ctx.actions.args()
+    args.add("-output")
+    args.add(ctx.outputs.header_archive)
+    args.add("--file")
+    args.add_all(data.package_headers)
 
     ctx.actions.run(
         executable = ctx.executable.build_tar,
-        arguments = arguments,
+        arguments = [args],
+        inputs = data.package_headers,
         outputs = [ctx.outputs.header_archive],
     )
 
