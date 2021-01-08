@@ -1,7 +1,6 @@
 # -*- python -*-
 
 load("//tools/skylark:py.bzl", "py_library")
-
 load("@cc//:compiler.bzl", "COMPILER_ID")
 
 # @see bazelbuild/bazel#3493 for needing `@drake//` when loading `install`.
@@ -356,6 +355,7 @@ def _collect_cc_header_info(targets):
 
 def _quote(filename, protect = "="):
     """Quote the filename, by escaping = by \\= and \\ by \\\\"""
+
     # Taken from rules_pkg@0.3.0.
     return filename.replace("\\", "\\\\").replace(protect, "\\" + protect)
 
@@ -370,6 +370,7 @@ def _generate_autopybind11_rsp_file_impl(ctx):
     )
 
     args = ctx.actions.args()
+
     # Following suite with usage here:
     # https://github.com/bazelbuild/rules_pkg/blob/0.3.0/pkg/pkg.bzl#L106-L110
     args.add("--output")
@@ -407,10 +408,11 @@ generate_autopybind11_rsp_file = rule(
         # Bazel to communicate to our example program.
         "header_archive": attr.output(mandatory = True),
         "build_tar": attr.label(
-            default=Label("@rules_pkg//:build_tar"),
-            cfg="host",
-            executable=True,
-            allow_files=True),
+            default = Label("@rules_pkg//:build_tar"),
+            cfg = "host",
+            executable = True,
+            allow_files = True,
+        ),
     },
     implementation = _generate_autopybind11_rsp_file_impl,
     output_to_genfiles = True,
