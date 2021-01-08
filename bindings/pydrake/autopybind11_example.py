@@ -62,11 +62,13 @@ def run_autopybind11(output_dir):
     # the genfiles directory.
     with extract_archive_tempdir(headers_tar) as headers_dir:
         result = run(
-            argv, cwd=headers_dir, check=True, stdout=PIPE, stderr=STDOUT,
-            env=os.environ.copy()
+            argv, cwd=headers_dir, stdout=PIPE, stderr=STDOUT,
+            encoding="utf8",
+            env=os.environ.copy(),
         )
 
     if result.returncode != 0:
+        print(f"Failure for: {argv}", file=sys.stderr)
         print(result.stdout, file=sys.stderr)
         sys.exit(1)
     print(f"Wrote files to: {output_dir}")
