@@ -33,7 +33,7 @@ def extract_archive_tempdir(archive, *, dir=None, prefix=None):
             yield str(tmp_dir)
 
 
-def run_autopybind11(output_dir):
+def run_autopybind11(output_dir, customization_file):
     castxml_bin = find_data("external/castxml/castxml_bin")
     config_file = find_data("bindings/pydrake/autopybind11_example.yaml")
     response_file = find_data("bindings/pydrake/autopybind11_example.rsp")
@@ -57,6 +57,9 @@ def run_autopybind11(output_dir):
         "-rs",
         response_file,
     ]
+    if customization_file:
+        argv.append("-cg")
+        argv.append(find_data(customization_file))
 
     # Since we're connecting a genrule with a proper binary, we must "simulate"
     # the genfiles directory.
@@ -80,8 +83,12 @@ def main():
         "--output_dir", type=str, required=True,
         help="Outputs all generated artifcats this directory. Creates the "
              "directory if it does not exist.")
+    parser.add_argument(
+        "--config_file", type=str, required=False,
+        help="Path to the YAML file which contains customization updates"
+             "to the AutoPyBind11 code.")
     args = parser.parse_args()
-    run_autopybind11(args.output_dir)
+    run_autopybind11(args.output_dir, args.config_file)
 
 
 if __name__ == "__main__":
