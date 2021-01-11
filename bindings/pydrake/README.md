@@ -21,3 +21,19 @@ bazel run //bindings/pydrake:autopybind11_example -- \
 This is configured using the `autopybind11_example.yaml` in this directory. For more information on the `autopybind11` schema, please review its documentation:
 <br/>
 <https://gitlab.kitware.com/autopybind11/autopybind11>
+
+### Additional Customization
+
+The bazel command can take an additional argument to take advantage of a feature of AutoPyBind11
+which is used to customize the code which is generated. It does this by passing a YAML file
+with additional information and flags.  See the `Code Customziation` header within
+ [`the README`]('https://gitlab.kitware.com/autopybind11/autopybind11/-/blob/master/README.rst') for more information.
+
+The file that the script will look for is called `autopybind11_config.yaml`.
+An example run with the configuration flag added would look as follows
+
+```sh
+bazel run //bindings/pydrake:autopybind11_example -- \
+    --output_dir=/tmp/autopybind11 \
+    --config_file=bindings/pydrake/autopybind11_config.yaml
+```
