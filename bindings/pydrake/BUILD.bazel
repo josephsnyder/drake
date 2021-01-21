@@ -67,6 +67,9 @@ generate_autopybind11_rsp_file(
         "//examples/quadrotor:quadrotor_plant",
         "//examples/rimless_wheel:rimless_wheel",
         "//examples/van_der_pol:van_der_pol",
+        "@eigen",
+        "@fmt",
+        "@spdlog",
     ],
 )
 
