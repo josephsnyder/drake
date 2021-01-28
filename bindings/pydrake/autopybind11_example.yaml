@@ -30,35 +30,36 @@ files:
               AutoDiffXd:
                 inst: []
                 cust_name: "AutoDiffXd"
-  "drake/lcm/drake_lcm_interface.h":
-    namespaces:
-      drake:
-        namespaces:
-          lcm:
-            classes:
-              DrakeLcmInterface:
-                inst: [ ]
-                cust_name: DrakeLcmInterface
-              DrakeSubscriptionInterface:
-                inst: [ ]
-                cust_name: DrakeSubscriptionInterface
-  "drake/lcm/drake_lcm.h":
-    namespaces:
-      drake:
-        namespaces:
-          lcm:
-            classes:
-              DrakeLcm:
-                inst: []
-                cust_name: "DrakeLcm"
-  "drake/lcm/drake_mock_lcm.h":
-    namespaces:
-      drake:
-        namespaces:
-          lcm:
-            classes:
-              DrakeMockLcm:
-                inst: []
+  # Currently broken to externals fighting against castxml.
+  # "drake/lcm/drake_lcm_interface.h":
+  #   namespaces:
+  #     drake:
+  #       namespaces:
+  #         lcm:
+  #           classes:
+  #             DrakeLcmInterface:
+  #               inst: [ ]
+  #               cust_name: DrakeLcmInterface
+  #             DrakeSubscriptionInterface:
+  #               inst: [ ]
+  #               cust_name: DrakeSubscriptionInterface
+  # "drake/lcm/drake_lcm.h":
+  #   namespaces:
+  #     drake:
+  #       namespaces:
+  #         lcm:
+  #           classes:
+  #             DrakeLcm:
+  #               inst: []
+  #               cust_name: "DrakeLcm"
+  # "drake/lcm/drake_mock_lcm.h":
+  #   namespaces:
+  #     drake:
+  #       namespaces:
+  #         lcm:
+  #           classes:
+  #             DrakeMockLcm:
+  #               inst: []
   "drake/math/rotation_matrix.h":
     namespaces:
       drake:
@@ -131,12 +132,6 @@ files:
                 Environment:
                   inst: []
                   cust_name: Environment
-  "drake/common/symbolic_formula_cell.h":
-    namespaces:
-        drake:
-          namespaces:
-            symbolic:
-              classes:
                 Formula:
                   inst: []
                   cust_name: Formula
@@ -182,3 +177,17 @@ files:
               SystemMessageInterface:
                 inst: []
                 cust_name: SystemMessageInterface
+  "drake/geometry/render/render_engine.h":
+    namespaces:
+      drake:
+        namespaces:
+          geometry:
+            namespaces:
+              render:
+                classes:
+                  ClippingRange: {}
+                  RenderCameraCore: {}
+                  ColorRenderCamera: {}
+                  DepthRange: {}
+                  DepthRenderCamera: {}
+                  RenderEngine: {}
