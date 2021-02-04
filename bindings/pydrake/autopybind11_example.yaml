@@ -2,181 +2,136 @@
 #    https://gitlab.kitware.com/autopybind11/autopybind11/-/tree/master/Tests
 #    https://github.com/josephsnyder/drake-external-examples/tree/add_binding_example_2/drake_cmake_bindings/pydrake
 
-# files:
-#   "drake/common/random.h":
-#     namespaces:
-#       drake:
-#         classes:
-#           RandomGenerator:
-#             inst: []
-#             customization:
-#               name: RandomGenerator
-#   "drake/common/constants.h":
-#     namespaces:
-#       drake:
-#         enums:
-#           ToleranceType:
-#             customization:
-#              name: ToleranceType
-#              custom_enum_vals:
-#                kAbsolute: absolute
-#                kRelative: relative
-#   "drake/math/autodiff.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           math:
-#             classes:
-#               AutoDiffXd:
-#                 inst: []
-#                 cust_name: "AutoDiffXd"
-#   # Currently broken to externals fighting against castxml.
-#   # "drake/lcm/drake_lcm_interface.h":
-#   #   namespaces:
-#   #     drake:
-#   #       namespaces:
-#   #         lcm:
-#   #           classes:
-#   #             DrakeLcmInterface:
-#   #               inst: [ ]
-#   #               cust_name: DrakeLcmInterface
-#   #             DrakeSubscriptionInterface:
-#   #               inst: [ ]
-#   #               cust_name: DrakeSubscriptionInterface
-#   # "drake/lcm/drake_lcm.h":
-#   #   namespaces:
-#   #     drake:
-#   #       namespaces:
-#   #         lcm:
-#   #           classes:
-#   #             DrakeLcm:
-#   #               inst: []
-#   #               cust_name: "DrakeLcm"
-#   # "drake/lcm/drake_mock_lcm.h":
-#   #   namespaces:
-#   #     drake:
-#   #       namespaces:
-#   #         lcm:
-#   #           classes:
-#   #             DrakeMockLcm:
-#   #               inst: []
-#   "drake/math/rotation_matrix.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           math:
-#             classes:
-#               RotationMatrix:
-#                 inst: ["double"]
-#                 cust_name: ["RotationMatrix"]
-#               RollPitchYaw:
-#                 inst: ["double"]
-#                 cust_name: ["RollPitchYaw"]
-#   "drake/math/barycentric.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           math:
-#             classes:
-#               BarycentricMesh:
-#                 inst: []
-#                 cust_name: "BarycentricMesh"
-#   "drake/perception/point_cloud_flags.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           perception:
-#             namespaces:
-#               pc_flags:
-#                 enums:
-#                   BaseField:
-#                 classes:
-#                   Fields:
-#                     inst: []
-#                     cust_name: Fields
-#   "drake/perception/point_cloud.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           perception:
-#             classes:
-#               PointCloud:
-#                 inst: []
-#                 cust_name: PointCloud
-#   "drake/perception/depth_image_to_point_cloud.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           perception:
-#             classes:
-#               DepthImageToPointCloud:
-#                 inst: []
-#                 cust_name: DepthImageToPointCloud
-#   "drake/common/symbolic.h":
-#     namespaces:
-#         drake:
-#           namespaces:
-#             symbolic:
-#               classes:
-#                 Variable:
-#                   inst: []
-#                   cust_name: Variable
-#                 Monomial:
-#                   inst: []
-#                   cust_name: Monomial
-#                   inst: []
-#                   cust_name: Polynomial
-#                 Expression:
-#                   inst: []
-#                   cust_name: Expression
-#                 Environment:
-#                   inst: []
-#                   cust_name: Environment
-#                 Formula:
-#                   inst: []
-#                   cust_name: Formula
-#                 FormulaCell:
-#                   inst: []
-#                   cust_name: FormulaCell
-#   "drake/systems/framework/leaf_system.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           systems:
-#             classes:
-#               LeafSystem:
-#                 inst: ["double"]
-#                 cust_name: ["LeafSystem"]
-#                 exclude: ["DeclareAbstractState", "DoCalcWitnessValue"]
-#   "drake/systems/framework/system.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           systems:
-#             classes:
-#               System:
-#                 inst: ["double"]
-#                 cust_name: ["System"]
-#                 exclude: ["AddConstraint"]
-#   "drake/systems/framework/system_base.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           systems:
-#             classes:
-#               SystemBase:
-#                 inst: []
-#                 cust_name: SystemBase
-#                 exclude: ["AddInputPort","AddOutputPort"]
-#   "drake/systems/framework/framework_common.h":
-#     namespaces:
-#       drake:
-#         namespaces:
-#           systems:
-#             classes:
-#               SystemMessageInterface:
-#                 inst: []
-#                 cust_name: SystemMessageInterface
+files:
+  "drake/common/random.h":
+    namespaces:
+      drake:
+        classes:
+          RandomGenerator: {}
+  "drake/common/constants.h":
+    namespaces:
+      drake:
+        enums:
+          ToleranceType: {}
+  "drake/math/autodiff.h":
+    namespaces:
+      drake:
+        namespaces:
+          math:
+            classes:
+              AutoDiffXd: {}
+  # Currently broken to externals fighting against castxml.
+  "drake/lcm/drake_lcm_interface.h":
+    namespaces:
+      drake:
+        namespaces:
+          lcm:
+            classes:
+              DrakeLcmInterface: {}
+              DrakeSubscriptionInterface: {}
+  "drake/lcm/drake_lcm.h":
+    namespaces:
+      drake:
+        namespaces:
+          lcm:
+            classes:
+              DrakeLcm: {}
+  "drake/lcm/drake_mock_lcm.h":
+    namespaces:
+      drake:
+        namespaces:
+          lcm:
+            classes:
+              DrakeMockLcm: {}
+  "drake/math/rotation_matrix.h":
+    namespaces:
+      drake:
+        namespaces:
+          math:
+            classes:
+              RotationMatrix:
+                inst: ["double", "AutoDiffXd"]
+              RollPitchYaw:
+                inst: ["double", "AutoDiffXd"]
+  "drake/math/barycentric.h":
+    namespaces:
+      drake:
+        namespaces:
+          math:
+            classes:
+              BarycentricMesh: {}
+  "drake/perception/point_cloud_flags.h":
+    namespaces:
+      drake:
+        namespaces:
+          perception:
+            namespaces:
+              pc_flags:
+                enums:
+                  BaseField:
+                classes:
+                  Fields: {}
+  "drake/perception/point_cloud.h":
+    namespaces:
+      drake:
+        namespaces:
+          perception:
+            classes:
+              PointCloud: {}
+  "drake/perception/depth_image_to_point_cloud.h":
+    namespaces:
+      drake:
+        namespaces:
+          perception:
+            classes:
+              DepthImageToPointCloud: {}
+  "drake/common/symbolic.h":
+    namespaces:
+        drake:
+          namespaces:
+            symbolic:
+              classes:
+                Variable: {}
+                Monomial: {}
+                Expression: {}
+                Environment: {}
+                Formula: {}
+                FormulaCell: {}
+  "drake/systems/framework/leaf_system.h":
+    namespaces:
+      drake:
+        namespaces:
+          systems:
+            classes:
+              LeafSystem:
+                inst: ["double", "AutoDiffXd"]
+                cust_name: ["LeafSystem"]
+                exclude: ["DeclareAbstractState", "DoCalcWitnessValue"]
+  "drake/systems/framework/system.h":
+    namespaces:
+      drake:
+        namespaces:
+          systems:
+            classes:
+              System:
+                inst: ["double", "AutoDiffXd"]
+                cust_name: ["System"]
+                exclude: ["AddConstraint"]
+  "drake/systems/framework/system_base.h":
+    namespaces:
+      drake:
+        namespaces:
+          systems:
+            classes:
+              SystemBase:
+                exclude: ["AddInputPort","AddOutputPort"]
+  "drake/systems/framework/framework_common.h":
+    namespaces:
+      drake:
+        namespaces:
+          systems:
+            classes:
+              SystemMessageInterface: {}
   "drake/geometry/render/render_engine.h":
     namespaces:
       drake:
