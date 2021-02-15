@@ -50,9 +50,9 @@ files:
           math:
             classes:
               RotationMatrix:
-                inst: ["double", "AutoDiffXd"]
+                inst: ["double", "drake::AutoDiffXd"]
               RollPitchYaw:
-                inst: ["double", "AutoDiffXd"]
+                inst: ["double", "drake::AutoDiffXd"]
   "drake/math/barycentric.h":
     namespaces:
       drake:
@@ -104,9 +104,12 @@ files:
           systems:
             classes:
               LeafSystem:
-                inst: ["double", "AutoDiffXd"]
+                inst: ["double", "drake::AutoDiffXd", "float"]
                 cust_name: ["LeafSystem"]
-                exclude: ["DeclareAbstractState", "DoCalcWitnessValue"]
+                skiplist:
+                  member_functions:
+                    - DeclareAbstractState
+                    - DoCalcWitnessValue
   "drake/systems/framework/system.h":
     namespaces:
       drake:
@@ -114,9 +117,10 @@ files:
           systems:
             classes:
               System:
-                inst: ["double", "AutoDiffXd"]
-                cust_name: ["System"]
-                exclude: ["AddConstraint"]
+                inst: [double, drake::AutoDiffXd]
+                skiplist:
+                  member_functions:
+                    - AddConstraint
   "drake/systems/framework/system_base.h":
     namespaces:
       drake:
@@ -124,7 +128,10 @@ files:
           systems:
             classes:
               SystemBase:
-                exclude: ["AddInputPort","AddOutputPort"]
+                skiplist:
+                  member_functions:
+                    - AddInputPort
+                    - AddOutputPort
   "drake/systems/framework/framework_common.h":
     namespaces:
       drake:
