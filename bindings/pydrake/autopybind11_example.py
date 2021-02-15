@@ -74,6 +74,7 @@ def run_autopybind11(output_dir, customization_file):
         print(f"Failure for: {argv}", file=sys.stderr)
         print(result.stdout, file=sys.stderr)
         sys.exit(1)
+    print(result.stdout)
     print(f"Wrote files to: {output_dir}")
 
 
