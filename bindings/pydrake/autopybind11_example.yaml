@@ -59,7 +59,8 @@ files:
         namespaces:
           math:
             classes:
-              BarycentricMesh: {}
+              BarycentricMesh:
+                inst: ["double"]
   "drake/perception/point_cloud_flags.h":
     namespaces:
       drake:
@@ -96,6 +97,9 @@ files:
                 Expression: {}
                 Environment: {}
                 Formula: {}
+                # FormulaCell marked as class_declaration_t not a class_t
+                # Therefore, we cannot properly check for abstract.
+                # Maybe we need another?
                 FormulaCell: {}
   "drake/systems/framework/leaf_system.h":
     namespaces:
@@ -137,8 +141,10 @@ files:
       drake:
         namespaces:
           systems:
-            classes:
-              SystemMessageInterface: {}
+            namespaces:
+              internal:
+                classes:
+                  SystemMessageInterface: {}
   "drake/geometry/render/render_engine.h":
     namespaces:
       drake:
