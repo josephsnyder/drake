@@ -57,7 +57,6 @@ void apb11_pydrake_Monomial_py_register(py::module &m) {
  */")
     
     .def("__imul__", static_cast<::drake::symbolic::Monomial & ( ::drake::symbolic::Monomial::* )( ::drake::symbolic::Monomial const & )>(&::drake::symbolic::Monomial::operator*=), py::arg("m"), "/** Returns this monomial multiplied by @p m. */")
-    .def("__neq__", static_cast<bool ( ::drake::symbolic::Monomial::* )( ::drake::symbolic::Monomial const & )const>(&::drake::symbolic::Monomial::operator!=), py::arg("m"), "/** Checks if this monomial and @p m do not represent the same monomial. */")
     .def("__str__", +[](::drake::symbolic::Monomial const & m) {
         std::ostringstream oss;
         oss << m;
@@ -66,5 +65,6 @@ void apb11_pydrake_Monomial_py_register(py::module &m) {
         return s;})    .def("__eq__", static_cast<bool ( ::drake::symbolic::Monomial::* )( ::drake::symbolic::Monomial const & )const>(&::drake::symbolic::Monomial::operator==), py::arg("m"), "/** Checks if this monomial and @p m represent the same monomial. Two \
  * monomials are equal iff they contain the same variable raised to the same \
  * exponent. */")
+    .def("__neq__", static_cast<bool ( ::drake::symbolic::Monomial::* )( ::drake::symbolic::Monomial const & )const>(&::drake::symbolic::Monomial::operator!=), py::arg("m"), "/** Checks if this monomial and @p m do not represent the same monomial. */")
     ;
 }
