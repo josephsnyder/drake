@@ -97,10 +97,13 @@ files:
                 Expression: {}
                 Environment: {}
                 Formula: {}
-                # FormulaCell marked as class_declaration_t not a class_t
-                # Therefore, we cannot properly check for abstract.
-                # Maybe we need another?
-                FormulaCell: {}
+                # TODO(eric.cousineau): FormulaCell is not important for Python
+                # public API at the moment. No need to fix this.
+                # # TODO(joseph.snyder): FormulaCell marked as
+                # # class_declaration_t not a class_t
+                # # Therefore, we cannot properly check for abstract.
+                # # Maybe we need another?
+                # FormulaCell: {}
   "drake/systems/framework/leaf_system.h":
     namespaces:
       drake:

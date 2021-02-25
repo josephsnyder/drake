@@ -1,7 +1,7 @@
 + echo /home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11/output.txt
 /home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11/output.txt
 + bazel build //bindings/pydrake:documentation_pybind.h
-INFO: Invocation ID: 652d2ca0-bfc4-4411-9511-4224ffb8b8ae
+INFO: Invocation ID: 07ed261a-5de5-4b8e-8c02-604c3771ddc7
 Loading: 
 Loading: 0 packages loaded
 INFO: Build option --run_under has changed, discarding analysis cache.
@@ -11,23 +11,23 @@ INFO: Found 1 target...
 [0 / 2] [Prepa] BazelWorkspaceStatusAction stable-status.txt
 Target //bindings/pydrake:documentation_pybind.h up-to-date:
   bazel-bin/bindings/pydrake/documentation_pybind.h
-INFO: Elapsed time: 1.591s, Critical Path: 0.04s
+INFO: Elapsed time: 1.442s, Critical Path: 0.03s
 INFO: 1 process: 1 internal.
 INFO: Build completed successfully, 1 total action
 INFO: Build completed successfully, 1 total action
 + cat ./bazel-bin/bindings/pydrake/documentation_pybind.h
 + bazel run '--run_under=env PYTHONUNBUFFERED=1' //bindings/pydrake:autopybind11_example -- --debug --output_dir=/home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11
-INFO: Invocation ID: 677d651c-825b-488f-8497-2607064c83b7
+INFO: Invocation ID: 21c72dc8-e997-4332-8f76-15b317df14f7
 Loading: 
 Loading: 0 packages loaded
 INFO: Build option --run_under has changed, discarding analysis cache.
 Analyzing: target //bindings/pydrake:autopybind11_example (0 packages loaded, 0 targets configured)
 INFO: Analyzed target //bindings/pydrake:autopybind11_example (0 packages loaded, 20288 targets configured).
 INFO: Found 1 target...
-[0 / 3] [Prepa] BazelWorkspaceStatusAction stable-status.txt
+[0 / 2] [Prepa] BazelWorkspaceStatusAction stable-status.txt
 Target //bindings/pydrake:autopybind11_example up-to-date:
   bazel-bin/bindings/pydrake/autopybind11_example
-INFO: Elapsed time: 1.584s, Critical Path: 0.02s
+INFO: Elapsed time: 1.400s, Critical Path: 0.02s
 INFO: 1 process: 1 internal.
 INFO: Build completed successfully, 1 total action
 INFO: Running command line: /bin/bash -c 'env PYTHONUNBUFFERED=1 bazel-bin/bindings/pydrake/autopybind11_example --debug '\''--output_dir=/home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11'\'''
@@ -36,7 +36,7 @@ Running autopybind11...
 + /usr/bin/python3 -m autopybind11 --stage=2 --module_name=pydrake --castxml /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/drake/external/castxml/castxml_bin -o /home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11 -y /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/drake/bindings/pydrake/autopybind11_example.yaml -rs /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/drake/bindings/pydrake/autopybind11_example.rsp
 Extracted:
   archive: /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/drake/bindings/pydrake/autopybind11_example_headers.tar
-  tmp_dir: /tmp/tmp2adifye0
+  tmp_dir: /tmp/tmpfrnwjibv
 /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/pygccxml_py/pygccxml/parser/config.py:207: RuntimeWarning: include directory("lcmtypes") does not exist.
   warnings.warn(msg, RuntimeWarning)
 /mnt/ssd2/eacousineau/cache/bazel/_bazel_eacousineau/b2e564e32f8ad0fdcd9d9d860a1def41/execroot/drake/bazel-out/k8-opt/bin/bindings/pydrake/autopybind11_example.runfiles/pygccxml_py/pygccxml/parser/config.py:207: RuntimeWarning: include directory("bazel-out/k8-opt/bin/lcmtypes") does not exist.
@@ -963,8 +963,6 @@ Extracted:
   warnings.warn(msg, RuntimeWarning)
 Warning: Class ShapeReifier  was not found in current module or any linked module
 Warning: Class System<float>  was not found in current module or any linked module
-Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
-Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
 Warning member get_context_sizes will not be bound due to unmet dependency ContextSizes
 Warning member get_mutable_context_sizes will not be bound due to unmet dependency ContextSizes
 Warning member get_context_sizes will not be bound due to unmet dependency ContextSizes
@@ -972,10 +970,6 @@ Warning member context_sizes_ will not be bound due to unmet dependency ContextS
 Warning member get_context_sizes will not be bound due to unmet dependency ContextSizes
 Warning member get_mutable_context_sizes will not be bound due to unmet dependency ContextSizes
 Warning member get_context_sizes will not be bound due to unmet dependency ContextSizes
-Warning member type_ will not be bound due to unmet dependency Type
-Warning member get_type will not be bound due to unmet dependency Type
-Warning: All instances of FormulaCell were unable to be found
-There were 1 names to find but 0 class(es) were returned
 Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
 Warning: Class LeafSystem<float> will not have inheritance relationship with class System<float> in binding code.
 
@@ -993,15 +987,19 @@ Warning member DeclareVectorInputPort will not be bound due to unmet dependency 
 Warning member DeclareAbstractInputPort will not be bound due to unmet dependency InputPort<float>
 Warning member DeclareVectorInputPort will not be bound due to unmet dependency InputPort<float>
 Warning member DeclareAbstractInputPort will not be bound due to unmet dependency InputPort<float>
+Warning: Class RenderEngine will not have inheritance relationship with class ShapeReifier in binding code.
+
+                                Unable to locate class definition.
+Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
+Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
+Warning member type_ will not be bound due to unmet dependency Type
+Warning member get_type will not be bound due to unmet dependency Type
 Warning: All instances of AutoDiffXd were unable to be found
 There were 1 names to find but 0 class(es) were returned
 Warning member Accept will not be bound due to unmet dependency SystemVisitor<double>
 Warning member Convert will not be bound due to unmet dependency Image<drake::systems::sensors::PixelType::kDepth16U>
-Warning: Class RenderEngine will not have inheritance relationship with class ShapeReifier in binding code.
-
-                                Unable to locate class definition.
 
 
-autopybind11 run time: 78.0090s
+autopybind11 run time: 86.6533s
 
 Wrote files to: /home/eacousineau/proj/tri/repo/branches/drake/master/drake/tmp/autopybind11
