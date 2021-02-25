@@ -22,6 +22,16 @@ This is configured using the `autopybind11_example.yaml` in this directory. For 
 <br/>
 <https://gitlab.kitware.com/autopybind11/autopybind11>
 
+To debug:
+
+```sh
+env PYTHONUNBUFFERED=1 \
+    bazel run //bindings/pydrake:autopybind11_example -- \
+    --debug \
+    --output_dir=/tmp/autopybind11 \
+    2>&1 | tee /tmp/autopybind11_output.txt
+```
+
 ### Additional Customization
 
 The bazel command can take an additional argument to take advantage of a feature of AutoPyBind11
