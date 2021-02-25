@@ -22,14 +22,18 @@ This is configured using the `autopybind11_example.yaml` in this directory. For 
 <br/>
 <https://gitlab.kitware.com/autopybind11/autopybind11>
 
-To debug:
+## Debugging
+
+To run, capture all output, and version control:
 
 ```sh
-env PYTHONUNBUFFERED=1 \
-    bazel run //bindings/pydrake:autopybind11_example -- \
+cd drake
+rm -rf ${PWD}/tmp/autopybind11
+bazel run --run_under="env PYTHONUNBUFFERED=1" \
+    //bindings/pydrake:autopybind11_example -- \
     --debug \
-    --output_dir=/tmp/autopybind11 \
-    2>&1 | tee /tmp/autopybind11_output.txt
+    --output_dir=${PWD}/tmp/autopybind11 \
+    2>&1 | tee ${PWD}/tmp/autopybind11/output.txt
 ```
 
 ### Additional Customization
