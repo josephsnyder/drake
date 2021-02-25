@@ -59,6 +59,16 @@ are indexed using a SubsystemIndex; there is no separate SubcontextIndex since \
 the numbering must be identical. */");
 
   SystemBase
+      .def_static(
+          "all_sources_ticket",
+          static_cast<::drake::systems::DependencyTicket (*)()>(
+              &::drake::systems::SystemBase::all_sources_ticket),
+          "/** Returns a ticket indicating dependence on every possible independent \
+source value, including time, accuracy, state, input ports, and parameters \
+(but not cache entries). This is the default dependency for computations that \
+have not specified anything more refined. It is equivalent to the set \
+`{all_sources_except_input_ports_ticket(), all_input_ports_ticket()}`. \
+@see cache_entry_ticket() to obtain a ticket for a cache entry. */")
       .def(
           "GetDirectFeedthroughs",
           static_cast<
@@ -257,16 +267,6 @@ by `index`. \
           "/** Returns a ticket indicating dependence on _all_ input ports u of this \
 system. \
 @see input_port_ticket() to obtain a ticket for just one input port. */")
-      .def_static(
-          "all_sources_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::all_sources_ticket),
-          "/** Returns a ticket indicating dependence on every possible independent \
-source value, including time, accuracy, state, input ports, and parameters \
-(but not cache entries). This is the default dependency for computations that \
-have not specified anything more refined. It is equivalent to the set \
-`{all_sources_except_input_ports_ticket(), all_input_ports_ticket()}`. \
-@see cache_entry_ticket() to obtain a ticket for a cache entry. */")
       .def(
           "cache_entry_ticket",
           static_cast<::drake::systems::DependencyTicket (
@@ -524,18 +524,6 @@ LeafSystem::DeclareImplicitTimeDerivativesResidualSize(). */")
            py::arg("context"),
            "/** Checks whether the given context was created for this system. \
 @note This method is sufficiently fast for performance sensitive code. */")
-      .def("AddInputPort",
-           [](::drake::systems::SystemBase &self,
-              drake::systems::InputPortBase port) {
-             self.AddInputPort(
-                 std::make_unique<drake::systems::InputPortBase>(port));
-           })
-      .def("AddOutputPort",
-           [](::drake::systems::SystemBase &self,
-              drake::systems::OutputPortBase port) {
-             self.AddOutputPort(
-                 std::make_unique<drake::systems::OutputPortBase>(port));
-           })
       .def(
           "NextInputPortName",
           static_cast<::std::string (::drake::systems::SystemBase::*)(
@@ -560,6 +548,18 @@ from the next available input port index. \
 given name if it isn't kUseDefaultName, otherwise making up a name like " y3 " \
 from the next available output port index. \
 @pre `given_name` must not be empty. */")
+      .def("AddInputPort",
+           [](::drake::systems::SystemBase &self,
+              drake::systems::InputPortBase port) {
+             self.AddInputPort(
+                 std::make_unique<drake::systems::InputPortBase>(port));
+           })
+      .def("AddOutputPort",
+           [](::drake::systems::SystemBase &self,
+              drake::systems::OutputPortBase port) {
+             self.AddOutputPort(
+                 std::make_unique<drake::systems::OutputPortBase>(port));
+           })
       .def(
           "AddDiscreteStateGroup",
           static_cast<void (::drake::systems::SystemBase::*)(

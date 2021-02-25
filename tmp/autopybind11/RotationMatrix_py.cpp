@@ -313,16 +313,18 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 /// @returns an AngleAxis with `0 <= theta <= pi` and a unit vector `lambda`.")
 
       .def(
-          "__mul__",
-          static_cast<::Eigen::Matrix<double, 3, 1, 0, 3, 1> (
-              ::drake::math::RotationMatrix<double>::*)(
-              ::Eigen::Matrix<double, 3, 1, 0, 3, 1> const &) const>(
-              &::drake::math::RotationMatrix<double>::operator*),
-          py::arg("v_B"),
-          "/// Calculates `this` rotation matrix `R_AB` multiplied by an arbitrary \
-/// Vector3 expressed in the B frame. \
-/// @param[in] v_B 3x1 vector that post-multiplies `this`. \
-/// @returns 3x1 vector `v_A = R_AB * v_B`.")
+          "__imul__",
+          static_cast<::drake::math::RotationMatrix<double> &(
+              ::drake::math::RotationMatrix<
+                  double>::*)(::drake::math::RotationMatrix<double> const &)>(
+              &::drake::math::RotationMatrix<double>::operator*=),
+          py::arg("other"),
+          "/// In-place multiply of `this` rotation matrix `R_AB` by `other` rotation \
+/// matrix `R_BC`.  On return, `this` is set to equal `R_AB * R_BC`. \
+/// @param[in] other %RotationMatrix that post-multiplies `this`. \
+/// @returns `this` rotation matrix which has been multiplied by `other`. \
+/// @note It is possible (albeit improbable) to create an invalid rotation \
+/// matrix by accumulating round-off error with a large number of multiplies.")
       .def(
           "__mul__",
           static_cast<::drake::math::RotationMatrix<double> (
@@ -337,18 +339,16 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 /// @note It is possible (albeit improbable) to create an invalid rotation \
 /// matrix by accumulating round-off error with a large number of multiplies.")
       .def(
-          "__imul__",
-          static_cast<::drake::math::RotationMatrix<double> &(
-              ::drake::math::RotationMatrix<
-                  double>::*)(::drake::math::RotationMatrix<double> const &)>(
-              &::drake::math::RotationMatrix<double>::operator*=),
-          py::arg("other"),
-          "/// In-place multiply of `this` rotation matrix `R_AB` by `other` rotation \
-/// matrix `R_BC`.  On return, `this` is set to equal `R_AB * R_BC`. \
-/// @param[in] other %RotationMatrix that post-multiplies `this`. \
-/// @returns `this` rotation matrix which has been multiplied by `other`. \
-/// @note It is possible (albeit improbable) to create an invalid rotation \
-/// matrix by accumulating round-off error with a large number of multiplies.");
+          "__mul__",
+          static_cast<::Eigen::Matrix<double, 3, 1, 0, 3, 1> (
+              ::drake::math::RotationMatrix<double>::*)(
+              ::Eigen::Matrix<double, 3, 1, 0, 3, 1> const &) const>(
+              &::drake::math::RotationMatrix<double>::operator*),
+          py::arg("v_B"),
+          "/// Calculates `this` rotation matrix `R_AB` multiplied by an arbitrary \
+/// Vector3 expressed in the B frame. \
+/// @param[in] v_B 3x1 vector that post-multiplies `this`. \
+/// @returns 3x1 vector `v_A = R_AB * v_B`.");
 
   py::class_<
       ::drake::math::RotationMatrix<Eigen::AutoDiffScalar<Eigen::VectorXd>>>
@@ -688,20 +688,20 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 /// @returns an AngleAxis with `0 <= theta <= pi` and a unit vector `lambda`.")
 
       .def(
-          "__mul__",
+          "__imul__",
           static_cast<::drake::math::RotationMatrix<
-              Eigen::AutoDiffScalar<Eigen::VectorXd>> (
+              Eigen::AutoDiffScalar<Eigen::VectorXd>> &(
               ::drake::math::RotationMatrix<
-                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::*)(
-              ::drake::math::RotationMatrix<
-                  Eigen::AutoDiffScalar<Eigen::VectorXd>> const &) const>(
+                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+                  *)(::drake::math::RotationMatrix<
+                     Eigen::AutoDiffScalar<Eigen::VectorXd>> const &)>(
               &::drake::math::RotationMatrix<
-                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::operator*),
+                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::operator*=),
           py::arg("other"),
-          "/// Calculates `this` rotation matrix `R_AB` multiplied by `other` rotation \
-/// matrix `R_BC`, returning the composition `R_AB * R_BC`. \
+          "/// In-place multiply of `this` rotation matrix `R_AB` by `other` rotation \
+/// matrix `R_BC`.  On return, `this` is set to equal `R_AB * R_BC`. \
 /// @param[in] other %RotationMatrix that post-multiplies `this`. \
-/// @returns rotation matrix that results from `this` multiplied by `other`. \
+/// @returns `this` rotation matrix which has been multiplied by `other`. \
 /// @note It is possible (albeit improbable) to create an invalid rotation \
 /// matrix by accumulating round-off error with a large number of multiplies.")
       .def(
@@ -720,20 +720,20 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 /// @param[in] v_B 3x1 vector that post-multiplies `this`. \
 /// @returns 3x1 vector `v_A = R_AB * v_B`.")
       .def(
-          "__imul__",
+          "__mul__",
           static_cast<::drake::math::RotationMatrix<
-              Eigen::AutoDiffScalar<Eigen::VectorXd>> &(
+              Eigen::AutoDiffScalar<Eigen::VectorXd>> (
               ::drake::math::RotationMatrix<
-                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::
-                  *)(::drake::math::RotationMatrix<
-                     Eigen::AutoDiffScalar<Eigen::VectorXd>> const &)>(
+                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::*)(
+              ::drake::math::RotationMatrix<
+                  Eigen::AutoDiffScalar<Eigen::VectorXd>> const &) const>(
               &::drake::math::RotationMatrix<
-                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::operator*=),
+                  Eigen::AutoDiffScalar<Eigen::VectorXd>>::operator*),
           py::arg("other"),
-          "/// In-place multiply of `this` rotation matrix `R_AB` by `other` rotation \
-/// matrix `R_BC`.  On return, `this` is set to equal `R_AB * R_BC`. \
+          "/// Calculates `this` rotation matrix `R_AB` multiplied by `other` rotation \
+/// matrix `R_BC`, returning the composition `R_AB * R_BC`. \
 /// @param[in] other %RotationMatrix that post-multiplies `this`. \
-/// @returns `this` rotation matrix which has been multiplied by `other`. \
+/// @returns rotation matrix that results from `this` multiplied by `other`. \
 /// @note It is possible (albeit improbable) to create an invalid rotation \
 /// matrix by accumulating round-off error with a large number of multiplies.");
 }
