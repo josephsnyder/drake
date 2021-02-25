@@ -8,8 +8,9 @@ Please see the neighboring README.md for more information.
 from contextlib import contextmanager
 import argparse
 import tarfile
-from tempfile import TemporaryDirectory
+from tempfile import TemporaryDirectory, mkdtemp
 import os
+import shlex
 import sys
 from subprocess import run, PIPE, STDOUT
 
@@ -19,7 +20,17 @@ from drake.tools.lint.find_data import find_data
 
 
 @contextmanager
-def extract_archive_tempdir(archive, *, dir=None, prefix=None):
+def debuggable_temporary_directory(*, dir, prefix, debug):
+    if debug:
+        tmp_dir = mkdtemp(prefix=prefix, dir=dir)
+        yield tmp_dir
+    else:
+        with TemporaryDirectory(dir=dir, prefix=prefix) as tmp_dir:
+            yield str(tmp_dir)
+
+
+@contextmanager
+def extract_archive_tempdir(archive, *, dir=None, prefix=None, debug=False):
     """
     Extracts an archive to a temporary directory.
 
@@ -27,13 +38,27 @@ def extract_archive_tempdir(archive, *, dir=None, prefix=None):
     """
     if dir is None:
         dir = os.environ.get("TEST_TMPDIR")
-    with TemporaryDirectory(dir=dir, prefix=prefix) as tmp_dir:
+    with debuggable_temporary_directory(dir=dir, prefix=prefix, debug=debug) as tmp_dir:  # noqa
         with tarfile.open(archive, "r") as tar:
             tar.extractall(path=tmp_dir)
+            if debug:
+                eprint(f"Extracted:")
+                eprint(f"  archive: {archive}")
+                eprint(f"  tmp_dir: {tmp_dir}")
             yield str(tmp_dir)
 
 
-def run_autopybind11(output_dir, customization_file):
+def shlex_join(argv):
+    # TODO(eric.cousineau): Replace this with `shlex.join` when we exclusively
+    # use Python>=3.8.
+    return " ".join(map(shlex.quote, argv))
+
+
+def eprint(s):
+    print(s, file=sys.stderr)
+
+
+def run_autopybind11(output_dir, customization_file, debug):
     castxml_bin = find_data("external/castxml/castxml_bin")
     config_file = find_data("bindings/pydrake/autopybind11_example.yaml")
     response_file = find_data("bindings/pydrake/autopybind11_example.rsp")
@@ -61,9 +86,12 @@ def run_autopybind11(output_dir, customization_file):
         argv.append("-cg")
         argv.append(find_data(customization_file))
 
+    print("Running autopybind11...")
+    if debug:
+        eprint(f"+ {shlex_join(argv)}")
     # Since we're connecting a genrule with a proper binary, we must "simulate"
     # the genfiles directory.
-    with extract_archive_tempdir(headers_tar) as headers_dir:
+    with extract_archive_tempdir(headers_tar, debug=debug) as headers_dir:
         result = run(
             argv, cwd=headers_dir, stdout=PIPE, stderr=STDOUT,
             encoding="utf8",
@@ -88,8 +116,11 @@ def main():
         "--config_file", type=str, required=False,
         help="Path to the YAML file which contains customization updates"
              "to the AutoPyBind11 code.")
+    parser.add_argument(
+        "--debug", action="store_true",
+        help="Include verbose output and keep intermediate articats")
     args = parser.parse_args()
-    run_autopybind11(args.output_dir, args.config_file)
+    run_autopybind11(args.output_dir, args.config_file, args.debug)
 
 
 if __name__ == "__main__":
