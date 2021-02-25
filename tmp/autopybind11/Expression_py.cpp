@@ -205,24 +205,24 @@ symbolic::Expression can be used as a scalar type of Eigen types. \
     .def_static("E", static_cast<::drake::symbolic::Expression (*)(  )>(&::drake::symbolic::Expression::E), "/** Return e, the base of natural logarithms. */")
     .def_static("NaN", static_cast<::drake::symbolic::Expression (*)(  )>(&::drake::symbolic::Expression::NaN), "/** Returns NaN (Not-a-Number). */")
     
-    .def("__sub__", static_cast<::drake::symbolic::Expression ( ::drake::symbolic::Expression::* )( int )>(&::drake::symbolic::Expression::operator--), py::arg("arg0"), "/** Provides postfix decrement operator (i.e. x--). */")
-    .def("__itruediv__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs/=rhs; })
-    .def("__truediv__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs/rhs; })
-    .def("__iadd__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs+=rhs; })
-    .def("__add__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs+rhs; })
-    .def("__sub__", static_cast<::drake::symbolic::Expression & ( ::drake::symbolic::Expression::* )(  )>(&::drake::symbolic::Expression::operator--), "/** Provides prefix decrement operator (i.e. --x). */")
+    .def("__mul__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs*rhs; })
+    .def("__add__", static_cast<::drake::symbolic::Expression ( ::drake::symbolic::Expression::* )( int )>(&::drake::symbolic::Expression::operator++), py::arg("arg0"), "/** Provides postfix increment operator (i.e. x++). */")
+        .def("__add__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs+rhs; })
     .def("__isub__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs-=rhs; })
-        .def("__str__", +[](::drake::symbolic::Expression const & e) {
+    .def("__sub__", +[](::drake::symbolic::Expression const & e){ return e; })
+    .def("__imul__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs*=rhs; })
+    .def("__add__", static_cast<::drake::symbolic::Expression & ( ::drake::symbolic::Expression::* )(  )>(&::drake::symbolic::Expression::operator++), "/** Provides prefix increment operator (i.e. ++x). */")
+    .def("__add__", +[](::drake::symbolic::Expression const & e){ return e; })
+    .def("__sub__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs-rhs; })
+    .def("__itruediv__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs/=rhs; })
+    .def("__str__", +[](::drake::symbolic::Expression const & e) {
         std::ostringstream oss;
         oss << e;
         std::string s(oss.str());
 
-        return s;})    .def("__mul__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs*rhs; })
-    .def("__add__", static_cast<::drake::symbolic::Expression ( ::drake::symbolic::Expression::* )( int )>(&::drake::symbolic::Expression::operator++), py::arg("arg0"), "/** Provides postfix increment operator (i.e. x++). */")
-    .def("__sub__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs-rhs; })
-    .def("__imul__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs*=rhs; })
-    .def("__add__", static_cast<::drake::symbolic::Expression & ( ::drake::symbolic::Expression::* )(  )>(&::drake::symbolic::Expression::operator++), "/** Provides prefix increment operator (i.e. ++x). */")
-    .def("__sub__", +[](::drake::symbolic::Expression const & e){ return e; })
-    .def("__add__", +[](::drake::symbolic::Expression const & e){ return e; })
+        return s;})    .def("__sub__", static_cast<::drake::symbolic::Expression ( ::drake::symbolic::Expression::* )( int )>(&::drake::symbolic::Expression::operator--), py::arg("arg0"), "/** Provides postfix decrement operator (i.e. x--). */")
+    .def("__sub__", static_cast<::drake::symbolic::Expression & ( ::drake::symbolic::Expression::* )(  )>(&::drake::symbolic::Expression::operator--), "/** Provides prefix decrement operator (i.e. --x). */")
+    .def("__iadd__", +[](::drake::symbolic::Expression & lhs,::drake::symbolic::Expression const & rhs){ return lhs+=rhs; })
+    .def("__truediv__", +[](::drake::symbolic::Expression lhs,::drake::symbolic::Expression const & rhs){ return lhs/rhs; })
     ;
 }

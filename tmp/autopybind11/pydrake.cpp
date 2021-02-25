@@ -15,7 +15,6 @@ py::module apb11_pydrake_systems_py_register(py::module &model);
 py::module apb11_pydrake_internal_py_register(py::module &model);
 py::module apb11_pydrake_geometry_py_register(py::module &model);
 py::module apb11_pydrake_render_py_register(py::module &model);
-void apb11_pydrake_FormulaCell_py_register(py::module &model);
 void apb11_pydrake_AutoDiffXd_py_register(py::module &model);
 void apb11_pydrake_RandomGenerator_py_register(py::module &model);
 void apb11_pydrake_ClippingRange_py_register(py::module &model);
@@ -63,7 +62,6 @@ PYBIND11_EXPORT void apb11_pydrake_register_types(py::module &model) {
   auto internal = apb11_pydrake_internal_py_register(systems);
   auto geometry = apb11_pydrake_geometry_py_register(drake);
   auto render = apb11_pydrake_render_py_register(geometry);
-  apb11_pydrake_FormulaCell_py_register(symbolic);
   apb11_pydrake_AutoDiffXd_py_register(math);
   apb11_pydrake_RandomGenerator_py_register(drake);
   apb11_pydrake_ClippingRange_py_register(render);

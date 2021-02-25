@@ -33,18 +33,18 @@ void apb11_pydrake_Fields_py_register(py::module &m) {
     .def("contains", static_cast<bool ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::contains), py::arg("rhs"), "/// Returns whether this set of fields contains (is a superset of) `rhs`.")
     
     .def("__and__", static_cast<::drake::perception::pc_flags::Fields ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator&), py::arg("rhs"), "/// Provides intersection.")
-    .def("__eq__", static_cast<bool ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator==), py::arg("rhs"), "")
-        .def("__neq__", static_cast<bool ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator!=), py::arg("rhs"), "")
-    .def("__ior__", static_cast<::drake::perception::pc_flags::Fields & ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )>(&::drake::perception::pc_flags::Fields::operator|=), py::arg("rhs"), "/// Provides in-place union. \
-/// @throws std::runtime_error if multiple non-None `DescriptorType`s are \
-/// specified.")
+    .def("__iand__", static_cast<::drake::perception::pc_flags::Fields & ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )>(&::drake::perception::pc_flags::Fields::operator&=), py::arg("rhs"), "/// Provides in-place intersection.")
+    .def("__or__", static_cast<::drake::perception::pc_flags::Fields ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator|), py::arg("rhs"), "/// Provides union. \
+/// @see operator|= for preconditions.")
     .def("__str__", +[](::drake::perception::pc_flags::Fields const & rhs) {
         std::ostringstream oss;
         oss << rhs;
         std::string s(oss.str());
 
-        return s;})    .def("__iand__", static_cast<::drake::perception::pc_flags::Fields & ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )>(&::drake::perception::pc_flags::Fields::operator&=), py::arg("rhs"), "/// Provides in-place intersection.")
-    .def("__or__", static_cast<::drake::perception::pc_flags::Fields ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator|), py::arg("rhs"), "/// Provides union. \
-/// @see operator|= for preconditions.")
+        return s;})    .def("__neq__", static_cast<bool ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator!=), py::arg("rhs"), "")
+        .def("__eq__", static_cast<bool ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )const>(&::drake::perception::pc_flags::Fields::operator==), py::arg("rhs"), "")
+    .def("__ior__", static_cast<::drake::perception::pc_flags::Fields & ( ::drake::perception::pc_flags::Fields::* )( ::drake::perception::pc_flags::Fields const & )>(&::drake::perception::pc_flags::Fields::operator|=), py::arg("rhs"), "/// Provides in-place union. \
+/// @throws std::runtime_error if multiple non-None `DescriptorType`s are \
+/// specified.")
     ;
 }
