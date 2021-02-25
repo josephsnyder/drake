@@ -198,7 +198,7 @@ void VerifyCylinderMeshWithMa(const VolumeMesh<double>& mesh,
   //     each tetrahedron has at least one interior vertex.
   std::vector<VolumeVertexIndex> boundary_vertices =
       CollectUniqueVertices(IdentifyBoundaryFaces(mesh.tetrahedra()));
-  for (const VolumeElement tetrahedron : mesh.tetrahedra()) {
+  for (const VolumeElement& tetrahedron : mesh.tetrahedra()) {
     bool tetrahedron_has_an_interior_vertex = false;
     for (int i = 0;
          i < mesh.kVertexPerElement && !tetrahedron_has_an_interior_vertex;
@@ -438,38 +438,27 @@ GTEST_TEST(MakeCylinderVolumeMesh, EulerCharacteristic) {
 }
 
 // Smoke test only. Assume correctness of MakeCylinderVolumeMesh() and
-// ConvertVolumeToSurfaceMesh(). The resolution_hint larger than √2 times the
-// radius of the cylinder produces a rectangular prism with 24 triangles and
-// 14 vertices, which is the coarsest surface mesh that our algorithm can
-// produce. The positions (● in the picture below) of the 14 vertices look
+// ConvertVolumeToSurfaceMesh(). The resolution_hint 3 times the
+// radius of the cylinder produces a triangular prism with 12 triangles and
+// 8 vertices, which is the coarsest surface mesh that our algorithm can
+// produce. The positions (● in the picture below) of the 8 vertices look
 // like this:
 //
 //                +Z   -X
 //                 |   /
-//                 |  ●
-//                 | /
+//                 |  /
+//          ●      | /    ●
 //                 |/
-//  -Y-----●-------●-------●---+Y
+//  -Y-------------●-----------+Y
 //                /|
 //               / |
 //              ●  |
 //             /   |
-//           +X    |   -X
-//                 |   /
-//                 |  ●
-//                 | /
+//           +X    |  -X
+//                 |  /
+//          ●      | /    ●
 //                 |/
-//  -Y-----●-------+-------●---+Y
-//                /|
-//               / |
-//              ●  |
-//             /   |
-//           +X    |    -X
-//                 |   /
-//                 |  ●
-//                 | /
-//                 |/
-//  -Y-----●-------●-------●---+Y
+//  -Y-------------●-----------+Y
 //                /|
 //               / |
 //              ●  |
@@ -480,12 +469,12 @@ GTEST_TEST(MakeCylinderVolumeMesh, EulerCharacteristic) {
 GTEST_TEST(MakeCylinderSurfaceMesh, GenerateSurface) {
   const double radius = 1.0;
   const double length = 2.0;
-  const double resolution_hint = 1.5;
+  const double resolution_hint = 3.0;
   const Cylinder cylinder(radius, length);
   SurfaceMesh<double> surface_mesh =
       MakeCylinderSurfaceMesh<double>(cylinder, resolution_hint);
-  EXPECT_EQ(surface_mesh.num_faces(), 24);
-  EXPECT_EQ(surface_mesh.num_vertices(), 14);
+  EXPECT_EQ(surface_mesh.num_faces(), 12);
+  EXPECT_EQ(surface_mesh.num_vertices(), 8);
 }
 
 }  // namespace
