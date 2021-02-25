@@ -121,7 +121,7 @@ files:
           systems:
             classes:
               System:
-                inst: [double, drake::AutoDiffXd]
+                inst: [double, "drake::AutoDiffXd"]
                 skiplist:
                   member_functions:
                     - AddConstraint
