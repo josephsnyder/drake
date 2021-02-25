@@ -13,6 +13,7 @@ import os
 import shlex
 import sys
 from subprocess import run, PIPE, STDOUT
+import time
 
 # TODO(eric.cousineau): Use Bazel's runfiles / Rlocation for proper resource
 # finding.
@@ -87,22 +88,29 @@ def run_autopybind11(output_dir, customization_file, debug):
         argv.append(find_data(customization_file))
 
     print("Running autopybind11...")
+    cmd = shlex_join(argv)
     if debug:
-        eprint(f"+ {shlex_join(argv)}")
+        eprint(f"+ {cmd}")
     # Since we're connecting a genrule with a proper binary, we must "simulate"
     # the genfiles directory.
+    dt_autopybind11 = float("nan")
     with extract_archive_tempdir(headers_tar, debug=debug) as headers_dir:
+        t_start = time.time()
         result = run(
             argv, cwd=headers_dir, stdout=PIPE, stderr=STDOUT,
             encoding="utf8",
             env=os.environ.copy(),
         )
+        dt_autopybind11 = time.time() - t_start
+
+    print(result.stdout)
+    print()
+    print(f"autopybind11 run time: {dt_autopybind11:.4f}s")
+    print()
 
     if result.returncode != 0:
-        print(f"Failure for: {argv}", file=sys.stderr)
-        print(result.stdout, file=sys.stderr)
+        print(f"ERROR: Failed for: {cmd}", file=sys.stderr)
         sys.exit(1)
-    print(result.stdout)
     print(f"Wrote files to: {output_dir}")
 
 

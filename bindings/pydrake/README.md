@@ -28,12 +28,7 @@ To run, capture all output, and version control:
 
 ```sh
 cd drake
-rm -rf ${PWD}/tmp/autopybind11
-bazel run --run_under="env PYTHONUNBUFFERED=1" \
-    //bindings/pydrake:autopybind11_example -- \
-    --debug \
-    --output_dir=${PWD}/tmp/autopybind11 \
-    2>&1 | tee ${PWD}/tmp/autopybind11/output.txt
+./bindings/pydrake/autopybind11_example_debug.sh
 ```
 
 ### Additional Customization
