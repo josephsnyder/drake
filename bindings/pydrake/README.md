@@ -22,6 +22,15 @@ This is configured using the `autopybind11_example.yaml` in this directory. For 
 <br/>
 <https://gitlab.kitware.com/autopybind11/autopybind11>
 
+## Debugging
+
+To run, capture all output, and version control:
+
+```sh
+cd drake
+./bindings/pydrake/autopybind11_example_debug.sh
+```
+
 ### Additional Customization
 
 The bazel command can take an additional argument to take advantage of a feature of AutoPyBind11
