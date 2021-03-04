@@ -95,12 +95,12 @@ R"""(/** Returns string representation. */)""")
         oss << env;
         std::string s(oss.str());
 
-        return s;})        .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type const & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )const>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
-R"""(/** As above, but returns a constref and does not perform an insertion 
- * (throwing a runtime error instead) if the key does not exist. */)""")
-    .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
+        return s;})        .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
 R"""(/** Returns a reference to the value that is mapped to a key equivalent to 
  *  @p key, performing an insertion if such key does not already exist. 
  */)""")
+    .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type const & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )const>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
+R"""(/** As above, but returns a constref and does not perform an insertion 
+ * (throwing a runtime error instead) if the key does not exist. */)""")
     ;
 }
