@@ -12,8 +12,8 @@ void apb11_pydrake_ClippingRange_py_register(py::module &m) {
   called = true;
   py::class_<::drake::geometry::render::ClippingRange> ClippingRange(
       m, "ClippingRange",
-      "/** Defines the near and far clipping planes for frustum-based (e.g. OpenGL) \
- RenderEngine cameras.  */");
+      R"""(/** Defines the near and far clipping planes for frustum-based (e.g. OpenGL) 
+ RenderEngine cameras.  */)""");
 
   ClippingRange
       .def(py::init<::drake::geometry::render::ClippingRange const &>(),
@@ -22,18 +22,13 @@ void apb11_pydrake_ClippingRange_py_register(py::module &m) {
       .def_static(
           "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
           static_cast<void (*)()>(&::drake::geometry::render::ClippingRange::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE),
-          "")
-      .def("near",
-           static_cast<double (::drake::geometry::render::ClippingRange::*)()
-                           const>(
-               &::drake::geometry::render::ClippingRange::near),
-           "")
-      .def("far",
-           static_cast<double (::drake::geometry::render::ClippingRange::*)()
-                           const>(
-               &::drake::geometry::render::ClippingRange::far),
-           "")
+                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def("far", static_cast<double (
+                      ::drake::geometry::render::ClippingRange::*)() const>(
+                      &::drake::geometry::render::ClippingRange::far))
+      .def("near", static_cast<double (
+                       ::drake::geometry::render::ClippingRange::*)() const>(
+                       &::drake::geometry::render::ClippingRange::near))
 
       ;
 }
