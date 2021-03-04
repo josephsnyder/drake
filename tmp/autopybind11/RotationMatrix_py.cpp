@@ -308,6 +308,17 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 
       .def(
           "__mul__",
+          static_cast<::Eigen::Matrix<double, 3, 1, 0, 3, 1> (
+              ::drake::math::RotationMatrix<double>::*)(
+              ::Eigen::Matrix<double, 3, 1, 0, 3, 1> const &) const>(
+              &::drake::math::RotationMatrix<double>::operator*),
+          py::arg("v_B"),
+          R"""(/// Calculates `this` rotation matrix `R_AB` multiplied by an arbitrary 
+/// Vector3 expressed in the B frame. 
+/// @param[in] v_B 3x1 vector that post-multiplies `this`. 
+/// @returns 3x1 vector `v_A = R_AB * v_B`.)""")
+      .def(
+          "__mul__",
           static_cast<::drake::math::RotationMatrix<double> (
               ::drake::math::RotationMatrix<double>::*)(
               ::drake::math::RotationMatrix<double> const &) const>(
@@ -319,17 +330,6 @@ void apb11_pydrake_RotationMatrix_py_register(py::module &m) {
 /// @returns rotation matrix that results from `this` multiplied by `other`. 
 /// @note It is possible (albeit improbable) to create an invalid rotation 
 /// matrix by accumulating round-off error with a large number of multiplies.)""")
-      .def(
-          "__mul__",
-          static_cast<::Eigen::Matrix<double, 3, 1, 0, 3, 1> (
-              ::drake::math::RotationMatrix<double>::*)(
-              ::Eigen::Matrix<double, 3, 1, 0, 3, 1> const &) const>(
-              &::drake::math::RotationMatrix<double>::operator*),
-          py::arg("v_B"),
-          R"""(/// Calculates `this` rotation matrix `R_AB` multiplied by an arbitrary 
-/// Vector3 expressed in the B frame. 
-/// @param[in] v_B 3x1 vector that post-multiplies `this`. 
-/// @returns 3x1 vector `v_A = R_AB * v_B`.)""")
       .def(
           "__imul__",
           static_cast<::drake::math::RotationMatrix<double> &(
