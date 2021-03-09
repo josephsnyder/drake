@@ -314,22 +314,22 @@ symbolic::Expression can be used as a scalar type of Eigen types.
           +[](::drake::symbolic::Expression &lhs,
               ::drake::symbolic::Expression const &rhs) { return lhs *= rhs; })
       .def(
-          "__add__", +[](::drake::symbolic::Expression const &e) { return e; })
-      .def(
           "__add__",
           +[](::drake::symbolic::Expression lhs,
               ::drake::symbolic::Expression const &rhs) { return lhs + rhs; })
+      .def(
+          "__add__", +[](::drake::symbolic::Expression const &e) { return e; })
+      .def("__add__",
+           static_cast<::drake::symbolic::Expression &(
+               ::drake::symbolic::Expression::*)()>(
+               &::drake::symbolic::Expression::operator++),
+           R"""(/** Provides prefix increment operator (i.e. ++x). */)""")
       .def("__add__",
            static_cast<::drake::symbolic::Expression (
                ::drake::symbolic::Expression::*)(int)>(
                &::drake::symbolic::Expression::operator++),
            py::arg("arg0"),
            R"""(/** Provides postfix increment operator (i.e. x++). */)""")
-      .def("__add__",
-           static_cast<::drake::symbolic::Expression &(
-               ::drake::symbolic::Expression::*)()>(
-               &::drake::symbolic::Expression::operator++),
-           R"""(/** Provides prefix increment operator (i.e. ++x). */)""")
       .def(
           "__iadd__",
           +[](::drake::symbolic::Expression &lhs,
