@@ -11,9 +11,10 @@ void apb11_pydrake_Variable_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::symbolic::Variable> Variable(
-      m, "Variable",
-      R"""(/** Represents a symbolic variable. 
+  using namespace drake::symbolic;
+
+  py::class_<Variable> PyVariable(m, "Variable",
+                                  R"""(/** Represents a symbolic variable. 
  * 
  * @note Expression::Evaluate and Formula::Evaluate methods take a symbolic 
  * environment (Variable → double) and a random number generator. When an 
@@ -24,61 +25,49 @@ void apb11_pydrake_Variable_py_register(py::module &m) {
  * formula. 
  */)""");
 
-  py::enum_<::drake::symbolic::Variable::Type>(
-      Variable, "Type", py::arithmetic(),
+  py::enum_<Variable::Type>(
+      PyVariable, "Type", py::arithmetic(),
       R"""(/** Supported types of symbolic variables. */)""")
-      .value("BINARY", ::drake::symbolic::Variable::Type::BINARY, "")
-      .value("BOOLEAN", ::drake::symbolic::Variable::Type::BOOLEAN, "")
-      .value("CONTINUOUS", ::drake::symbolic::Variable::Type::CONTINUOUS, "")
-      .value("INTEGER", ::drake::symbolic::Variable::Type::INTEGER, "")
-      .value("RANDOM_EXPONENTIAL",
-             ::drake::symbolic::Variable::Type::RANDOM_EXPONENTIAL, "")
-      .value("RANDOM_GAUSSIAN",
-             ::drake::symbolic::Variable::Type::RANDOM_GAUSSIAN, "")
-      .value("RANDOM_UNIFORM",
-             ::drake::symbolic::Variable::Type::RANDOM_UNIFORM, "");
-  Variable.def(py::init<::drake::symbolic::Variable const &>(), py::arg("arg0"))
+      .value("BINARY", Variable::Type::BINARY, "")
+      .value("BOOLEAN", Variable::Type::BOOLEAN, "")
+      .value("CONTINUOUS", Variable::Type::CONTINUOUS, "")
+      .value("INTEGER", Variable::Type::INTEGER, "")
+      .value("RANDOM_EXPONENTIAL", Variable::Type::RANDOM_EXPONENTIAL, "")
+      .value("RANDOM_GAUSSIAN", Variable::Type::RANDOM_GAUSSIAN, "")
+      .value("RANDOM_UNIFORM", Variable::Type::RANDOM_UNIFORM, "");
+  PyVariable.def(py::init<Variable const &>(), py::arg("arg0"))
       .def(py::init<>())
       .def(py::init<::std::nullptr_t>(), py::arg("arg0"))
-      .def(py::init<::std::string, ::drake::symbolic::Variable::Type>(),
-           py::arg("name"),
-           py::arg("type") = ::drake::symbolic::Variable::Type(
-               ::drake::symbolic::Variable::Type::CONTINUOUS))
-      .def_static(
-          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-          static_cast<void (*)()>(&::drake::symbolic::Variable::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def(py::init<::std::string, Variable::Type>(), py::arg("name"),
+           py::arg("type") = Variable::Type(Variable::Type::CONTINUOUS))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &Variable::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
       .def(
           "equal_to",
-          static_cast<bool (::drake::symbolic::Variable::*)(
-              ::drake::symbolic::Variable const &) const>(
-              &::drake::symbolic::Variable::equal_to),
+          static_cast<bool (Variable::*)(Variable const &) const>(
+              &Variable::equal_to),
           py::arg("v"),
           R"""(/// Checks the equality of two variables based on their ID values.)""")
-      .def("get_id", static_cast<::drake::symbolic::Variable::Id (
-                         ::drake::symbolic::Variable::*)() const>(
-                         &::drake::symbolic::Variable::get_id))
-      .def("get_name",
-           static_cast<::std::string (::drake::symbolic::Variable::*)() const>(
-               &::drake::symbolic::Variable::get_name))
+      .def("get_id",
+           static_cast<Variable::Id (Variable::*)() const>(&Variable::get_id))
+      .def("get_name", static_cast<::std::string (Variable::*)() const>(
+                           &Variable::get_name))
       .def(
           "is_dummy",
-          static_cast<bool (::drake::symbolic::Variable::*)() const>(
-              &::drake::symbolic::Variable::is_dummy),
+          static_cast<bool (Variable::*)() const>(&Variable::is_dummy),
           R"""(/** Checks if this is a dummy variable (ID = 0) which is created by 
  *  the default constructor. */)""")
       .def("less",
-           static_cast<bool (::drake::symbolic::Variable::*)(
-               ::drake::symbolic::Variable const &) const>(
-               &::drake::symbolic::Variable::less),
+           static_cast<bool (Variable::*)(Variable const &) const>(
+               &Variable::less),
            py::arg("v"),
            R"""(/// Compares two variables based on their ID values.)""")
-      .def("to_string",
-           static_cast<::std::string (::drake::symbolic::Variable::*)() const>(
-               &::drake::symbolic::Variable::to_string))
+      .def("to_string", static_cast<::std::string (Variable::*)() const>(
+                            &Variable::to_string))
 
       .def(
-          "__str__", +[](::drake::symbolic::Variable const &var) {
+          "__str__", +[](Variable const &var) {
             std::ostringstream oss;
             oss << var;
             std::string s(oss.str());

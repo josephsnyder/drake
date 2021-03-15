@@ -42,11 +42,11 @@ void apb11_pydrake_SystemBase_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::systems::SystemBase,
-             ::drake::systems::internal::SystemMessageInterface>
-      SystemBase(
-          m, "SystemBase",
-          R"""(/** Provides non-templatized functionality shared by the templatized System 
+  using namespace drake::systems;
+
+  py::class_<SystemBase, internal::SystemMessageInterface> PySystemBase(
+      m, "SystemBase",
+      R"""(/** Provides non-templatized functionality shared by the templatized System 
 classes. 
  
 Terminology: in general a Drake System is a tree structure composed of 
@@ -57,11 +57,10 @@ subcontexts. Within a given System (Context), its child subsystems (subcontexts)
 are indexed using a SubsystemIndex; there is no separate SubcontextIndex since 
 the numbering must be identical. */)""");
 
-  SystemBase
+  PySystemBase
       .def(
           "AddAbstractParameter",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::AbstractParameterIndex)>(
+          static_cast<void (SystemBase::*)(AbstractParameterIndex)>(
               &SystemBase_publicist::AddAbstractParameter),
           py::arg("index"),
           R"""(/** (Internal use only) Assigns a ticket to a new abstract parameter with 
@@ -70,8 +69,7 @@ the given `index`.
      must be assigned sequentially. */)""")
       .def(
           "AddAbstractState",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::AbstractStateIndex)>(
+          static_cast<void (SystemBase::*)(AbstractStateIndex)>(
               &SystemBase_publicist::AddAbstractState),
           py::arg("index"),
           R"""(/** (Internal use only) Assigns a ticket to a new abstract state variable with 
@@ -80,8 +78,7 @@ the given `index`.
      must be assigned sequentially. */)""")
       .def(
           "AddDiscreteStateGroup",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::DiscreteStateIndex)>(
+          static_cast<void (SystemBase::*)(DiscreteStateIndex)>(
               &SystemBase_publicist::AddDiscreteStateGroup),
           py::arg("index"),
           R"""(/** (Internal use only) Assigns a ticket to a new discrete variable group 
@@ -90,8 +87,7 @@ with the given `index`.
      must be assigned sequentially. */)""")
       .def(
           "AddInputPort",
-          [](::drake::systems::SystemBase &self,
-             drake::systems::InputPortBase port) {
+          [](SystemBase &self, drake::systems::InputPortBase port) {
             self.AddInputPort(
                 std::make_unique<drake::systems::InputPortBase>(port));
           },
@@ -102,8 +98,7 @@ this System, that the port name is unique (just within this System), and that
 the port name is non-empty. */)""")
       .def(
           "AddNumericParameter",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::NumericParameterIndex)>(
+          static_cast<void (SystemBase::*)(NumericParameterIndex)>(
               &SystemBase_publicist::AddNumericParameter),
           py::arg("index"),
           R"""(/** (Internal use only) Assigns a ticket to a new numeric parameter with 
@@ -112,8 +107,7 @@ the given `index`.
      must be assigned sequentially. */)""")
       .def(
           "AddOutputPort",
-          [](::drake::systems::SystemBase &self,
-             drake::systems::OutputPortBase port) {
+          [](SystemBase &self, drake::systems::OutputPortBase port) {
             self.AddOutputPort(
                 std::make_unique<drake::systems::OutputPortBase>(port));
           },
@@ -127,16 +121,15 @@ for this System, and that the name of the port is unique.
           static_cast<::std::unique_ptr<
               drake::systems::ContextBase,
               std::default_delete<drake::systems::ContextBase>> (
-              ::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::AllocateContext),
+              SystemBase::*)() const>(&SystemBase::AllocateContext),
           R"""(/** Returns a Context suitable for use with this System. Context resources 
 are allocated based on resource requests that were made during System 
 construction. */)""")
       .def(
           "DeclareCacheEntry",
-          [](::drake::systems::SystemBase &self, ::std::string description,
-             ::drake::systems::CacheEntry::AllocCallback alloc_function,
-             ::drake::systems::CacheEntry::CalcCallback calc_function,
+          [](SystemBase &self, ::std::string description,
+             CacheEntry::AllocCallback alloc_function,
+             CacheEntry::CalcCallback calc_function,
              ::std::set<
                  drake::TypeSafeIndex<drake::systems::DependencyTag>,
                  std::less<drake::TypeSafeIndex<drake::systems::DependencyTag>>,
@@ -180,11 +173,10 @@ where the AbstractValue objects must resolve to the same concrete type.
 @throws std::logic_error if given an explicitly empty prerequisite list. */)""")
       .def(
           "DeclareCacheEntryWithKnownTicket",
-          [](::drake::systems::SystemBase &self,
-             ::drake::systems::DependencyTicket known_ticket,
+          [](SystemBase &self, DependencyTicket known_ticket,
              ::std::string description,
-             ::drake::systems::CacheEntry::AllocCallback alloc_function,
-             ::drake::systems::CacheEntry::CalcCallback calc_function,
+             CacheEntry::AllocCallback alloc_function,
+             CacheEntry::CalcCallback calc_function,
              ::std::set<
                  drake::TypeSafeIndex<drake::systems::DependencyTag>,
                  std::less<drake::TypeSafeIndex<drake::systems::DependencyTag>>,
@@ -204,8 +196,7 @@ other parameters here. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::ContextBase,
               std::default_delete<drake::systems::ContextBase>> (
-              ::drake::systems::SystemBase::*)() const>(
-              &SystemBase_publicist::DoAllocateContext),
+              SystemBase::*)() const>(&SystemBase_publicist::DoAllocateContext),
           R"""(/** Derived class implementations should allocate a suitable concrete Context 
 type, then invoke the above InitializeContextBase() method. A Diagram must 
 then invoke AllocateContext() to obtain each of the subcontexts for its 
@@ -215,9 +206,8 @@ parameters and state should be allocated. */)""")
       .def(
           "EvalAbstractInput",
           static_cast<::drake::AbstractValue const *(
-              ::drake::systems::SystemBase::
-                  *)(::drake::systems::ContextBase const &, int)const>(
-              &::drake::systems::SystemBase::EvalAbstractInput),
+              SystemBase::*)(ContextBase const &, int)const>(
+              &SystemBase::EvalAbstractInput),
           py::arg("context"), py::arg("port_index"),
           R"""(/** Returns the value of the input port with the given `port_index` as an 
 AbstractValue, which is permitted for ports of any type. Causes the value to 
@@ -233,10 +223,8 @@ signatures.
       .def(
           "EvalAbstractInputImpl",
           static_cast<::drake::AbstractValue const *(
-              ::drake::systems::SystemBase::
-                  *)(char const *, ::drake::systems::ContextBase const &,
-                     ::drake::systems::InputPortIndex) const>(
-              &SystemBase_publicist::EvalAbstractInputImpl),
+              SystemBase::*)(char const *, ContextBase const &, InputPortIndex)
+                          const>(&SystemBase_publicist::EvalAbstractInputImpl),
           py::arg("func"), py::arg("context"), py::arg("port_index"),
           R"""(/** (Internal use only) Shared code for updating an input port and returning a 
 pointer to its abstract value, or nullptr if the port is not connected. `func` 
@@ -246,8 +234,7 @@ should be the user-visible API function name obtained with __func__. */)""")
           static_cast<
               ::std::multimap<int, int, std::less<int>,
                               std::allocator<std::pair<const int, int>>> (
-                  ::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::GetDirectFeedthroughs),
+                  SystemBase::*)() const>(&SystemBase::GetDirectFeedthroughs),
           R"""(/** Reports all direct feedthroughs from input ports to output ports. For 
 a system with m input ports: `I = i₀, i₁, ..., iₘ₋₁`, and n output ports, 
 `O = o₀, o₁, ..., oₙ₋₁`, the return map will contain pairs (u, v) such that 
@@ -261,8 +248,8 @@ documentation for how leaf systems can report their feedthrough.
 */)""")
       .def(
           "GetInputPortBaseOrThrow",
-          static_cast<::drake::systems::InputPortBase const &(
-              ::drake::systems::SystemBase::*)(char const *, int)const>(
+          static_cast<InputPortBase const &(SystemBase::*)(char const *,
+                                                           int)const>(
               &SystemBase_publicist::GetInputPortBaseOrThrow),
           py::arg("func"), py::arg("port_index"),
           R"""(/** (Internal use only) Returns the InputPortBase at index `port_index`, 
@@ -271,8 +258,8 @@ public API method that received the bad index is provided in `func` and is
 included in the error message. */)""")
       .def(
           "GetOutputPortBaseOrThrow",
-          static_cast<::drake::systems::OutputPortBase const &(
-              ::drake::systems::SystemBase::*)(char const *, int)const>(
+          static_cast<OutputPortBase const &(SystemBase::*)(char const *,
+                                                            int)const>(
               &SystemBase_publicist::GetOutputPortBaseOrThrow),
           py::arg("func"), py::arg("port_index"),
           R"""(/** (Internal use only) Returns the OutputPortBase at index `port_index`, 
@@ -281,24 +268,24 @@ public API method that received the bad index is provided in `func` and is
 included in the error message. */)""")
       .def(
           "GetSystemName",
-          static_cast<::std::string const &(::drake::systems::SystemBase::*)()
-                          const>(&::drake::systems::SystemBase::GetSystemName),
+          static_cast<::std::string const &(SystemBase::*)() const>(
+              &SystemBase::GetSystemName),
           R"""(/** Returns a human-readable name for this system, for use in messages and 
 logging. This will be the same as returned by get_name(), unless that would 
 be an empty string. In that case we return a non-unique placeholder name, 
 currently just "_" (a lone underscore). */)""")
       .def(
           "GetSystemPathname",
-          static_cast<::std::string (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::GetSystemPathname),
+          static_cast<::std::string (SystemBase::*)() const>(
+              &SystemBase::GetSystemPathname),
           R"""(/** Generates and returns a human-readable full path name of this subsystem, 
 for use in messages and logging. The name starts from the root System, with 
 "::" delimiters between parent and child subsystems, with the individual 
 subsystems represented by their names as returned by GetSystemName(). */)""")
       .def(
           "GetSystemType",
-          static_cast<::std::string (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::GetSystemType),
+          static_cast<::std::string (SystemBase::*)() const>(
+              &SystemBase::GetSystemType),
           R"""(/** Returns the most-derived type of this concrete System object as a 
 human-readable string suitable for use in error messages. The format is as 
 generated by NiceTypeName and will include namespace qualification if 
@@ -306,8 +293,7 @@ present.
 @see NiceTypeName for more specifics. */)""")
       .def(
           "InitializeContextBase",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::ContextBase *) const>(
+          static_cast<void (SystemBase::*)(ContextBase *) const>(
               &SystemBase_publicist::InitializeContextBase),
           py::arg("context"),
           R"""(/** This method must be invoked from within derived class DoAllocateContext() 
@@ -320,8 +306,7 @@ behavior.
       .def(
           "MakeFixInputPortTypeChecker",
           static_cast<::std::function<void(const drake::AbstractValue &)> (
-              ::drake::systems::SystemBase::*)(::drake::systems::InputPortIndex)
-                          const>(
+              SystemBase::*)(InputPortIndex) const>(
               &SystemBase_publicist::MakeFixInputPortTypeChecker),
           py::arg("port_index"),
           R"""(/** (Internal use only) Given a `port_index`, returns a function to be called 
@@ -330,7 +315,7 @@ to throw an exception if the input AbstractValue is invalid, so that errors
 can be reported at Fix-time instead of EvalInput-time.*/)""")
       .def(
           "NextInputPortName",
-          static_cast<::std::string (::drake::systems::SystemBase::*)(
+          static_cast<::std::string (SystemBase::*)(
               ::std::variant<std::basic_string<char, std::char_traits<char>,
                                                std::allocator<char>>,
                              drake::systems::UseDefaultName>) const>(
@@ -342,7 +327,7 @@ from the next available input port index.
 @pre `given_name` must not be empty. */)""")
       .def(
           "NextOutputPortName",
-          static_cast<::std::string (::drake::systems::SystemBase::*)(
+          static_cast<::std::string (SystemBase::*)(
               ::std::variant<std::basic_string<char, std::char_traits<char>,
                                                std::allocator<char>>,
                              drake::systems::UseDefaultName>) const>(
@@ -354,8 +339,7 @@ from the next available output port index.
 @pre `given_name` must not be empty. */)""")
       .def(
           "ThrowCantEvaluateInputPort",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              char const *, ::drake::systems::InputPortIndex) const>(
+          static_cast<void (SystemBase::*)(char const *, InputPortIndex) const>(
               &SystemBase_publicist::ThrowCantEvaluateInputPort),
           py::arg("func"), py::arg("port_index"),
           R"""(/** Throws std::logic_error because someone called API method `func`, that 
@@ -363,9 +347,9 @@ requires this input port to be evaluatable, but the port was neither
 fixed nor connected. */)""")
       .def(
           "ThrowInputPortHasWrongType",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              char const *, ::drake::systems::InputPortIndex,
-              ::std::string const &, ::std::string const &) const>(
+          static_cast<void (SystemBase::*)(char const *, InputPortIndex,
+                                           ::std::string const &,
+                                           ::std::string const &) const>(
               &SystemBase_publicist::ThrowInputPortHasWrongType),
           py::arg("func"), py::arg("port_index"), py::arg("expected_type"),
           py::arg("actual_type"),
@@ -374,9 +358,8 @@ the input port had some value type that was wrong. */)""")
       .def_static(
           "ThrowInputPortHasWrongType",
           static_cast<void (*)(char const *, ::std::string const &,
-                               ::drake::systems::InputPortIndex,
-                               ::std::string const &, ::std::string const &,
-                               ::std::string const &)>(
+                               InputPortIndex, ::std::string const &,
+                               ::std::string const &, ::std::string const &)>(
               &SystemBase_publicist::ThrowInputPortHasWrongType),
           py::arg("func"), py::arg("system_pathname"), py::arg("arg2"),
           py::arg("port_name"), py::arg("expected_type"),
@@ -385,21 +368,18 @@ the input port had some value type that was wrong. */)""")
 the input port had some value type that was wrong. */)""")
       .def(
           "ThrowInputPortIndexOutOfRange",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              char const *, ::drake::systems::InputPortIndex) const>(
+          static_cast<void (SystemBase::*)(char const *, InputPortIndex) const>(
               &SystemBase_publicist::ThrowInputPortIndexOutOfRange),
           py::arg("func"), py::arg("port_index"),
           R"""(/** Throws std::out_of_range to report bad input `port_index` that was passed 
 to API method `func`. */)""")
-      .def(
-          "ThrowNegativePortIndex",
-          static_cast<void (::drake::systems::SystemBase::*)(char const *, int)
-                          const>(&SystemBase_publicist::ThrowNegativePortIndex),
-          py::arg("func"), py::arg("port_index"))
+      .def("ThrowNegativePortIndex",
+           static_cast<void (SystemBase::*)(char const *, int) const>(
+               &SystemBase_publicist::ThrowNegativePortIndex),
+           py::arg("func"), py::arg("port_index"))
       .def(
           "ThrowNotAVectorInputPort",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              char const *, ::drake::systems::InputPortIndex) const>(
+          static_cast<void (SystemBase::*)(char const *, InputPortIndex) const>(
               &SystemBase_publicist::ThrowNotAVectorInputPort),
           py::arg("func"), py::arg("port_index"),
           R"""(/** Throws std::logic_error because someone misused API method `func`, that is 
@@ -407,73 +387,65 @@ only allowed for declared-vector input ports, on an abstract port whose
 index is given here. */)""")
       .def(
           "ThrowOutputPortIndexOutOfRange",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              char const *, ::drake::systems::OutputPortIndex) const>(
+          static_cast<void (SystemBase::*)(char const *, OutputPortIndex)
+                          const>(
               &SystemBase_publicist::ThrowOutputPortIndexOutOfRange),
           py::arg("func"), py::arg("port_index"),
           R"""(/** Throws std::out_of_range to report bad output `port_index` that was passed 
 to API method `func`. */)""")
       .def(
           "ValidateContext",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::ContextBase const &) const>(
-              &::drake::systems::SystemBase::ValidateContext),
+          static_cast<void (SystemBase::*)(ContextBase const &) const>(
+              &SystemBase::ValidateContext),
           py::arg("context"),
           R"""(/** Checks whether the given context was created for this system. 
 @note This method is sufficiently fast for performance sensitive code. */)""")
       .def(
           "ValidateContext",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::drake::systems::ContextBase *) const>(
-              &::drake::systems::SystemBase::ValidateContext),
+          static_cast<void (SystemBase::*)(ContextBase *) const>(
+              &SystemBase::ValidateContext),
           py::arg("context"),
           R"""(/** Checks whether the given context was created for this system. 
 @note This method is sufficiently fast for performance sensitive code. */)""")
       .def(
           "abstract_parameter_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(
-              ::drake::systems::AbstractParameterIndex) const>(
-              &::drake::systems::SystemBase::abstract_parameter_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(AbstractParameterIndex)
+                          const>(&SystemBase::abstract_parameter_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on a particular abstract 
 parameter paᵢ. 
 @see pa_ticket() to obtain a ticket for _all_ abstract parameters. */)""")
       .def(
           "abstract_state_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(
-              ::drake::systems::AbstractStateIndex) const>(
-              &::drake::systems::SystemBase::abstract_state_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(AbstractStateIndex)
+                          const>(&SystemBase::abstract_state_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on a particular abstract state 
 variable xaᵢ. 
 @see xa_ticket() to obtain a ticket for _all_ abstract variables. */)""")
       .def_static(
           "accuracy_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::accuracy_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::accuracy_ticket),
           R"""(/** Returns a ticket indicating dependence on the accuracy setting in the 
 Context. This is the same ticket for all systems and refers to the same 
 accuracy value. */)""")
       .def_static(
           "all_input_ports_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::all_input_ports_ticket),
+          static_cast<DependencyTicket (*)()>(
+              &SystemBase::all_input_ports_ticket),
           R"""(/** Returns a ticket indicating dependence on _all_ input ports u of this 
 system. 
 @see input_port_ticket() to obtain a ticket for just one input port. */)""")
       .def_static(
           "all_parameters_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::all_parameters_ticket),
+          static_cast<DependencyTicket (*)()>(
+              &SystemBase::all_parameters_ticket),
           R"""(/** Returns a ticket indicating dependence on _all_ parameters p in this 
 system, including numeric parameters pn, and abstract parameters pa. */)""")
       .def_static(
           "all_sources_except_input_ports_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::
-                  all_sources_except_input_ports_ticket),
+          static_cast<DependencyTicket (*)()>(
+              &SystemBase::all_sources_except_input_ports_ticket),
           R"""(/** Returns a ticket indicating dependence on every possible independent 
 source value _except_ input ports. This can be helpful in avoiding the 
 incorrect appearance of algebraic loops in a Diagram (those always involve 
@@ -493,8 +465,7 @@ direct dependency on the cache entry.
 @see all_sources_ticket() to also include all input ports as dependencies. */)""")
       .def_static(
           "all_sources_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::all_sources_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::all_sources_ticket),
           R"""(/** Returns a ticket indicating dependence on every possible independent 
 source value, including time, accuracy, state, input ports, and parameters 
 (but not cache entries). This is the default dependency for computations that 
@@ -503,8 +474,7 @@ have not specified anything more refined. It is equivalent to the set
 @see cache_entry_ticket() to obtain a ticket for a cache entry. */)""")
       .def_static(
           "all_state_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::all_state_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::all_state_ticket),
           R"""(/** Returns a ticket indicating dependence on _all_ state variables x in this 
 system, including continuous variables xc, discrete (numeric) variables xd, 
 and abstract state variables xa. This does not imply dependence on time, 
@@ -513,32 +483,27 @@ mean to express dependence on all possible value sources, use
 all_sources_ticket() instead. */)""")
       .def(
           "assign_next_dependency_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)()>(
+          static_cast<DependencyTicket (SystemBase::*)()>(
               &SystemBase_publicist::assign_next_dependency_ticket),
           R"""(/** (Internal use only) Assigns the next unused dependency ticket number, 
 unique only within a particular system. Each call to this method increments 
 the ticket number. */)""")
       .def(
           "cache_entry_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(::drake::systems::CacheIndex)
-                          const>(
-              &::drake::systems::SystemBase::cache_entry_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(CacheIndex) const>(
+              &SystemBase::cache_entry_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on the cache entry indicated 
 by `index`. Note that cache entries are _not_ included in the `all_sources` 
 ticket so must be listed separately. 
 @pre `index` selects an existing cache entry in this System. */)""")
       .def_static("configuration_ticket",
-                  static_cast<::drake::systems::DependencyTicket (*)()>(
-                      &::drake::systems::SystemBase::configuration_ticket))
+                  static_cast<DependencyTicket (*)()>(
+                      &SystemBase::configuration_ticket))
       .def(
           "discrete_state_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(
-              ::drake::systems::DiscreteStateIndex) const>(
-              &::drake::systems::SystemBase::discrete_state_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(DiscreteStateIndex)
+                          const>(&SystemBase::discrete_state_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on a particular discrete state 
 variable xdᵢ (may be a vector). (We sometimes refer to this as a "discrete 
@@ -546,34 +511,28 @@ variable group".)
 @see xd_ticket() to obtain a ticket for _all_ discrete variables. */)""")
       .def(
           "get_cache_entry",
-          static_cast<::drake::systems::CacheEntry const &(
-              ::drake::systems::SystemBase::*)(::drake::systems::CacheIndex)
-                          const>(
-              &::drake::systems::SystemBase::get_cache_entry),
+          static_cast<CacheEntry const &(SystemBase::*)(CacheIndex) const>(
+              &SystemBase::get_cache_entry),
           py::arg("index"),
           R"""(/** Returns a reference to a CacheEntry given its `index`. */)""")
-      .def(
-          "get_input_port_base",
-          static_cast<::drake::systems::InputPortBase const &(
-              ::drake::systems::SystemBase::*)(::drake::systems::InputPortIndex)
-                          const>(
-              &::drake::systems::SystemBase::get_input_port_base),
-          py::arg("port_index"),
-          R"""(/** Returns a reference to an InputPort given its `port_index`. 
+      .def("get_input_port_base",
+           static_cast<InputPortBase const &(SystemBase::*)(InputPortIndex)
+                           const>(&SystemBase::get_input_port_base),
+           py::arg("port_index"),
+           R"""(/** Returns a reference to an InputPort given its `port_index`. 
 @pre `port_index` selects an existing input port of this System. */)""")
       .def(
           "get_mutable_cache_entry",
-          static_cast<::drake::systems::CacheEntry &(
-              ::drake::systems::SystemBase::*)(::drake::systems::CacheIndex)>(
-              &::drake::systems::SystemBase::get_mutable_cache_entry),
+          static_cast<CacheEntry &(SystemBase::*)(CacheIndex)>(
+              &SystemBase::get_mutable_cache_entry),
           py::arg("index"),
           R"""(/** (Advanced) Returns a mutable reference to a CacheEntry given its `index`. 
 Note that you do not need mutable access to a CacheEntry to modify its value 
 in a Context, so most users should not use this method. */)""")
       .def(
           "get_name",
-          static_cast<::std::string const &(::drake::systems::SystemBase::*)()
-                          const>(&::drake::systems::SystemBase::get_name),
+          static_cast<::std::string const &(SystemBase::*)() const>(
+              &SystemBase::get_name),
           R"""(/** Returns the name last supplied to set_name(), if any. Diagrams built with 
 DiagramBuilder will always have a default name for every contained subsystem 
 for which no user-provided name is available. Systems created by copying with 
@@ -581,136 +540,122 @@ a scalar type change have the same name as the source system. An empty string
 is returned if no name has been set. */)""")
       .def(
           "get_output_port_base",
-          static_cast<::drake::systems::OutputPortBase const &(
-              ::drake::systems::SystemBase::
-                  *)(::drake::systems::OutputPortIndex) const>(
-              &::drake::systems::SystemBase::get_output_port_base),
+          static_cast<OutputPortBase const &(SystemBase::*)(OutputPortIndex)
+                          const>(&SystemBase::get_output_port_base),
           py::arg("port_index"),
           R"""(/** Returns a reference to an OutputPort given its `port_index`. 
 @pre `port_index` selects an existing output port of this System. */)""")
       .def(
           "get_parent_service",
-          static_cast<
-              ::drake::systems::internal::SystemParentServiceInterface const *(
-                  ::drake::systems::SystemBase::*)() const>(
+          static_cast<internal::SystemParentServiceInterface const *(
+              SystemBase::*)() const>(
               &SystemBase_publicist::get_parent_service),
           R"""(/** Returns a pointer to the service interface of the immediately enclosing 
 Diagram if one has been set, otherwise nullptr. */)""")
       .def(
           "get_system_id",
-          static_cast<::drake::systems::internal::SystemId (
-              ::drake::systems::SystemBase::*)() const>(
+          static_cast<internal::SystemId (SystemBase::*)() const>(
               &SystemBase_publicist::get_system_id),
           R"""(/** (Internal) Gets the id used to tag context data as being created by this 
 system. */)""")
       .def(
           "implicit_time_derivatives_residual_size",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::
-                  implicit_time_derivatives_residual_size),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::implicit_time_derivatives_residual_size),
           R"""(/** Returns the size of the implicit time derivatives residual vector. 
 By default this is the same as num_continuous_states() but a LeafSystem 
 can change it during construction via 
 LeafSystem::DeclareImplicitTimeDerivativesResidualSize(). */)""")
       .def(
           "input_port_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(::drake::systems::InputPortIndex)
-                          const>(
-              &::drake::systems::SystemBase::input_port_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(InputPortIndex) const>(
+              &SystemBase::input_port_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on input port uᵢ indicated 
 by `index`. 
 @pre `index` selects an existing input port of this System. */)""")
       .def_static(
           "ke_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::ke_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::ke_ticket),
           R"""(/** Returns a ticket for the cache entry that holds the kinetic energy 
 calculation. 
 @see System::EvalKineticEnergy() */)""")
-      .def_static("kinematics_ticket",
-                  static_cast<::drake::systems::DependencyTicket (*)()>(
-                      &::drake::systems::SystemBase::kinematics_ticket))
+      .def_static("kinematics_ticket", static_cast<DependencyTicket (*)()>(
+                                           &SystemBase::kinematics_ticket))
       .def_static(
           "nothing_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::nothing_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::nothing_ticket),
           R"""(/** Returns a ticket indicating that a computation does not depend on *any* 
 source value; that is, it is a constant. If this appears in a prerequisite 
 list, it must be the only entry. */)""")
       .def("num_abstract_parameters",
-           static_cast<int (::drake::systems::SystemBase::*)() const>(
-               &::drake::systems::SystemBase::num_abstract_parameters),
+           static_cast<int (SystemBase::*)() const>(
+               &SystemBase::num_abstract_parameters),
            R"""(/** Returns the number of declared abstract parameters. */)""")
       .def(
           "num_abstract_states",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_abstract_states),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_abstract_states),
           R"""(/** Returns the number of declared abstract state variables. */)""")
       .def(
           "num_cache_entries",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_cache_entries),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_cache_entries),
           R"""(/** Returns the number nc of cache entries currently allocated in this System. 
 These are indexed from 0 to nc-1. */)""")
       .def(
           "num_continuous_states",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_continuous_states),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_continuous_states),
           R"""(/** Returns the number of declared continuous state variables. */)""")
       .def(
           "num_discrete_state_groups",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_discrete_state_groups),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_discrete_state_groups),
           R"""(/** Returns the number of declared discrete state groups (each group is 
 a vector-valued discrete state variable). */)""")
       .def(
           "num_input_ports",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_input_ports),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_input_ports),
           R"""(/** Returns the number of input ports currently allocated in this System. 
 These are indexed from 0 to %num_input_ports()-1. */)""")
       .def(
           "num_numeric_parameter_groups",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_numeric_parameter_groups),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_numeric_parameter_groups),
           R"""(/** Returns the number of declared numeric parameters (each of these is 
 a vector-valued parameter). */)""")
       .def(
           "num_output_ports",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_output_ports),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_output_ports),
           R"""(/** Returns the number of output ports currently allocated in this System. 
 These are indexed from 0 to %num_output_ports()-1. */)""")
       .def(
           "num_total_inputs",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_total_inputs),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_total_inputs),
           R"""(/** Returns the total dimension of all of the vector-valued input ports (as if 
 they were muxed). */)""")
       .def(
           "num_total_outputs",
-          static_cast<int (::drake::systems::SystemBase::*)() const>(
-              &::drake::systems::SystemBase::num_total_outputs),
+          static_cast<int (SystemBase::*)() const>(
+              &SystemBase::num_total_outputs),
           R"""(/** Returns the total dimension of all of the vector-valued output ports (as 
 if they were muxed). */)""")
       .def(
           "numeric_parameter_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(
-              ::drake::systems::NumericParameterIndex) const>(
-              &::drake::systems::SystemBase::numeric_parameter_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(NumericParameterIndex)
+                          const>(&SystemBase::numeric_parameter_ticket),
           py::arg("index"),
           R"""(/** Returns a ticket indicating dependence on a particular numeric parameter 
 pnᵢ (may be a vector). 
 @see pn_ticket() to obtain a ticket for _all_ numeric parameters. */)""")
       .def(
           "output_port_ticket",
-          static_cast<::drake::systems::DependencyTicket (
-              ::drake::systems::SystemBase::*)(
-              ::drake::systems::OutputPortIndex) const>(
-              &::drake::systems::SystemBase::output_port_ticket),
+          static_cast<DependencyTicket (SystemBase::*)(OutputPortIndex) const>(
+              &SystemBase::output_port_ticket),
           py::arg("index"),
           R"""(/** (Internal use only) Returns a ticket indicating dependence on the output 
 port indicated by `index`. No user-definable quantities in a system can 
@@ -718,51 +663,45 @@ meaningfully depend on that system's own output ports.
 @pre `index` selects an existing output port of this System. */)""")
       .def_static(
           "pa_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::pa_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::pa_ticket),
           R"""(/** Returns a ticket indicating dependence on all of the abstract 
 parameters pa in the current Context. 
 @see abstract_parameter_ticket() to obtain a ticket for just one abstract 
      parameter. */)""")
       .def_static(
           "pc_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::pc_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::pc_ticket),
           R"""(/** Returns a ticket for the cache entry that holds the conservative power 
 calculation. 
 @see System::EvalConservativePower() */)""")
       .def_static(
           "pe_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::pe_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::pe_ticket),
           R"""(/** Returns a ticket for the cache entry that holds the potential energy 
 calculation. 
 @see System::EvalPotentialEnergy() */)""")
       .def_static(
           "pn_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::pn_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::pn_ticket),
           R"""(/** Returns a ticket indicating dependence on all of the numerical 
 parameters in the current Context. 
 @see numeric_parameter_ticket() to obtain a ticket for just one numeric 
      parameter. */)""")
       .def_static(
           "pnc_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::pnc_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::pnc_ticket),
           R"""(/** Returns a ticket for the cache entry that holds the non-conservative 
 power calculation. 
 @see System::EvalNonConservativePower() */)""")
       .def_static(
           "q_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::q_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::q_ticket),
           R"""(/** Returns a ticket indicating that a computation depends on configuration 
 state variables q. There is no ticket representing just one of the state 
 variables qᵢ. */)""")
       .def(
           "set_implicit_time_derivatives_residual_size",
-          static_cast<void (::drake::systems::SystemBase::*)(int)>(
+          static_cast<void (SystemBase::*)(int)>(
               &SystemBase_publicist::
                   set_implicit_time_derivatives_residual_size),
           py::arg("n"),
@@ -779,8 +718,8 @@ is set, the default size is n=num_continuous_states().
 @see System::CalcImplicitTimeDerivativesResidual() */)""")
       .def(
           "set_name",
-          static_cast<void (::drake::systems::SystemBase::*)(
-              ::std::string const &)>(&::drake::systems::SystemBase::set_name),
+          static_cast<void (SystemBase::*)(::std::string const &)>(
+              &SystemBase::set_name),
           py::arg("name"),
           R"""(/** Sets the name of the system. Do not use the path delimiter character ':' 
 in the name. When creating a Diagram, names of sibling subsystems should be 
@@ -788,61 +727,53 @@ unique. DiagramBuilder uses this method to assign a unique default name if
 none is provided. */)""")
       .def_static(
           "set_parent_service",
-          static_cast<void (*)(
-              ::drake::systems::SystemBase *,
-              ::drake::systems::internal::SystemParentServiceInterface const
-                  *)>(&SystemBase_publicist::set_parent_service),
+          static_cast<void (*)(SystemBase *,
+                               internal::SystemParentServiceInterface const *)>(
+              &SystemBase_publicist::set_parent_service),
           py::arg("child"), py::arg("parent_service"),
           R"""(/** (Internal use only) Declares that `parent_service` is the service 
 interface of the Diagram that owns this subsystem. Aborts if the parent 
 service has already been set to something else. */)""")
       .def_static(
           "time_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::time_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::time_ticket),
           R"""(/** Returns a ticket indicating dependence on time. This is the same ticket 
 for all systems and refers to the same time value. */)""")
       .def_static(
           "v_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::v_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::v_ticket),
           R"""(/** Returns a ticket indicating dependence on velocity state variables v. This 
 does _not_ also indicate a dependence on configuration variables q -- you must 
 list that explicitly or use kinematics_ticket() instead. There is no ticket 
 representing just one of the state variables vᵢ. */)""")
       .def_static(
           "xa_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::xa_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::xa_ticket),
           R"""(/** Returns a ticket indicating dependence on all of the abstract 
 state variables in the current Context. 
 @see abstract_state_ticket() to obtain a ticket for just one abstract 
      state variable. */)""")
       .def_static(
           "xc_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::xc_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::xc_ticket),
           R"""(/** Returns a ticket indicating dependence on _all_ of the continuous 
 state variables q, v, or z. */)""")
       .def_static(
           "xcdot_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::xcdot_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::xcdot_ticket),
           R"""(/** Returns a ticket for the cache entry that holds time derivatives of 
 the continuous variables. 
 @see EvalTimeDerivatives() */)""")
       .def_static(
           "xd_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::xd_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::xd_ticket),
           R"""(/** Returns a ticket indicating dependence on all of the numerical 
 discrete state variables, in any discrete variable group. 
 @see discrete_state_ticket() to obtain a ticket for just one discrete 
      state variable. */)""")
       .def_static(
           "z_ticket",
-          static_cast<::drake::systems::DependencyTicket (*)()>(
-              &::drake::systems::SystemBase::z_ticket),
+          static_cast<DependencyTicket (*)()>(&SystemBase::z_ticket),
           R"""(/** Returns a ticket indicating dependence on any or all of the miscellaneous 
 continuous state variables z. There is no ticket representing just one of 
 the state variables zᵢ. */)""")

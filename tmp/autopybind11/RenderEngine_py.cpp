@@ -30,7 +30,9 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::geometry::render::RenderEngine> RenderEngine(
+  using namespace drake::geometry::render;
+
+  py::class_<RenderEngine> PyRenderEngine(
       m, "RenderEngine",
       R"""(/** The engine for performing rasterization operations on geometry. This 
  includes rgb images and depth images. The coordinate system of 
@@ -88,14 +90,13 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  the documented @ref reserved_render_label "RenderLabel semantics"; see 
  GetRenderLabelOrThrow().  */)""");
 
-  RenderEngine
+  PyRenderEngine
       .def(
           "Clone",
           static_cast<::std::unique_ptr<
               drake::geometry::render::RenderEngine,
               std::default_delete<drake::geometry::render::RenderEngine>> (
-              ::drake::geometry::render::RenderEngine::*)() const>(
-              &::drake::geometry::render::RenderEngine::Clone),
+              RenderEngine::*)() const>(&RenderEngine::Clone),
           R"""(/** Clones the render engine -- making the %RenderEngine compatible with 
  copyable_unique_ptr.  */)""")
       .def_static(
@@ -106,12 +107,11 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
            static_cast<::std::unique_ptr<
                drake::geometry::render::RenderEngine,
                std::default_delete<drake::geometry::render::RenderEngine>> (
-               ::drake::geometry::render::RenderEngine::*)() const>(
-               &RenderEngine_publicist::DoClone),
+               RenderEngine::*)() const>(&RenderEngine_publicist::DoClone),
            R"""(/** The NVI-function for cloning this render engine.  */)""")
       .def(
           "DoRegisterVisual",
-          static_cast<bool (::drake::geometry::render::RenderEngine::*)(
+          static_cast<bool (RenderEngine::*)(
               ::drake::geometry::GeometryId, ::drake::geometry::Shape const &,
               ::drake::geometry::PerceptionProperties const &,
               ::drake::math::RigidTransformd const &)>(
@@ -136,8 +136,7 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  _exclusively_ use GetRenderLabelOrThrow().  */)""")
       .def(
           "DoRemoveGeometry",
-          static_cast<bool (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::GeometryId)>(
+          static_cast<bool (RenderEngine::*)(::drake::geometry::GeometryId)>(
               &RenderEngine_publicist::DoRemoveGeometry),
           py::arg("id"),
           R"""(/** The NVI-function for removing the geometry with the given `id`. 
@@ -146,8 +145,8 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
           removed, false if it wasn't registered in the first place.  */)""")
       .def(
           "DoRenderColorImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::ColorRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              ColorRenderCamera const &,
               ::drake::systems::sensors::ImageRgba8U *) const>(
               &RenderEngine_publicist::DoRenderColorImage),
           py::arg("camera"), py::arg("color_image_out"),
@@ -163,8 +162,8 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  */)""")
       .def(
           "DoRenderDepthImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::DepthRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              DepthRenderCamera const &,
               ::drake::systems::sensors::ImageDepth32F *) const>(
               &RenderEngine_publicist::DoRenderDepthImage),
           py::arg("camera"), py::arg("depth_image_out"),
@@ -180,8 +179,8 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  */)""")
       .def(
           "DoRenderLabelImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::ColorRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              ColorRenderCamera const &,
               ::drake::systems::sensors::ImageLabel16I *) const>(
               &RenderEngine_publicist::DoRenderLabelImage),
           py::arg("camera"), py::arg("label_image_out"),
@@ -197,7 +196,7 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  */)""")
       .def(
           "DoUpdateVisualPose",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
+          static_cast<void (RenderEngine::*)(
               ::drake::geometry::GeometryId,
               ::drake::math::RigidTransformd const &)>(
               &RenderEngine_publicist::DoUpdateVisualPose),
@@ -210,21 +209,20 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
       .def_static(
           "GetColorDFromLabel",
           static_cast<::drake::systems::sensors::ColorD (*)(
-              ::drake::geometry::render::RenderLabel const &)>(
+              RenderLabel const &)>(
               &RenderEngine_publicist::GetColorDFromLabel),
           py::arg("label"),
           R"""(/** Transforms `this` render label into a double-valued RGB color.  */)""")
       .def_static(
           "GetColorIFromLabel",
           static_cast<::drake::systems::sensors::ColorI (*)(
-              ::drake::geometry::render::RenderLabel const &)>(
+              RenderLabel const &)>(
               &RenderEngine_publicist::GetColorIFromLabel),
           py::arg("label"),
           R"""(/** Transforms `this` render label into a byte-valued RGB color.  */)""")
       .def(
           "GetRenderLabelOrThrow",
-          static_cast<::drake::geometry::render::RenderLabel (
-              ::drake::geometry::render::RenderEngine::*)(
+          static_cast<RenderLabel (RenderEngine::*)(
               ::drake::geometry::PerceptionProperties const &) const>(
               &RenderEngine_publicist::GetRenderLabelOrThrow),
           py::arg("properties"),
@@ -235,7 +233,7 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  */)""")
       .def_static(
           "LabelFromColor",
-          static_cast<::drake::geometry::render::RenderLabel (*)(
+          static_cast<RenderLabel (*)(
               ::drake::systems::sensors::ColorI const &)>(
               &RenderEngine_publicist::LabelFromColor),
           py::arg("color"),
@@ -243,11 +241,12 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
  RenderLabel.  */)""")
       .def(
           "RegisterVisual",
-          static_cast<bool (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::GeometryId, ::drake::geometry::Shape const &,
+          static_cast<bool (RenderEngine::*)(
+              ::drake::geometry::GeometryId,
+              ::drake::geometry::Shape const &,
               ::drake::geometry::PerceptionProperties const &,
               ::drake::math::RigidTransformd const &, bool)>(
-              &::drake::geometry::render::RenderEngine::RegisterVisual),
+              &RenderEngine::RegisterVisual),
           py::arg("id"), py::arg("shape"), py::arg("properties"),
           py::arg("X_WG"), py::arg("needs_updates") = bool(true),
           R"""(/** Requests registration of the given shape with this render engine. The 
@@ -276,27 +275,26 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
 */)""")
       .def(
           "RemoveGeometry",
-          static_cast<bool (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::GeometryId)>(
-              &::drake::geometry::render::RenderEngine::RemoveGeometry),
+          static_cast<bool (RenderEngine::*)(::drake::geometry::GeometryId)>(
+              &RenderEngine::RemoveGeometry),
           py::arg("id"),
           R"""(/** Removes the geometry indicated by the given `id` from the engine. 
  @param id    The id of the geometry to remove. 
  @returns True if the geometry was removed (false implies that this id wasn't 
           registered with this engine).  */)""")
       .def("RenderColorImage",
-           static_cast<void (::drake::geometry::render::RenderEngine::*)(
-               ::drake::geometry::render::CameraProperties const &, bool,
+           static_cast<void (RenderEngine::*)(
+               CameraProperties const &, bool,
                ::drake::systems::sensors::ImageRgba8U *) const>(
-               &::drake::geometry::render::RenderEngine::RenderColorImage),
+               &RenderEngine::RenderColorImage),
            py::arg("camera"), py::arg("show_window"),
            py::arg("color_image_out"))
       .def(
           "RenderColorImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::ColorRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              ColorRenderCamera const &,
               ::drake::systems::sensors::ImageRgba8U *) const>(
-              &::drake::geometry::render::RenderEngine::RenderColorImage),
+              &RenderEngine::RenderColorImage),
           py::arg("camera"), py::arg("color_image_out"),
           R"""(/** Renders the registered geometry into the given color (rgb) image based on 
  a _fully_ specified camera. 
@@ -307,17 +305,17 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
                           given input image doesn't match the size declared in 
                           `camera`.  */)""")
       .def("RenderDepthImage",
-           static_cast<void (::drake::geometry::render::RenderEngine::*)(
-               ::drake::geometry::render::DepthCameraProperties const &,
+           static_cast<void (RenderEngine::*)(
+               DepthCameraProperties const &,
                ::drake::systems::sensors::ImageDepth32F *) const>(
-               &::drake::geometry::render::RenderEngine::RenderDepthImage),
+               &RenderEngine::RenderDepthImage),
            py::arg("camera"), py::arg("depth_image_out"))
       .def(
           "RenderDepthImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::DepthRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              DepthRenderCamera const &,
               ::drake::systems::sensors::ImageDepth32F *) const>(
-              &::drake::geometry::render::RenderEngine::RenderDepthImage),
+              &RenderEngine::RenderDepthImage),
           py::arg("camera"), py::arg("depth_image_out"),
           R"""(/** Renders the registered geometry into the given depth image based on 
  a _fully_ specified camera. In contrast to the other rendering operations, 
@@ -330,18 +328,18 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
                           given input image doesn't match the size declared in 
                           `camera`.  */)""")
       .def("RenderLabelImage",
-           static_cast<void (::drake::geometry::render::RenderEngine::*)(
-               ::drake::geometry::render::CameraProperties const &, bool,
+           static_cast<void (RenderEngine::*)(
+               CameraProperties const &, bool,
                ::drake::systems::sensors::ImageLabel16I *) const>(
-               &::drake::geometry::render::RenderEngine::RenderLabelImage),
+               &RenderEngine::RenderLabelImage),
            py::arg("camera"), py::arg("show_window"),
            py::arg("label_image_out"))
       .def(
           "RenderLabelImage",
-          static_cast<void (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::render::ColorRenderCamera const &,
+          static_cast<void (RenderEngine::*)(
+              ColorRenderCamera const &,
               ::drake::systems::sensors::ImageLabel16I *) const>(
-              &::drake::geometry::render::RenderEngine::RenderLabelImage),
+              &RenderEngine::RenderLabelImage),
           py::arg("camera"), py::arg("label_image_out"),
           R"""(/** Renders the registered geometry into the given label image based on 
  a _fully_ specified camera. 
@@ -355,7 +353,7 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
                           given input image doesn't match the size declared in 
                           `camera`.  */)""")
       .def("SetDefaultLightPosition",
-           [](::drake::geometry::render::RenderEngine &self,
+           [](RenderEngine &self,
               Eigen::Ref<::Eigen::Matrix<double, 3, 1, 0, 3, 1> const &, 0,
                          Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>> &X_DL) {
              return self.SetDefaultLightPosition(X_DL);
@@ -385,9 +383,9 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
               char const *)>(&RenderEngine_publicist::ThrowIfInvalid),
           py::arg("intrinsics"), py::arg("image"), py::arg("image_type"))
       .def("UpdateViewpoint",
-           static_cast<void (::drake::geometry::render::RenderEngine::*)(
+           static_cast<void (RenderEngine::*)(
                ::drake::math::RigidTransformd const &)>(
-               &::drake::geometry::render::RenderEngine::UpdateViewpoint),
+               &RenderEngine::UpdateViewpoint),
            py::arg("X_WR"),
            R"""(/** Updates the renderer's viewpoint with given pose X_WR. 
  
@@ -395,16 +393,14 @@ void apb11_pydrake_RenderEngine_py_register(py::module &m) {
               system.  */)""")
       .def(
           "default_render_label",
-          static_cast<::drake::geometry::render::RenderLabel (
-              ::drake::geometry::render::RenderEngine::*)() const>(
-              &::drake::geometry::render::RenderEngine::default_render_label),
+          static_cast<RenderLabel (RenderEngine::*)() const>(
+              &RenderEngine::default_render_label),
           R"""(/** Reports the render label value this render engine has been configured to 
  use.  */)""")
       .def(
           "has_geometry",
-          static_cast<bool (::drake::geometry::render::RenderEngine::*)(
-              ::drake::geometry::GeometryId) const>(
-              &::drake::geometry::render::RenderEngine::has_geometry),
+          static_cast<bool (RenderEngine::*)(::drake::geometry::GeometryId)
+                          const>(&RenderEngine::has_geometry),
           py::arg("id"),
           R"""(/** Reports true if a geometry with the given `id` has been registered with 
  `this` engine.  */)""")

@@ -5,7 +5,8 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_geometry_py_register(py::module &m) {
-  py::module geometry = m.def_submodule("geometry", "");
 
-  return geometry;
+  py::module Pygeometry = m.def_submodule("geometry", "");
+
+  return Pygeometry;
 }

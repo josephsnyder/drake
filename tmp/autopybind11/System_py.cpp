@@ -46,6 +46,81 @@ public:
   using ::drake::systems::System<double>::set_forced_unrestricted_update_events;
 };
 
+class System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist
+    : public ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>> {
+public:
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::AddConstraint;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DeclareInputPort;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DeclareInputPort;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      DispatchDiscreteVariableUpdateHandler;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DispatchPublishHandler;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      DispatchUnrestrictedUpdateHandler;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoApplyDiscreteVariableUpdate;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoApplyUnrestrictedUpdate;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcConservativePower;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      DoCalcImplicitTimeDerivativesResidual;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcKineticEnergy;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcNextUpdateTime;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcNonConservativePower;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcPotentialEnergy;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcTimeDerivatives;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoCalcWitnessValue;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoGetInitializationEvents;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoGetPerStepEvents;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoGetPeriodicEvents;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoGetWitnessFunctions;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoMapQDotToVelocity;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::DoMapVelocityToQDot;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::GetMutableOutputVector;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      forced_discrete_update_events_exist;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::forced_publish_events_exist;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      forced_unrestricted_update_events_exist;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      get_forced_discrete_update_events;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::get_forced_publish_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      get_forced_unrestricted_update_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      get_mutable_forced_discrete_update_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      get_mutable_forced_publish_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      get_mutable_forced_unrestricted_update_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      set_forced_discrete_update_events;
+  using ::drake::systems::System<
+      Eigen::AutoDiffScalar<Eigen::VectorXd>>::set_forced_publish_events;
+  using ::drake::systems::System<Eigen::AutoDiffScalar<Eigen::VectorXd>>::
+      set_forced_unrestricted_update_events;
+};
+
 namespace py = pybind11;
 void apb11_pydrake_System_py_register(py::module &m) {
   static bool called = false;
@@ -53,13 +128,14 @@ void apb11_pydrake_System_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::systems::System<double>, ::drake::systems::SystemBase>
-      System_double(m, "System_double");
+  using namespace drake::systems;
 
-  System_double
+  py::class_<System<double>, SystemBase> PySystem_double(m, "System_double");
+
+  PySystem_double
       .def(
           "AddConstraint",
-          [](::drake::systems::System<double> &self,
+          [](System<double> &self,
              drake::systems::SystemConstraint<double> constraint) {
             return self.AddConstraint(
                 std::make_unique<drake::systems::SystemConstraint<double>>(
@@ -68,10 +144,9 @@ void apb11_pydrake_System_py_register(py::module &m) {
           R"""(/** Adds an already-created constraint to the list of constraints for this 
 System.  Ownership of the SystemConstraint is transferred to this system. */)""")
       .def("AddExternalConstraint",
-           static_cast<::drake::systems::SystemConstraintIndex (
-               ::drake::systems::System<double>::*)(
-               ::drake::systems::ExternalSystemConstraint)>(
-               &::drake::systems::System<double>::AddExternalConstraint),
+           static_cast<SystemConstraintIndex (System<double>::*)(
+               ExternalSystemConstraint)>(
+               &System<double>::AddExternalConstraint),
            py::arg("constraint"),
            R"""(/** Adds an "external" constraint to this System. 
  
@@ -87,10 +162,9 @@ The `constraint` will automatically persist across system scalar
 conversion. */)""")
       .def(
           "AddTriggeredWitnessFunctionToCompositeEventCollection",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Event<double> *,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
-              &::drake::systems::System<double>::
+          static_cast<void (System<double>::*)(
+              Event<double> *, CompositeEventCollection<double> *) const>(
+              &System<double>::
                   AddTriggeredWitnessFunctionToCompositeEventCollection),
           py::arg("event"), py::arg("events"),
           R"""(/** Add `event` to `events` due to a witness function triggering. `events` 
@@ -103,9 +177,8 @@ the type of that data must be WitnessTriggeredEventData. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::CompositeEventCollection<double>,
               std::default_delete<drake::systems::CompositeEventCollection<
-                  double>>> (::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<
-                  double>::AllocateCompositeEventCollection),
+                  double>>> (System<double>::*)() const>(
+              &System<double>::AllocateCompositeEventCollection),
           R"""(/** Allocates a CompositeEventCollection for this system. The allocated 
 instance is used for populating collections of triggered events; for 
 example, Simulator passes this object to System::CalcNextUpdateTime() to 
@@ -115,24 +188,22 @@ allow the system to identify and handle upcoming events. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::Context<double>,
               std::default_delete<drake::systems::Context<double>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::AllocateContext),
+              System<double>::*)() const>(&System<double>::AllocateContext),
           R"""(/** Returns a Context<T> suitable for use with this System<T>. */)""")
       .def(
           "AllocateDiscreteVariables",
           static_cast<::std::unique_ptr<
               drake::systems::DiscreteValues<double>,
               std::default_delete<drake::systems::DiscreteValues<double>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::AllocateDiscreteVariables),
+              System<double>::*)() const>(
+              &System<double>::AllocateDiscreteVariables),
           R"""(/** Returns a DiscreteValues of the same dimensions as the discrete_state 
 allocated in CreateDefaultContext. The simulator will provide this state 
 as the output argument to Update. */)""")
       .def(
           "AllocateFixedInputs",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> *) const>(
-              &::drake::systems::System<double>::AllocateFixedInputs),
+          static_cast<void (System<double>::*)(Context<double> *) const>(
+              &System<double>::AllocateFixedInputs),
           py::arg("context"),
           R"""(/** For each input port, allocates a fixed input of the concrete type 
 that this System requires, and binds it to the port, disconnecting any 
@@ -143,33 +214,30 @@ prior input. Does not assign any values to the fixed inputs. */)""")
                    drake::systems::DiscreteUpdateEvent<double>>,
                std::default_delete<drake::systems::EventCollection<
                    drake::systems::DiscreteUpdateEvent<double>>>> (
-               ::drake::systems::System<double>::*)() const>(
-               &::drake::systems::System<
-                   double>::AllocateForcedDiscreteUpdateEventCollection))
+               System<double>::*)() const>(
+               &System<double>::AllocateForcedDiscreteUpdateEventCollection))
       .def("AllocateForcedPublishEventCollection",
            static_cast<::std::unique_ptr<
                drake::systems::EventCollection<
                    drake::systems::PublishEvent<double>>,
                std::default_delete<drake::systems::EventCollection<
-                   drake::systems::PublishEvent<double>>>> (
-               ::drake::systems::System<double>::*)() const>(
-               &::drake::systems::System<
-                   double>::AllocateForcedPublishEventCollection))
-      .def("AllocateForcedUnrestrictedUpdateEventCollection",
-           static_cast<::std::unique_ptr<
-               drake::systems::EventCollection<
-                   drake::systems::UnrestrictedUpdateEvent<double>>,
-               std::default_delete<drake::systems::EventCollection<
-                   drake::systems::UnrestrictedUpdateEvent<double>>>> (
-               ::drake::systems::System<double>::*)() const>(
-               &::drake::systems::System<
-                   double>::AllocateForcedUnrestrictedUpdateEventCollection))
+                   drake::systems::PublishEvent<double>>>> (System<double>::*)()
+                           const>(
+               &System<double>::AllocateForcedPublishEventCollection))
+      .def(
+          "AllocateForcedUnrestrictedUpdateEventCollection",
+          static_cast<::std::unique_ptr<
+              drake::systems::EventCollection<
+                  drake::systems::UnrestrictedUpdateEvent<double>>,
+              std::default_delete<drake::systems::EventCollection<
+                  drake::systems::UnrestrictedUpdateEvent<double>>>> (
+              System<double>::*)() const>(
+              &System<double>::AllocateForcedUnrestrictedUpdateEventCollection))
       .def(
           "AllocateImplicitTimeDerivativesResidual",
           static_cast<::Eigen::Matrix<double, -1, 1, 0, -1, 1> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<
-                  double>::AllocateImplicitTimeDerivativesResidual),
+              System<double>::*)() const>(
+              &System<double>::AllocateImplicitTimeDerivativesResidual),
           R"""(/** Returns an Eigen VectorX suitable for use as the output argument to 
 the CalcImplicitTimeDerivativesResidual() method. The returned VectorX 
 will have size implicit_time_derivatives_residual_size() with the 
@@ -179,9 +247,8 @@ to use any properly-sized mutable Eigen object as the residual vector. */)""")
           "AllocateInputAbstract",
           static_cast<::std::unique_ptr<
               drake::AbstractValue, std::default_delete<drake::AbstractValue>> (
-              ::drake::systems::System<double>::*)(
-              ::drake::systems::InputPort<double> const &) const>(
-              &::drake::systems::System<double>::AllocateInputAbstract),
+              System<double>::*)(InputPort<double> const &) const>(
+              &System<double>::AllocateInputAbstract),
           py::arg("input_port"),
           R"""(/** Given an input port, allocates the abstract storage.  The @p input_port 
 must match a port declared via DeclareInputPort. */)""")
@@ -190,9 +257,8 @@ must match a port declared via DeclareInputPort. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::BasicVector<double>,
               std::default_delete<drake::systems::BasicVector<double>>> (
-              ::drake::systems::System<double>::*)(
-              ::drake::systems::InputPort<double> const &) const>(
-              &::drake::systems::System<double>::AllocateInputVector),
+              System<double>::*)(InputPort<double> const &) const>(
+              &System<double>::AllocateInputVector),
           py::arg("input_port"),
           R"""(/** Given an input port, allocates the vector storage.  The @p input_port 
 must match a port declared via DeclareInputPort. */)""")
@@ -201,8 +267,7 @@ must match a port declared via DeclareInputPort. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::SystemOutput<double>,
               std::default_delete<drake::systems::SystemOutput<double>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::AllocateOutput),
+              System<double>::*)() const>(&System<double>::AllocateOutput),
           R"""(/** Returns a container that can hold the values of all of this System's 
 output ports. It is sized with the number of output ports and uses each 
 output port's allocation method to provide an object of the right type 
@@ -212,20 +277,20 @@ for that port. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::ContinuousState<double>,
               std::default_delete<drake::systems::ContinuousState<double>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::AllocateTimeDerivatives),
+              System<double>::*)() const>(
+              &System<double>::AllocateTimeDerivatives),
           R"""(/** Returns a ContinuousState of the same size as the continuous_state 
 allocated in CreateDefaultContext. The simulator will provide this state 
 as the output argument to EvalTimeDerivatives. */)""")
-      .def("ApplyDiscreteVariableUpdate",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::EventCollection<
-                   drake::systems::DiscreteUpdateEvent<double>> const &,
-               ::drake::systems::DiscreteValues<double> *,
-               ::drake::systems::Context<double> *) const>(
-               &::drake::systems::System<double>::ApplyDiscreteVariableUpdate),
-           py::arg("events"), py::arg("discrete_state"), py::arg("context"),
-           R"""(/** Given the @p discrete_state results of a previous call to 
+      .def(
+          "ApplyDiscreteVariableUpdate",
+          static_cast<void (System<double>::*)(
+              EventCollection<drake::systems::DiscreteUpdateEvent<double>> const
+                  &,
+              DiscreteValues<double> *, Context<double> *) const>(
+              &System<double>::ApplyDiscreteVariableUpdate),
+          py::arg("events"), py::arg("discrete_state"), py::arg("context"),
+          R"""(/** Given the @p discrete_state results of a previous call to 
 CalcDiscreteVariableUpdates() that dispatched the given collection of 
 events, modifies the @p context to reflect the updated @p discrete_state. 
 @param[in] events 
@@ -244,12 +309,11 @@ events, modifies the @p context to reflect the updated @p discrete_state.
      collection. */)""")
       .def(
           "ApplyUnrestrictedUpdate",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::EventCollection<
+          static_cast<void (System<double>::*)(
+              EventCollection<
                   drake::systems::UnrestrictedUpdateEvent<double>> const &,
-              ::drake::systems::State<double> *,
-              ::drake::systems::Context<double> *) const>(
-              &::drake::systems::System<double>::ApplyUnrestrictedUpdate),
+              State<double> *, Context<double> *) const>(
+              &System<double>::ApplyUnrestrictedUpdate),
           py::arg("events"), py::arg("state"), py::arg("context"),
           R"""(/** Given the @p state results of a previous call to CalcUnrestrictedUpdate() 
 that dispatched the given collection of events, modifies the @p context to 
@@ -269,9 +333,8 @@ reflect the updated @p state.
      that dispatched this @p events collection. */)""")
       .def(
           "CalcConservativePower",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::CalcConservativePower),
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(&System<double>::CalcConservativePower),
           py::arg("context"),
           R"""(/** Calculates and returns the conservative power represented by the current 
 contents of the given `context`. Prefer EvalConservativePower() to avoid 
@@ -280,12 +343,12 @@ unnecessary recalculation.
 @see EvalConservativePower() for more information. */)""")
       .def(
           "CalcDiscreteVariableUpdates",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
-                  drake::systems::DiscreteUpdateEvent<double>> const &,
-              ::drake::systems::DiscreteValues<double> *) const>(
-              &::drake::systems::System<double>::CalcDiscreteVariableUpdates),
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<drake::systems::DiscreteUpdateEvent<double>> const
+                  &,
+              DiscreteValues<double> *) const>(
+              &System<double>::CalcDiscreteVariableUpdates),
           py::arg("context"), py::arg("events"), py::arg("discrete_state"),
           R"""(/** This method is the public entry point for dispatching all discrete 
 variable update event handlers. Using all the discrete update handlers in 
@@ -295,20 +358,17 @@ discrete_state. See documentation for
 DispatchDiscreteVariableUpdateHandler() for more details. */)""")
       .def(
           "CalcDiscreteVariableUpdates",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::DiscreteValues<double> *) const>(
-              &::drake::systems::System<double>::CalcDiscreteVariableUpdates),
+          static_cast<void (System<double>::*)(Context<double> const &,
+                                               DiscreteValues<double> *) const>(
+              &System<double>::CalcDiscreteVariableUpdates),
           py::arg("context"), py::arg("discrete_state"),
           R"""(/** This method forces a discrete update on the system given a @p context, 
 and the updated discrete state is stored in @p discrete_state. The 
 discrete update event will have a trigger type of kForced, with no 
 attribute or custom callback. */)""")
       .def("CalcImplicitTimeDerivativesResidual",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
-              ::drake::systems::ContinuousState<double> const
-                  &proposed_derivatives,
+           [](System<double> &self, Context<double> const &context,
+              ContinuousState<double> const &proposed_derivatives,
               Eigen::Ref<
                   ::drake::EigenPtr<Eigen::Matrix<double, -1, 1, 0, -1, 1>>, 0,
                   Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>
@@ -318,9 +378,8 @@ attribute or custom callback. */)""")
            })
       .def(
           "CalcKineticEnergy",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::CalcKineticEnergy),
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(&System<double>::CalcKineticEnergy),
           py::arg("context"),
           R"""(/** Calculates and returns the kinetic energy represented by the current 
 configuration and velocity provided in `context`. Prefer 
@@ -329,10 +388,9 @@ EvalKineticEnergy() to avoid unnecessary recalculation.
 @see EvalKineticEnergy() for more information. */)""")
       .def(
           "CalcNextUpdateTime",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
-              &::drake::systems::System<double>::CalcNextUpdateTime),
+          static_cast<double (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *)
+                          const>(&System<double>::CalcNextUpdateTime),
           py::arg("context"), py::arg("events"),
           R"""(/** This method is called by a Simulator during its calculation of the size of 
 the next continuous step to attempt. The System returns the next time at 
@@ -350,9 +408,8 @@ in the returned event collection.
 @p events cannot be null. @p events will be cleared on entry. */)""")
       .def(
           "CalcNonConservativePower",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::CalcNonConservativePower),
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(&System<double>::CalcNonConservativePower),
           py::arg("context"),
           R"""(/** Calculates and returns the non-conservative power represented by the 
 current contents of the given `context`. Prefer EvalNonConservativePower() 
@@ -361,10 +418,9 @@ to avoid unnecessary recalculation.
 @see EvalNonConservativePower() for more information. */)""")
       .def(
           "CalcOutput",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::SystemOutput<double> *) const>(
-              &::drake::systems::System<double>::CalcOutput),
+          static_cast<void (System<double>::*)(Context<double> const &,
+                                               SystemOutput<double> *) const>(
+              &System<double>::CalcOutput),
           py::arg("context"), py::arg("outputs"),
           R"""(/** Utility method that computes for _every_ output port i the value y(i) that 
 should result from the current contents of the given Context. Note that 
@@ -376,9 +432,8 @@ input ports, parameters, and state variables. The result is written to
 of entries of the right types. */)""")
       .def(
           "CalcPotentialEnergy",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::CalcPotentialEnergy),
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(&System<double>::CalcPotentialEnergy),
           py::arg("context"),
           R"""(/** Calculates and returns the potential energy represented by the current 
 configuration provided in `context`. Prefer EvalPotentialEnergy() to 
@@ -387,10 +442,9 @@ avoid unnecessary recalculation.
 @see EvalPotentialEnergy() for more information. */)""")
       .def(
           "CalcTimeDerivatives",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::ContinuousState<double> *) const>(
-              &::drake::systems::System<double>::CalcTimeDerivatives),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, ContinuousState<double> *) const>(
+              &System<double>::CalcTimeDerivatives),
           py::arg("context"), py::arg("derivatives"),
           R"""(/** Calculates the time derivatives ẋ꜀ of the continuous state x꜀ into 
 a given output argument. Prefer EvalTimeDerivatives() instead to avoid 
@@ -414,12 +468,11 @@ input values u are obtained.
      equations.*/)""")
       .def(
           "CalcUnrestrictedUpdate",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<
                   drake::systems::UnrestrictedUpdateEvent<double>> const &,
-              ::drake::systems::State<double> *) const>(
-              &::drake::systems::System<double>::CalcUnrestrictedUpdate),
+              State<double> *) const>(&System<double>::CalcUnrestrictedUpdate),
           py::arg("context"), py::arg("events"), py::arg("state"),
           R"""(/** This method is the public entry point for dispatching all unrestricted 
 update event handlers. Using all the unrestricted update handers in 
@@ -432,10 +485,9 @@ DispatchUnrestrictedUpdateHandler() for more details.
         changes in the callback. */)""")
       .def(
           "CalcUnrestrictedUpdate",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::State<double> *) const>(
-              &::drake::systems::System<double>::CalcUnrestrictedUpdate),
+          static_cast<void (System<double>::*)(Context<double> const &,
+                                               State<double> *) const>(
+              &System<double>::CalcUnrestrictedUpdate),
           py::arg("context"), py::arg("state"),
           R"""(/** This method forces an unrestricted update on the system given a 
 @p context, and the updated state is stored in @p state. The 
@@ -446,27 +498,23 @@ additional data, attribute or custom callback.
 EventCollection<UnrestrictedUpdateEvent<T>>*, State<T>* state) 
     for more information. */)""")
       .def("CalcWitnessValue",
-           static_cast<double (::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> const &,
-               ::drake::systems::WitnessFunction<double> const &) const>(
-               &::drake::systems::System<double>::CalcWitnessValue),
+           static_cast<double (System<double>::*)(
+               Context<double> const &, WitnessFunction<double> const &) const>(
+               &System<double>::CalcWitnessValue),
            py::arg("context"), py::arg("witness_func"),
            R"""(/** Evaluates a witness function at the given context. */)""")
       .def("CheckSystemConstraintsSatisfied",
            static_cast<::drake::scalar_predicate<double>::type (
-               ::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> const &, double) const>(
-               &::drake::systems::System<
-                   double>::CheckSystemConstraintsSatisfied),
+               System<double>::*)(Context<double> const &, double) const>(
+               &System<double>::CheckSystemConstraintsSatisfied),
            py::arg("context"), py::arg("tol"),
            R"""(/** Returns true if @p context satisfies all of the registered 
 SystemConstraints with tolerance @p tol.  @see 
 SystemConstraint::CheckSatisfied. */)""")
       .def(
           "CheckValidOutput",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::SystemOutput<double> const *) const>(
-              &::drake::systems::System<double>::CheckValidOutput),
+          static_cast<void (System<double>::*)(SystemOutput<double> const *)
+                          const>(&System<double>::CheckValidOutput),
           py::arg("output"),
           R"""(/** Checks that @p output is consistent with the number and size of output 
 ports declared by the system. 
@@ -475,9 +523,8 @@ system. */)""")
       .def(
           "CopyContinuousStateVector",
           static_cast<::Eigen::Matrix<double, -1, 1, 0, -1, 1> (
-              ::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::CopyContinuousStateVector),
+              System<double>::*)(Context<double> const &) const>(
+              &System<double>::CopyContinuousStateVector),
           py::arg("context"),
           R"""(/** Returns a copy of the continuous state vector x꜀ into an Eigen 
 vector. */)""")
@@ -486,20 +533,20 @@ vector. */)""")
           static_cast<::std::unique_ptr<
               drake::systems::Context<double>,
               std::default_delete<drake::systems::Context<double>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::CreateDefaultContext),
+              System<double>::*)() const>(
+              &System<double>::CreateDefaultContext),
           R"""(/** This convenience method allocates a context using AllocateContext() and 
 sets its default values using SetDefaultContext(). */)""")
       .def(
           "DeclareInputPort",
-          static_cast<::drake::systems::InputPort<double> &(
-              ::drake::systems::System<double>::
-                  *)(::std::variant<
-                         std::basic_string<char, std::char_traits<char>,
-                                           std::allocator<char>>,
-                         drake::systems::UseDefaultName>,
-                     ::drake::systems::PortDataType, int,
-                     ::std::optional<drake::RandomDistribution>)>(
+          static_cast<InputPort<double> &(
+              System<double>::*)(::std::variant<
+                                     std::basic_string<char,
+                                                       std::char_traits<char>,
+                                                       std::allocator<char>>,
+                                     drake::systems::UseDefaultName>,
+                                 PortDataType, int,
+                                 ::std::optional<drake::RandomDistribution>)>(
               &System_double_publicist::DeclareInputPort),
           py::arg("name"), py::arg("type"), py::arg("size"),
           py::arg("random_type") =
@@ -521,10 +568,9 @@ ports are assumed to be statistically independent.
 @returns the declared port. */)""")
       .def(
           "DeclareInputPort",
-          static_cast<::drake::systems::InputPort<double> &(
-              ::drake::systems::System<
-                  double>::*)(::drake::systems::PortDataType, int,
-                              ::std::optional<drake::RandomDistribution>)>(
+          static_cast<InputPort<double> &(
+              System<double>::*)(PortDataType, int,
+                                 ::std::optional<drake::RandomDistribution>)>(
               &System_double_publicist::DeclareInputPort),
           py::arg("type"), py::arg("size"),
           py::arg("random_type") =
@@ -534,56 +580,55 @@ specifying the port name.  This version will be deprecated as discussed
 in #9447. */)""")
       .def(
           "DispatchDiscreteVariableUpdateHandler",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
-                  drake::systems::DiscreteUpdateEvent<double>> const &,
-              ::drake::systems::DiscreteValues<double> *) const>(
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<drake::systems::DiscreteUpdateEvent<double>> const
+                  &,
+              DiscreteValues<double> *) const>(
               &System_double_publicist::DispatchDiscreteVariableUpdateHandler),
           py::arg("context"), py::arg("events"), py::arg("discrete_state"),
           R"""(/** This function dispatches all discrete update events to the appropriate 
 handlers. @p discrete_state cannot be null. */)""")
       .def(
           "DispatchPublishHandler",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
-                  drake::systems::PublishEvent<double>> const &) const>(
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<drake::systems::PublishEvent<double>> const &)
+                          const>(
               &System_double_publicist::DispatchPublishHandler),
           py::arg("context"), py::arg("events"),
           R"""(/** This function dispatches all publish events to the appropriate 
 handlers. */)""")
       .def(
           "DispatchUnrestrictedUpdateHandler",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<
                   drake::systems::UnrestrictedUpdateEvent<double>> const &,
-              ::drake::systems::State<double> *) const>(
+              State<double> *) const>(
               &System_double_publicist::DispatchUnrestrictedUpdateHandler),
           py::arg("context"), py::arg("events"), py::arg("state"),
           R"""(/** This function dispatches all unrestricted update events to the appropriate 
 handlers. @p state cannot be null. */)""")
-      .def("DoApplyDiscreteVariableUpdate",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::EventCollection<
-                   drake::systems::DiscreteUpdateEvent<double>> const &,
-               ::drake::systems::DiscreteValues<double> *,
-               ::drake::systems::Context<double> *) const>(
-               &System_double_publicist::DoApplyDiscreteVariableUpdate),
-           py::arg("events"), py::arg("discrete_state"), py::arg("context"))
+      .def(
+          "DoApplyDiscreteVariableUpdate",
+          static_cast<void (System<double>::*)(
+              EventCollection<drake::systems::DiscreteUpdateEvent<double>> const
+                  &,
+              DiscreteValues<double> *, Context<double> *) const>(
+              &System_double_publicist::DoApplyDiscreteVariableUpdate),
+          py::arg("events"), py::arg("discrete_state"), py::arg("context"))
       .def("DoApplyUnrestrictedUpdate",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::EventCollection<
+           static_cast<void (System<double>::*)(
+               EventCollection<
                    drake::systems::UnrestrictedUpdateEvent<double>> const &,
-               ::drake::systems::State<double> *,
-               ::drake::systems::Context<double> *) const>(
+               State<double> *, Context<double> *) const>(
                &System_double_publicist::DoApplyUnrestrictedUpdate),
            py::arg("events"), py::arg("state"), py::arg("context"))
       .def(
           "DoCalcConservativePower",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(
               &System_double_publicist::DoCalcConservativePower),
           py::arg("context"),
           R"""(/** Override this method to return the rate Pc at which mechanical energy is 
@@ -597,10 +642,8 @@ particular, this quantity must be _positive_ when potential energy
 is _decreasing_, and your conservative power method must _not_ depend 
 explicitly on time or any input port values. */)""")
       .def("DoCalcImplicitTimeDerivativesResidual",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
-              ::drake::systems::ContinuousState<double> const
-                  &proposed_derivatives,
+           [](System<double> &self, Context<double> const &context,
+              ContinuousState<double> const &proposed_derivatives,
               Eigen::Ref<
                   ::drake::EigenPtr<Eigen::Matrix<double, -1, 1, 0, -1, 1>>, 0,
                   Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>
@@ -610,9 +653,8 @@ explicitly on time or any input port values. */)""")
            })
       .def(
           "DoCalcKineticEnergy",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &System_double_publicist::DoCalcKineticEnergy),
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(&System_double_publicist::DoCalcKineticEnergy),
           py::arg("context"),
           R"""(/** Override this method for physical systems to calculate the kinetic 
 energy KE currently present in the motion provided in the given 
@@ -625,9 +667,8 @@ particular, your kinetic energy method must _not_ depend explicitly on
 time or any input port values. */)""")
       .def(
           "DoCalcNextUpdateTime",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *,
+          static_cast<void (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *,
               double *) const>(&System_double_publicist::DoCalcNextUpdateTime),
           py::arg("context"), py::arg("events"), py::arg("time"),
           R"""(/** Computes the next time at which this System must perform a discrete 
@@ -649,8 +690,8 @@ The default implementation returns with the next sample time being
 Infinity and no events added to @p events. */)""")
       .def(
           "DoCalcNonConservativePower",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(
               &System_double_publicist::DoCalcNonConservativePower),
           py::arg("context"),
           R"""(/** Override this method to return the rate Pnc at which work W is done on the 
@@ -665,8 +706,8 @@ method can depend on anything you find in the given Context, including
 time and input ports. */)""")
       .def(
           "DoCalcPotentialEnergy",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
+          static_cast<double (System<double>::*)(Context<double> const &)
+                          const>(
               &System_double_publicist::DoCalcPotentialEnergy),
           py::arg("context"),
           R"""(/** Override this method for physical systems to calculate the potential 
@@ -680,9 +721,8 @@ particular, your potential energy method must _not_ depend explicitly on
 time, velocities, or any input port values. */)""")
       .def(
           "DoCalcTimeDerivatives",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::ContinuousState<double> *) const>(
+          static_cast<void (System<double>::*)(
+              Context<double> const &, ContinuousState<double> *) const>(
               &System_double_publicist::DoCalcTimeDerivatives),
           py::arg("context"), py::arg("derivatives"),
           R"""(/** Override this if you have any continuous state variables x꜀ in your 
@@ -703,18 +743,17 @@ The default implementation does nothing if the `derivatives` vector is
 size zero and aborts otherwise. */)""")
       .def(
           "DoCalcWitnessValue",
-          static_cast<double (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::WitnessFunction<double> const &) const>(
+          static_cast<double (System<double>::*)(
+              Context<double> const &, WitnessFunction<double> const &) const>(
               &System_double_publicist::DoCalcWitnessValue),
           py::arg("context"), py::arg("witness_func"),
           R"""(/** Derived classes will implement this method to evaluate a witness function 
 at the given context. */)""")
       .def(
           "DoGetInitializationEvents",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
+          static_cast<void (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *)
+                          const>(
               &System_double_publicist::DoGetInitializationEvents),
           py::arg("context"), py::arg("events"),
           R"""(/** Implement this method to return any events to be handled at the 
@@ -726,28 +765,23 @@ changed freely by the overriding implementation.
 The default implementation returns without changing @p events. 
 @sa GetInitializationEvents() */)""")
       .def("DoGetMutableTargetSystemCompositeEventCollection",
-           static_cast<::drake::systems::CompositeEventCollection<double> *(
-               ::drake::systems::System<double>::
-                   *)(::drake::systems::System<double> const &,
-                      ::drake::systems::CompositeEventCollection<double> *)
-                           const>(
-               &::drake::systems::System<
+           static_cast<CompositeEventCollection<double> *(
+               System<double>::*)(System<double> const &,
+                                  CompositeEventCollection<double> *)const>(
+               &System<
                    double>::DoGetMutableTargetSystemCompositeEventCollection),
            py::arg("target_system"), py::arg("events"))
       .def(
           "DoGetMutableTargetSystemState",
-          static_cast<::drake::systems::State<double> *(
-              ::drake::systems::System<double>::
-                  *)(::drake::systems::System<double> const &,
-                     ::drake::systems::State<double> *)const>(
-              &::drake::systems::System<double>::DoGetMutableTargetSystemState),
+          static_cast<State<double> *(System<double>::*)(System<double> const &,
+                                                         State<double> *)const>(
+              &System<double>::DoGetMutableTargetSystemState),
           py::arg("target_system"), py::arg("state"))
       .def(
           "DoGetPerStepEvents",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
-              &System_double_publicist::DoGetPerStepEvents),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *)
+                          const>(&System_double_publicist::DoGetPerStepEvents),
           py::arg("context"), py::arg("events"),
           R"""(/** Implement this method to return any events to be handled before the 
 simulator integrates the system's continuous state at each time step. 
@@ -769,49 +803,41 @@ The default implementation returns without changing @p events.
               std::allocator<std::pair<
                   const drake::systems::PeriodicEventData,
                   std::vector<const drake::systems::Event<double> *,
-                              std::allocator<
-                                  const drake::systems::Event<double> *>>>>> (
-              ::drake::systems::System<double>::*)() const>(
+                              std::allocator<const drake::systems::Event<
+                                  double> *>>>>> (System<double>::*)() const>(
               &System_double_publicist::DoGetPeriodicEvents),
           R"""(/** Implement this method to return all periodic triggered events. 
 @see GetPeriodicEvents() for a detailed description of the returned 
      variable. 
 @note The default implementation returns an empty map. */)""")
       .def("DoGetTargetSystemCompositeEventCollection",
-           static_cast<::drake::systems::CompositeEventCollection<double> const
-                           *(::drake::systems::System<double>::
-                                 *)(::drake::systems::System<double> const &,
-                                    ::drake::systems::CompositeEventCollection<
-                                        double> const *)const>(
-               &::drake::systems::System<
-                   double>::DoGetTargetSystemCompositeEventCollection),
+           static_cast<CompositeEventCollection<double> const *(
+               System<double>::*)(System<double> const &,
+                                  CompositeEventCollection<double> const *)
+                           const>(
+               &System<double>::DoGetTargetSystemCompositeEventCollection),
            py::arg("target_system"), py::arg("events"))
       .def("DoGetTargetSystemContext",
-           static_cast<::drake::systems::Context<double> const *(
-               ::drake::systems::System<double>::
-                   *)(::drake::systems::System<double> const &,
-                      ::drake::systems::Context<double> const *)const>(
-               &::drake::systems::System<double>::DoGetTargetSystemContext),
+           static_cast<Context<double> const *(
+               System<double>::*)(System<double> const &,
+                                  Context<double> const *)const>(
+               &System<double>::DoGetTargetSystemContext),
            py::arg("target_system"), py::arg("context"))
       .def("DoGetTargetSystemContinuousState",
-           static_cast<::drake::systems::ContinuousState<double> const *(
-               ::drake::systems::System<double>::
-                   *)(::drake::systems::System<double> const &,
-                      ::drake::systems::ContinuousState<double> const *)const>(
-               &::drake::systems::System<
-                   double>::DoGetTargetSystemContinuousState),
+           static_cast<ContinuousState<double> const *(
+               System<double>::*)(System<double> const &,
+                                  ContinuousState<double> const *)const>(
+               &System<double>::DoGetTargetSystemContinuousState),
            py::arg("target_system"), py::arg("xc"))
       .def("DoGetTargetSystemState",
-           static_cast<::drake::systems::State<double> const *(
-               ::drake::systems::System<double>::
-                   *)(::drake::systems::System<double> const &,
-                      ::drake::systems::State<double> const *)const>(
-               &::drake::systems::System<double>::DoGetTargetSystemState),
+           static_cast<State<double> const *(
+               System<double>::*)(System<double> const &, State<double> const *)
+                           const>(&System<double>::DoGetTargetSystemState),
            py::arg("target_system"), py::arg("state"))
       .def(
           "DoGetWitnessFunctions",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
               ::std::vector<const drake::systems::WitnessFunction<double> *,
                             std::allocator<const drake::systems::
                                                WitnessFunction<double> *>> *)
@@ -824,29 +850,25 @@ entry to this function, the context will have already been validated and
 the vector of witness functions will have been validated to be both empty 
 and non-null. */)""")
       .def("DoMapQDotToVelocity",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
+           [](System<double> &self, Context<double> const &context,
               ::Eigen::Ref<const Eigen::Matrix<double, -1, 1, 0, -1, 1>, 0,
                            Eigen::InnerStride<1>> const &qdot,
-              ::drake::systems::VectorBase<double> *generalized_velocity) {
+              VectorBase<double> *generalized_velocity) {
              return self.DoMapQDotToVelocity(context, qdot,
                                              generalized_velocity);
            })
       .def("DoMapVelocityToQDot",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
+           [](System<double> &self, Context<double> const &context,
               ::Eigen::Ref<const Eigen::Matrix<double, -1, 1, 0, -1, 1>, 0,
                            Eigen::InnerStride<1>> const &generalized_velocity,
-              ::drake::systems::VectorBase<double> *qdot) {
+              VectorBase<double> *qdot) {
              return self.DoMapVelocityToQDot(context, generalized_velocity,
                                              qdot);
            })
       .def(
           "EvalConservativePower",
-          static_cast<double const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::EvalConservativePower),
+          static_cast<double const &(System<double>::*)(Context<double> const &)
+                          const>(&System<double>::EvalConservativePower),
           py::arg("context"),
           R"""(/** Returns a reference to the cached value of the conservative power (Pc), 
 evaluating first if necessary using CalcConservativePower(). 
@@ -875,11 +897,10 @@ Non-physical systems where Pc is not meaningful will return Pc = 0.
      EvalPotentialEnergy(), EvalKineticEnergy() */)""")
       .def(
           "EvalEigenVectorInput",
-          static_cast<
-              ::Eigen::VectorBlock<const Eigen::Matrix<double, -1, 1, 0, -1, 1>,
-                                   -1> (::drake::systems::System<double>::*)(
-                  ::drake::systems::Context<double> const &, int) const>(
-              &::drake::systems::System<double>::EvalEigenVectorInput),
+          static_cast<::Eigen::VectorBlock<
+              const Eigen::Matrix<double, -1, 1, 0, -1, 1>, -1> (
+              System<double>::*)(Context<double> const &, int) const>(
+              &System<double>::EvalEigenVectorInput),
           py::arg("context"), py::arg("port_index"),
           R"""(/** Returns the value of the vector-valued input port with the given 
 `port_index` as an %Eigen vector. Causes the value to become up to date 
@@ -892,10 +913,8 @@ first if necessary. See EvalAbstractInput() for more information.
 @see EvalVectorInput() */)""")
       .def(
           "EvalKineticEnergy",
-          static_cast<double const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::EvalKineticEnergy),
+          static_cast<double const &(System<double>::*)(Context<double> const &)
+                          const>(&System<double>::EvalKineticEnergy),
           py::arg("context"),
           R"""(/** Returns a reference to the cached value of the kinetic energy (KE), 
 evaluating first if necessary using CalcKineticEnergy(). 
@@ -916,10 +935,8 @@ Non-physical systems where KE is not meaningful will return KE = 0.
 @see CalcKineticEnergy() */)""")
       .def(
           "EvalNonConservativePower",
-          static_cast<double const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::EvalNonConservativePower),
+          static_cast<double const &(System<double>::*)(Context<double> const &)
+                          const>(&System<double>::EvalNonConservativePower),
           py::arg("context"),
           R"""(/** Returns a reference to the cached value of the non-conservative power 
 (Pnc), evaluating first if necessary using CalcNonConservativePower(). 
@@ -943,10 +960,8 @@ Non-physical systems where Pnc is not meaningful will return Pnc = 0.
 @see CalcNonConservativePower(), EvalConservativePower() */)""")
       .def(
           "EvalPotentialEnergy",
-          static_cast<double const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::EvalPotentialEnergy),
+          static_cast<double const &(System<double>::*)(Context<double> const &)
+                          const>(&System<double>::EvalPotentialEnergy),
           py::arg("context"),
           R"""(/** Returns a reference to the cached value of the potential energy (PE), 
 evaluating first if necessary using CalcPotentialEnergy(). 
@@ -968,10 +983,9 @@ Non-physical systems where PE is not meaningful will return PE = 0.
 @see CalcPotentialEnergy() */)""")
       .def(
           "EvalTimeDerivatives",
-          static_cast<::drake::systems::ContinuousState<double> const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::EvalTimeDerivatives),
+          static_cast<ContinuousState<double> const &(
+              System<double>::*)(Context<double> const &)const>(
+              &System<double>::EvalTimeDerivatives),
           py::arg("context"),
           R"""(/** Returns a reference to the cached value of the continuous state variable 
 time derivatives, evaluating first if necessary using CalcTimeDerivatives(). 
@@ -991,11 +1005,9 @@ accuracy values may be used to evaluate the derivatives.
      get_time_derivatives_cache_entry() */)""")
       .def(
           "FixInputPortsFrom",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::System<double> const &,
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::Context<double> *) const>(
-              &::drake::systems::System<double>::FixInputPortsFrom),
+          static_cast<void (System<double>::*)(
+              System<double> const &, Context<double> const &,
+              Context<double> *) const>(&System<double>::FixInputPortsFrom),
           py::arg("other_system"), py::arg("other_context"),
           py::arg("target_context"),
           R"""(/** Fixes all of the input ports in @p target_context to their current values 
@@ -1005,9 +1017,8 @@ have the same shape as this System, and the `other_system`. Ignores
 disconnected inputs. */)""")
       .def(
           "GetGraphvizFragment",
-          static_cast<void (::drake::systems::System<double>::*)(
-              int, ::std::stringstream *) const>(
-              &::drake::systems::System<double>::GetGraphvizFragment),
+          static_cast<void (System<double>::*)(int, ::std::stringstream *)
+                          const>(&System<double>::GetGraphvizFragment),
           py::arg("max_depth"), py::arg("dot"),
           R"""(/** Appends a Graphviz fragment to the @p dot stream.  The fragment must be 
 valid Graphviz when wrapped in a `digraph` or `subgraph` stanza.  Does 
@@ -1017,32 +1028,30 @@ nothing by default.
 visualize.  Set to zero to render a diagram as a single system block. */)""")
       .def(
           "GetGraphvizId",
-          static_cast<::int64_t (::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::GetGraphvizId),
+          static_cast<::int64_t (System<double>::*)() const>(
+              &System<double>::GetGraphvizId),
           R"""(/** Returns an opaque integer that uniquely identifies this system in the 
 Graphviz output. */)""")
       .def(
           "GetGraphvizInputPortToken",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::InputPort<double> const &, int,
-              ::std::stringstream *) const>(
-              &::drake::systems::System<double>::GetGraphvizInputPortToken),
+          static_cast<void (System<double>::*)(
+              InputPort<double> const &, int, ::std::stringstream *) const>(
+              &System<double>::GetGraphvizInputPortToken),
           py::arg("port"), py::arg("max_depth"), py::arg("dot"),
           R"""(/** Appends a fragment to the @p dot stream identifying the graphviz node 
 representing @p port. Does nothing by default. */)""")
       .def(
           "GetGraphvizOutputPortToken",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::OutputPort<double> const &, int,
-              ::std::stringstream *) const>(
-              &::drake::systems::System<double>::GetGraphvizOutputPortToken),
+          static_cast<void (System<double>::*)(OutputPort<double> const &, int,
+                                               ::std::stringstream *) const>(
+              &System<double>::GetGraphvizOutputPortToken),
           py::arg("port"), py::arg("max_depth"), py::arg("dot"),
           R"""(/** Appends a fragment to the @p dot stream identifying the graphviz node 
 representing @p port. Does nothing by default. */)""")
       .def(
           "GetGraphvizString",
-          static_cast<::std::string (::drake::systems::System<double>::*)(
-              int) const>(&::drake::systems::System<double>::GetGraphvizString),
+          static_cast<::std::string (System<double>::*)(int) const>(
+              &System<double>::GetGraphvizString),
           py::arg("max_depth") = int(std::numeric_limits<int>::max()),
           R"""(/** Returns a Graphviz string describing this System.  To render the string, 
 use the Graphviz tool, ``dot``. http://www.graphviz.org/ 
@@ -1054,10 +1063,9 @@ visualize.  Set to zero to render a diagram as a single system block.
 */)""")
       .def(
           "GetInitializationEvents",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
-              &::drake::systems::System<double>::GetInitializationEvents),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *)
+                          const>(&System<double>::GetInitializationEvents),
           py::arg("context"), py::arg("events"),
           R"""(/** This method is called by Simulator::Initialize() to gather all 
 update and publish events that need to be handled at initialization 
@@ -1066,9 +1074,9 @@ before the simulator starts integration.
 @p events cannot be null. @p events will be cleared on entry. */)""")
       .def(
           "GetInputPort",
-          static_cast<::drake::systems::InputPort<double> const &(
-              ::drake::systems::System<double>::*)(::std::string const &)const>(
-              &::drake::systems::System<double>::GetInputPort),
+          static_cast<InputPort<double> const &(
+              System<double>::*)(::std::string const &)const>(
+              &System<double>::GetInputPort),
           py::arg("port_name"),
           R"""(/** Returns the typed input port with the unique name @p port_name. 
 The current implementation performs a linear search over strings; prefer 
@@ -1076,9 +1084,8 @@ get_input_port() when performance is a concern.
 @throws std::logic_error if port_name is not found. */)""")
       .def(
           "GetMemoryObjectName",
-          static_cast<::std::string (::drake::systems::System<double>::*)()
-                          const>(
-              &::drake::systems::System<double>::GetMemoryObjectName),
+          static_cast<::std::string (System<double>::*)() const>(
+              &System<double>::GetMemoryObjectName),
           R"""(/** Returns a name for this %System based on a stringification of its type 
 name and memory address.  This is intended for use in diagnostic output 
 and should not be used for behavioral logic, because the stringification 
@@ -1088,8 +1095,7 @@ because the address can vary from run to run. */)""")
           "GetMutableOutputVector",
           static_cast<
               ::Eigen::VectorBlock<Eigen::Matrix<double, -1, 1, 0, -1, 1>, -1> (
-                  ::drake::systems::System<double>::*)(
-                  ::drake::systems::SystemOutput<double> *, int) const>(
+                  System<double>::*)(SystemOutput<double> *, int) const>(
               &System_double_publicist::GetMutableOutputVector),
           py::arg("output"), py::arg("port_index"),
           R"""(/** Returns a mutable Eigen expression for a vector valued output port with 
@@ -1098,11 +1104,9 @@ on this output port will be notified that upstream data has changed, and
 may invalidate cache entries as a result. */)""")
       .def(
           "GetMutableSubsystemContext",
-          static_cast<::drake::systems::Context<double> &(
-              ::drake::systems::System<double>::
-                  *)(::drake::systems::System<double> const &,
-                     ::drake::systems::Context<double> *)const>(
-              &::drake::systems::System<double>::GetMutableSubsystemContext),
+          static_cast<Context<double> &(
+              System<double>::*)(System<double> const &, Context<double> *)
+                          const>(&System<double>::GetMutableSubsystemContext),
           py::arg("subsystem"), py::arg("context"),
           R"""(/** Returns a mutable reference to the subcontext that corresponds to the 
 contained %System `subsystem`. 
@@ -1110,10 +1114,9 @@ contained %System `subsystem`.
 @pre The given `context` is valid for use with `this` %System. */)""")
       .def(
           "GetMyContextFromRoot",
-          static_cast<::drake::systems::Context<double> const &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> const &)const>(
-              &::drake::systems::System<double>::GetMyContextFromRoot),
+          static_cast<Context<double> const &(
+              System<double>::*)(Context<double> const &)const>(
+              &System<double>::GetMyContextFromRoot),
           py::arg("root_context"),
           R"""(/** Returns the const Context for `this` subsystem, given a root context. If 
 `this` %System is already the top level (root) %System, just returns 
@@ -1124,19 +1127,17 @@ Context.)
 @see GetSubsystemContext() */)""")
       .def(
           "GetMyMutableContextFromRoot",
-          static_cast<::drake::systems::Context<double> &(
-              ::drake::systems::System<double>::*)(::drake::systems::Context<
-                                                   double> *)const>(
-              &::drake::systems::System<double>::GetMyMutableContextFromRoot),
+          static_cast<Context<double> &(System<double>::*)(Context<double> *)
+                          const>(&System<double>::GetMyMutableContextFromRoot),
           py::arg("root_context"),
           R"""(/** Returns the mutable subsystem context for `this` system, given a root 
 context. 
 @see GetMyContextFromRoot() */)""")
       .def(
           "GetOutputPort",
-          static_cast<::drake::systems::OutputPort<double> const &(
-              ::drake::systems::System<double>::*)(::std::string const &)const>(
-              &::drake::systems::System<double>::GetOutputPort),
+          static_cast<OutputPort<double> const &(
+              System<double>::*)(::std::string const &)const>(
+              &System<double>::GetOutputPort),
           py::arg("port_name"),
           R"""(/** Returns the typed output port with the unique name @p port_name. 
 The current implementation performs a linear search over strings; prefer 
@@ -1144,10 +1145,9 @@ get_output_port() when performance is a concern.
 @throws std::logic_error if port_name is not found. */)""")
       .def(
           "GetPerStepEvents",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::CompositeEventCollection<double> *) const>(
-              &::drake::systems::System<double>::GetPerStepEvents),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, CompositeEventCollection<double> *)
+                          const>(&System<double>::GetPerStepEvents),
           py::arg("context"), py::arg("events"),
           R"""(/** This method is called by Simulator::Initialize() to gather all update 
 and publish events that are to be handled in AdvanceTo() at the point 
@@ -1172,20 +1172,18 @@ continuous state.
               std::allocator<std::pair<
                   const drake::systems::PeriodicEventData,
                   std::vector<const drake::systems::Event<double> *,
-                              std::allocator<
-                                  const drake::systems::Event<double> *>>>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::GetPeriodicEvents),
+                              std::allocator<const drake::systems::Event<
+                                  double> *>>>>> (System<double>::*)() const>(
+              &System<double>::GetPeriodicEvents),
           R"""(/** Gets all periodic triggered events for a system. Each periodic attribute 
 (offset and period, in seconds) is mapped to one or more update events 
 that are to be triggered at the proper times. */)""")
       .def(
           "GetSubsystemContext",
-          static_cast<::drake::systems::Context<double> const &(
-              ::drake::systems::System<double>::
-                  *)(::drake::systems::System<double> const &,
-                     ::drake::systems::Context<double> const &)const>(
-              &::drake::systems::System<double>::GetSubsystemContext),
+          static_cast<Context<double> const &(
+              System<double>::*)(System<double> const &,
+                                 Context<double> const &)const>(
+              &System<double>::GetSubsystemContext),
           py::arg("subsystem"), py::arg("context"),
           R"""(/** Returns a const reference to the subcontext that corresponds to the 
 contained %System `subsystem`. 
@@ -1194,9 +1192,8 @@ contained %System `subsystem`.
       .def(
           "GetUniquePeriodicDiscreteUpdateAttribute",
           static_cast<::std::optional<drake::systems::PeriodicEventData> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<
-                  double>::GetUniquePeriodicDiscreteUpdateAttribute),
+              System<double>::*)() const>(
+              &System<double>::GetUniquePeriodicDiscreteUpdateAttribute),
           R"""(/** Gets whether there exists a unique periodic attribute that triggers 
 one or more discrete update events (and, if so, returns that unique 
 periodic attribute). Thus, this method can be used (1) as a test to 
@@ -1206,13 +1203,12 @@ times.
 @returns optional<PeriodicEventData> Contains the periodic trigger 
 attributes if the unique periodic attribute exists, otherwise `nullopt`. */)""")
       .def("GetWitnessFunctions",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> const &,
+           static_cast<void (System<double>::*)(
+               Context<double> const &,
                ::std::vector<const drake::systems::WitnessFunction<double> *,
                              std::allocator<const drake::systems::
                                                 WitnessFunction<double> *>> *)
-                           const>(
-               &::drake::systems::System<double>::GetWitnessFunctions),
+                           const>(&System<double>::GetWitnessFunctions),
            py::arg("context"), py::arg("w"),
            R"""(/** Gets the witness functions active for the given state. 
 DoGetWitnessFunctions() does the actual work. The vector of active witness 
@@ -1223,46 +1219,42 @@ functions are expected to change only upon an unrestricted update.
             state. The method aborts if witnesses is null or non-empty. */)""")
       .def(
           "HasAnyDirectFeedthrough",
-          static_cast<bool (::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::HasAnyDirectFeedthrough),
+          static_cast<bool (System<double>::*)() const>(
+              &System<double>::HasAnyDirectFeedthrough),
           R"""(/** Returns `true` if any of the inputs to the system might be directly 
 fed through to any of its outputs and `false` otherwise. */)""")
       .def(
           "HasDirectFeedthrough",
-          static_cast<bool (::drake::systems::System<double>::*)(int) const>(
-              &::drake::systems::System<double>::HasDirectFeedthrough),
+          static_cast<bool (System<double>::*)(int) const>(
+              &System<double>::HasDirectFeedthrough),
           py::arg("output_port"),
           R"""(/** Returns true if there might be direct-feedthrough from any input port to 
 the given @p output_port, and false otherwise. */)""")
       .def(
           "HasDirectFeedthrough",
-          static_cast<bool (::drake::systems::System<double>::*)(int, int)
-                          const>(
-              &::drake::systems::System<double>::HasDirectFeedthrough),
+          static_cast<bool (System<double>::*)(int, int) const>(
+              &System<double>::HasDirectFeedthrough),
           py::arg("input_port"), py::arg("output_port"),
           R"""(/** Returns true if there might be direct-feedthrough from the given 
 @p input_port to the given @p output_port, and false otherwise. */)""")
       .def(
           "HasInputPort",
-          static_cast<bool (::drake::systems::System<double>::*)(
-              ::std::string const &) const>(
-              &::drake::systems::System<double>::HasInputPort),
+          static_cast<bool (System<double>::*)(::std::string const &) const>(
+              &System<double>::HasInputPort),
           py::arg("port_name"),
           R"""(/** Returns true iff the system has an InputPort of the given @p 
  port_name. */)""")
       .def(
           "HasOutputPort",
-          static_cast<bool (::drake::systems::System<double>::*)(
-              ::std::string const &) const>(
-              &::drake::systems::System<double>::HasOutputPort),
+          static_cast<bool (System<double>::*)(::std::string const &) const>(
+              &System<double>::HasOutputPort),
           py::arg("port_name"),
           R"""(/** Returns true iff the system has an OutputPort of the given @p 
  port_name. */)""")
       .def(
           "IsDifferenceEquationSystem",
-          static_cast<bool (::drake::systems::System<double>::*)(double *)
-                          const>(
-              &::drake::systems::System<double>::IsDifferenceEquationSystem),
+          static_cast<bool (System<double>::*)(double *) const>(
+              &System<double>::IsDifferenceEquationSystem),
           py::arg("time_period") = (double *)nullptr,
           R"""(/** Returns true iff the state dynamics of this system are governed 
 exclusively by a difference equation on a single discrete state group 
@@ -1281,11 +1273,9 @@ function returns `false` (the system is not a difference equation
 system), then `time_period` does not receive a value. */)""")
       .def(
           "MapQDotToVelocity",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::VectorBase<double> const &,
-              ::drake::systems::VectorBase<double> *) const>(
-              &::drake::systems::System<double>::MapQDotToVelocity),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, VectorBase<double> const &,
+              VectorBase<double> *) const>(&System<double>::MapQDotToVelocity),
           py::arg("context"), py::arg("qdot"), py::arg("generalized_velocity"),
           R"""(/** Transforms the time derivative `qdot` of the generalized configuration `q` 
 to generalized velocities `v`. `v` and `qdot` are related linearly by 
@@ -1305,20 +1295,17 @@ VectorX object; this signature will copy the VectorBase into an %Eigen
 object before performing the computation. 
 @see MapVelocityToQDot() */)""")
       .def("MapQDotToVelocity",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
+           [](System<double> &self, Context<double> const &context,
               ::Eigen::Ref<const Eigen::Matrix<double, -1, 1, 0, -1, 1>, 0,
                            Eigen::InnerStride<1>> const &qdot,
-              ::drake::systems::VectorBase<double> *generalized_velocity) {
+              VectorBase<double> *generalized_velocity) {
              return self.MapQDotToVelocity(context, qdot, generalized_velocity);
            })
       .def(
           "MapVelocityToQDot",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::VectorBase<double> const &,
-              ::drake::systems::VectorBase<double> *) const>(
-              &::drake::systems::System<double>::MapVelocityToQDot),
+          static_cast<void (System<double>::*)(
+              Context<double> const &, VectorBase<double> const &,
+              VectorBase<double> *) const>(&System<double>::MapVelocityToQDot),
           py::arg("context"), py::arg("generalized_velocity"), py::arg("qdot"),
           R"""(/** Transforms a given generalized velocity `v` to the time derivative `qdot` 
 of the generalized configuration `q` taken from the supplied Context. 
@@ -1333,20 +1320,18 @@ velocity in an Eigen VectorX object; this signature will copy the
 VectorBase into an Eigen object before performing the computation. 
 @see MapQDotToVelocity() */)""")
       .def("MapVelocityToQDot",
-           [](::drake::systems::System<double> &self,
-              ::drake::systems::Context<double> const &context,
+           [](System<double> &self, Context<double> const &context,
               ::Eigen::Ref<const Eigen::Matrix<double, -1, 1, 0, -1, 1>, 0,
                            Eigen::InnerStride<1>> const &generalized_velocity,
-              ::drake::systems::VectorBase<double> *qdot) {
+              VectorBase<double> *qdot) {
              return self.MapVelocityToQDot(context, generalized_velocity, qdot);
            })
       .def(
           "Publish",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::EventCollection<
-                  drake::systems::PublishEvent<double>> const &) const>(
-              &::drake::systems::System<double>::Publish),
+          static_cast<void (System<double>::*)(
+              Context<double> const &,
+              EventCollection<drake::systems::PublishEvent<double>> const &)
+                          const>(&System<double>::Publish),
           py::arg("context"), py::arg("events"),
           R"""(/** This method is the public entry point for dispatching all publish event 
 handlers. It checks the validity of @p context, and directly calls 
@@ -1361,9 +1346,8 @@ case the change in step size may affect the numerical result somewhat
 since a smaller integrator step produces a more accurate solution. */)""")
       .def(
           "Publish",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &) const>(
-              &::drake::systems::System<double>::Publish),
+          static_cast<void (System<double>::*)(Context<double> const &) const>(
+              &System<double>::Publish),
           py::arg("context"),
           R"""(/** Forces a publish on the system, given a @p context. The publish event will 
 have a trigger type of kForced, with no additional data, attribute or 
@@ -1372,44 +1356,39 @@ Simulator::Initialize() and at the start of each continuous integration
 step. See the Simulator API for more details. */)""")
       .def(
           "SetDefaultContext",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> *) const>(
-              &::drake::systems::System<double>::SetDefaultContext),
+          static_cast<void (System<double>::*)(Context<double> *) const>(
+              &System<double>::SetDefaultContext),
           py::arg("context"),
           R"""(/** Sets Context fields to their default values.  User code should not 
 override. */)""")
       .def(
           "SetDefaultParameters",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::Parameters<double> *) const>(
-              &::drake::systems::System<double>::SetDefaultParameters),
+          static_cast<void (System<double>::*)(Context<double> const &,
+                                               Parameters<double> *) const>(
+              &System<double>::SetDefaultParameters),
           py::arg("context"), py::arg("parameters"),
           R"""(/** Assigns default values to all parameters. Overrides must not 
 change the number of parameters. */)""")
       .def(
           "SetDefaultState",
-          static_cast<void (::drake::systems::System<double>::*)(
-              ::drake::systems::Context<double> const &,
-              ::drake::systems::State<double> *) const>(
-              &::drake::systems::System<double>::SetDefaultState),
+          static_cast<void (System<double>::*)(Context<double> const &,
+                                               State<double> *) const>(
+              &System<double>::SetDefaultState),
           py::arg("context"), py::arg("state"),
           R"""(/** Assigns default values to all elements of the state. Overrides must not 
 change the number of state variables. */)""")
       .def("SetRandomContext",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> *, ::drake::RandomGenerator *)
-                           const>(
-               &::drake::systems::System<double>::SetRandomContext),
+           static_cast<void (System<double>::*)(
+               Context<double> *, ::drake::RandomGenerator *) const>(
+               &System<double>::SetRandomContext),
            py::arg("context"), py::arg("generator"),
            R"""(/** Sets Context fields to random values.  User code should not 
 override. */)""")
       .def("SetRandomParameters",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> const &,
-               ::drake::systems::Parameters<double> *,
+           static_cast<void (System<double>::*)(
+               Context<double> const &, Parameters<double> *,
                ::drake::RandomGenerator *) const>(
-               &::drake::systems::System<double>::SetRandomParameters),
+               &System<double>::SetRandomParameters),
            py::arg("context"), py::arg("parameters"), py::arg("generator"),
            R"""(/** Assigns random values to all parameters. 
 This default implementation calls SetDefaultParameters; override this 
@@ -1423,11 +1402,10 @@ Overrides must not change the number of state variables.
  
 @see @ref stochastic_systems */)""")
       .def("SetRandomState",
-           static_cast<void (::drake::systems::System<double>::*)(
-               ::drake::systems::Context<double> const &,
-               ::drake::systems::State<double> *, ::drake::RandomGenerator *)
-                           const>(
-               &::drake::systems::System<double>::SetRandomState),
+           static_cast<void (System<double>::*)(
+               Context<double> const &, State<double> *,
+               ::drake::RandomGenerator *) const>(
+               &System<double>::SetRandomState),
            py::arg("context"), py::arg("state"), py::arg("generator"),
            R"""(/** Assigns random values to all elements of the state. 
 This default implementation calls SetDefaultState; override this method to 
@@ -1445,9 +1423,8 @@ Overrides must not change the number of state variables.
           static_cast<
               ::std::unique_ptr<drake::systems::System<::drake::AutoDiffXd>,
                                 std::default_delete<drake::systems::System<
-                                    ::drake::AutoDiffXd>>> (
-                  ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::ToAutoDiffXd),
+                                    ::drake::AutoDiffXd>>> (System<double>::*)()
+                  const>(&System<double>::ToAutoDiffXd),
           R"""(/** Creates a deep copy of this System, transmogrified to use the autodiff 
 scalar type, with a dynamic-sized vector of partial derivatives.  The 
 result is never nullptr. 
@@ -1460,9 +1437,8 @@ related to scalar-type conversion support. */)""")
           static_cast<
               ::std::unique_ptr<drake::systems::System<::drake::AutoDiffXd>,
                                 std::default_delete<drake::systems::System<
-                                    ::drake::AutoDiffXd>>> (
-                  ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::ToAutoDiffXdMaybe),
+                                    ::drake::AutoDiffXd>>> (System<double>::*)()
+                  const>(&System<double>::ToAutoDiffXdMaybe),
           R"""(/** Creates a deep copy of this system exactly like ToAutoDiffXd(), but 
 returns nullptr if this System does not support autodiff, instead of 
 throwing an exception. */)""")
@@ -1470,10 +1446,9 @@ throwing an exception. */)""")
           "ToSymbolic",
           static_cast<::std::unique_ptr<
               drake::systems::System<::drake::symbolic::Expression>,
-              std::default_delete<
-                  drake::systems::System<::drake::symbolic::Expression>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::ToSymbolic),
+              std::default_delete<drake::systems::System<
+                  ::drake::symbolic::Expression>>> (System<double>::*)() const>(
+              &System<double>::ToSymbolic),
           R"""(/** Creates a deep copy of this System, transmogrified to use the symbolic 
 scalar type. The result is never nullptr. 
 @throws std::exception if this System does not support symbolic 
@@ -1484,109 +1459,100 @@ related to scalar-type conversion support. */)""")
           "ToSymbolicMaybe",
           static_cast<::std::unique_ptr<
               drake::systems::System<::drake::symbolic::Expression>,
-              std::default_delete<
-                  drake::systems::System<::drake::symbolic::Expression>>> (
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::ToSymbolicMaybe),
+              std::default_delete<drake::systems::System<
+                  ::drake::symbolic::Expression>>> (System<double>::*)() const>(
+              &System<double>::ToSymbolicMaybe),
           R"""(/** Creates a deep copy of this system exactly like ToSymbolic(), but returns 
 nullptr if this System does not support symbolic, instead of throwing an 
 exception. */)""")
       .def("forced_discrete_update_events_exist",
-           static_cast<bool (::drake::systems::System<double>::*)() const>(
+           static_cast<bool (System<double>::*)() const>(
                &System_double_publicist::forced_discrete_update_events_exist))
       .def("forced_publish_events_exist",
-           static_cast<bool (::drake::systems::System<double>::*)() const>(
+           static_cast<bool (System<double>::*)() const>(
                &System_double_publicist::forced_publish_events_exist))
       .def("forced_unrestricted_update_events_exist",
-           static_cast<bool (::drake::systems::System<double>::*)() const>(
+           static_cast<bool (System<double>::*)() const>(
                &System_double_publicist::
                    forced_unrestricted_update_events_exist))
       .def("get_constraint",
-           static_cast<::drake::systems::SystemConstraint<double> const &(
-               ::drake::systems::System<
-                   double>::*)(::drake::systems::SystemConstraintIndex) const>(
-               &::drake::systems::System<double>::get_constraint),
+           static_cast<SystemConstraint<double> const &(
+               System<double>::*)(SystemConstraintIndex) const>(
+               &System<double>::get_constraint),
            py::arg("constraint_index"),
            R"""(/** Returns the constraint at index @p constraint_index. 
 @throws std::out_of_range for an invalid constraint_index. */)""")
       .def("get_forced_discrete_update_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::DiscreteUpdateEvent<double>> const
-                           &(::drake::systems::System<double>::*)() const>(
+           static_cast<EventCollection<drake::systems::DiscreteUpdateEvent<
+               double>> const &(System<double>::*)() const>(
                &System_double_publicist::get_forced_discrete_update_events))
       .def("get_forced_publish_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::PublishEvent<double>> const
-                           &(::drake::systems::System<double>::*)() const>(
+           static_cast<
+               EventCollection<drake::systems::PublishEvent<double>> const &(
+                   System<double>::*)() const>(
                &System_double_publicist::get_forced_publish_events))
       .def("get_forced_unrestricted_update_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::UnrestrictedUpdateEvent<double>> const
-                           &(::drake::systems::System<double>::*)() const>(
+           static_cast<EventCollection<drake::systems::UnrestrictedUpdateEvent<
+               double>> const &(System<double>::*)() const>(
                &System_double_publicist::get_forced_unrestricted_update_events))
       .def("get_input_port",
-           static_cast<::drake::systems::InputPort<double> const &(
-               ::drake::systems::System<double>::*)(int)const>(
-               &::drake::systems::System<double>::get_input_port),
+           static_cast<InputPort<double> const &(System<double>::*)(int)const>(
+               &System<double>::get_input_port),
            py::arg("port_index"),
            R"""(/** Returns the typed input port at index @p port_index. */)""")
       .def(
           "get_input_port",
-          static_cast<::drake::systems::InputPort<double> const &(
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::get_input_port),
+          static_cast<InputPort<double> const &(System<double>::*)() const>(
+              &System<double>::get_input_port),
           R"""(/** Convenience method for the case of exactly one input port. */)""")
       .def(
           "get_input_port_selection",
-          static_cast<::drake::systems::InputPort<double> const *(
-              ::drake::systems::System<double>::
+          static_cast<InputPort<double> const *(
+              System<double>::
                   *)(::std::variant<
                      drake::systems::InputPortSelection,
                      drake::TypeSafeIndex<drake::systems::InputPortTag>>)const>(
-              &::drake::systems::System<double>::get_input_port_selection),
+              &System<double>::get_input_port_selection),
           py::arg("port_index"),
           R"""(/** Returns the typed input port specified by the InputPortSelection or by 
 the InputPortIndex.  Returns nullptr if no port is selected.  This is 
 provided as a convenience method since many algorithms provide the same 
 common default or optional port semantics. */)""")
       .def("get_mutable_forced_discrete_update_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::DiscreteUpdateEvent<double>> &(
-               ::drake::systems::System<double>::*)()>(
+           static_cast<
+               EventCollection<drake::systems::DiscreteUpdateEvent<double>> &(
+                   System<double>::*)()>(
                &System_double_publicist::
                    get_mutable_forced_discrete_update_events))
       .def("get_mutable_forced_publish_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::PublishEvent<double>> &(
-               ::drake::systems::System<double>::*)()>(
+           static_cast<EventCollection<drake::systems::PublishEvent<double>> &(
+               System<double>::*)()>(
                &System_double_publicist::get_mutable_forced_publish_events))
       .def("get_mutable_forced_unrestricted_update_events",
-           static_cast<::drake::systems::EventCollection<
-               drake::systems::UnrestrictedUpdateEvent<double>> &(
-               ::drake::systems::System<double>::*)()>(
+           static_cast<
+               EventCollection<drake::systems::UnrestrictedUpdateEvent<double>>
+                   &(System<double>::*)()>(
                &System_double_publicist::
                    get_mutable_forced_unrestricted_update_events))
       .def(
           "get_output_port",
-          static_cast<::drake::systems::OutputPort<double> const &(
-              ::drake::systems::System<double>::*)(int)const>(
-              &::drake::systems::System<double>::get_output_port),
+          static_cast<OutputPort<double> const &(System<double>::*)(int)const>(
+              &System<double>::get_output_port),
           py::arg("port_index"),
           R"""(/** Returns the typed output port at index @p port_index. */)""")
       .def(
           "get_output_port",
-          static_cast<::drake::systems::OutputPort<double> const &(
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::get_output_port),
+          static_cast<OutputPort<double> const &(System<double>::*)() const>(
+              &System<double>::get_output_port),
           R"""(/** Convenience method for the case of exactly one output port. */)""")
       .def(
           "get_output_port_selection",
-          static_cast<::drake::systems::OutputPort<double> const *(
-              ::drake::systems::System<double>::
-                  *)(::std::variant<drake::systems::OutputPortSelection,
-                                    drake::TypeSafeIndex<
-                                        drake::systems::OutputPortTag>>)const>(
-              &::drake::systems::System<double>::get_output_port_selection),
+          static_cast<OutputPort<double> const *(
+              System<double>::*)(::std::variant<
+                                 drake::systems::OutputPortSelection,
+                                 drake::TypeSafeIndex<
+                                     drake::systems::OutputPortTag>>)const>(
+              &System<double>::get_output_port_selection),
           py::arg("port_index"),
           R"""(/** Returns the typed output port specified by the OutputPortSelection or by 
 the OutputPortIndex.  Returns nullptr if no port is selected. This is 
@@ -1594,27 +1560,24 @@ provided as a convenience method since many algorithms provide the same
 common default or optional port semantics. */)""")
       .def(
           "get_system_scalar_converter",
-          static_cast<::drake::systems::SystemScalarConverter const &(
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::get_system_scalar_converter),
+          static_cast<SystemScalarConverter const &(System<double>::*)() const>(
+              &System<double>::get_system_scalar_converter),
           R"""(/** (Advanced) Returns the SystemScalarConverter for this object.  This is an 
 expert-level API intended for framework authors.  Most users should 
 prefer the convenience helpers such as System::ToAutoDiffXd. */)""")
       .def(
           "get_time_derivatives_cache_entry",
-          static_cast<::drake::systems::CacheEntry const &(
-              ::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<
-                  double>::get_time_derivatives_cache_entry),
+          static_cast<CacheEntry const &(System<double>::*)() const>(
+              &System<double>::get_time_derivatives_cache_entry),
           R"""(/** (Advanced) Returns the CacheEntry used to cache time derivatives for 
 EvalTimeDerivatives(). */)""")
       .def(
           "num_constraints",
-          static_cast<int (::drake::systems::System<double>::*)() const>(
-              &::drake::systems::System<double>::num_constraints),
+          static_cast<int (System<double>::*)() const>(
+              &System<double>::num_constraints),
           R"""(/** Returns the number of constraints specified for the system. */)""")
       .def("set_forced_discrete_update_events",
-           [](::drake::systems::System<double> &self,
+           [](System<double> &self,
               drake::systems::EventCollection<
                   drake::systems::DiscreteUpdateEvent<double>>
                   forced) {
@@ -1623,22 +1586,1012 @@ EvalTimeDerivatives(). */)""")
                      drake::systems::DiscreteUpdateEvent<double>>>(forced));
            })
       .def("set_forced_publish_events",
-           [](::drake::systems::System<double> &self,
-              drake::systems::EventCollection<
-                  drake::systems::PublishEvent<double>>
-                  forced) {
+           [](System<double> &self, drake::systems::EventCollection<
+                                        drake::systems::PublishEvent<double>>
+                                        forced) {
              self.set_forced_publish_events(
                  std::make_unique<drake::systems::EventCollection<
                      drake::systems::PublishEvent<double>>>(forced));
            })
       .def("set_forced_unrestricted_update_events",
-           [](::drake::systems::System<double> &self,
+           [](System<double> &self,
               drake::systems::EventCollection<
                   drake::systems::UnrestrictedUpdateEvent<double>>
                   forced) {
              self.set_forced_unrestricted_update_events(
                  std::make_unique<drake::systems::EventCollection<
                      drake::systems::UnrestrictedUpdateEvent<double>>>(forced));
+           })
+
+      ;
+
+  using T_0 = ::drake::AutoDiffXd;
+
+  py::class_<System<T_0>, SystemBase>
+      PySystem_Eigen_AutoDiffScalar_Eigen_VectorXd(
+          m, "System_Eigen_AutoDiffScalar_Eigen_VectorXd");
+
+  PySystem_Eigen_AutoDiffScalar_Eigen_VectorXd
+      .def("Accept", [](System<T_0> &self,
+                        SystemVisitor<T_0> *v) { return self.Accept(v); })
+      .def(
+          "AddConstraint",
+          [](System<T_0> &self,
+             drake::systems::SystemConstraint<::drake::AutoDiffXd> constraint) {
+            return self.AddConstraint(
+                std::make_unique<
+                    drake::systems::SystemConstraint<::drake::AutoDiffXd>>(
+                    constraint));
+          },
+          R"""(/** Adds an already-created constraint to the list of constraints for this 
+System.  Ownership of the SystemConstraint is transferred to this system. */)""")
+      .def("AddExternalConstraint",
+           static_cast<SystemConstraintIndex (System<T_0>::*)(
+               ExternalSystemConstraint)>(&System<T_0>::AddExternalConstraint),
+           py::arg("constraint"),
+           R"""(/** Adds an "external" constraint to this System. 
+ 
+This method is intended for use by applications that are examining this 
+System to add additional constraints based on their particular situation 
+(e.g., that a velocity state element has an upper bound); it is not 
+intended for declaring intrinsic constraints that some particular System 
+subclass might always impose on itself (e.g., that a mass parameter is 
+non-negative).  To that end, this method should not be called by 
+subclasses of `this` during their constructor. 
+ 
+The `constraint` will automatically persist across system scalar 
+conversion. */)""")
+      .def("AddTriggeredWitnessFunctionToCompositeEventCollection",
+           [](System<T_0> &self, Event<T_0> *event,
+              CompositeEventCollection<T_0> *events) {
+             return self.AddTriggeredWitnessFunctionToCompositeEventCollection(
+                 event, events);
+           })
+      .def(
+          "AllocateCompositeEventCollection",
+          static_cast<::std::unique_ptr<
+              drake::systems::CompositeEventCollection<::drake::AutoDiffXd>,
+              std::default_delete<drake::systems::CompositeEventCollection<
+                  ::drake::AutoDiffXd>>> (System<T_0>::*)() const>(
+              &System<T_0>::AllocateCompositeEventCollection),
+          R"""(/** Allocates a CompositeEventCollection for this system. The allocated 
+instance is used for populating collections of triggered events; for 
+example, Simulator passes this object to System::CalcNextUpdateTime() to 
+allow the system to identify and handle upcoming events. */)""")
+      .def(
+          "AllocateContext",
+          static_cast<
+              ::std::unique_ptr<drake::systems::Context<::drake::AutoDiffXd>,
+                                std::default_delete<drake::systems::Context<
+                                    ::drake::AutoDiffXd>>> (System<T_0>::*)()
+                  const>(&System<T_0>::AllocateContext),
+          R"""(/** Returns a Context<T> suitable for use with this System<T>. */)""")
+      .def(
+          "AllocateDiscreteVariables",
+          static_cast<::std::unique_ptr<
+              drake::systems::DiscreteValues<::drake::AutoDiffXd>,
+              std::default_delete<drake::systems::DiscreteValues<
+                  ::drake::AutoDiffXd>>> (System<T_0>::*)() const>(
+              &System<T_0>::AllocateDiscreteVariables),
+          R"""(/** Returns a DiscreteValues of the same dimensions as the discrete_state 
+allocated in CreateDefaultContext. The simulator will provide this state 
+as the output argument to Update. */)""")
+      .def("AllocateFixedInputs",
+           [](System<T_0> &self, Context<T_0> *context) {
+             return self.AllocateFixedInputs(context);
+           })
+      .def("AllocateForcedDiscreteUpdateEventCollection",
+           static_cast<::std::unique_ptr<
+               drake::systems::EventCollection<
+                   drake::systems::DiscreteUpdateEvent<::drake::AutoDiffXd>>,
+               std::default_delete<drake::systems::EventCollection<
+                   drake::systems::DiscreteUpdateEvent<::drake::AutoDiffXd>>>> (
+               System<T_0>::*)() const>(
+               &System<T_0>::AllocateForcedDiscreteUpdateEventCollection))
+      .def("AllocateForcedPublishEventCollection",
+           static_cast<::std::unique_ptr<
+               drake::systems::EventCollection<
+                   drake::systems::PublishEvent<::drake::AutoDiffXd>>,
+               std::default_delete<drake::systems::EventCollection<
+                   drake::systems::PublishEvent<::drake::AutoDiffXd>>>> (
+               System<T_0>::*)() const>(
+               &System<T_0>::AllocateForcedPublishEventCollection))
+      .def(
+          "AllocateForcedUnrestrictedUpdateEventCollection",
+          static_cast<::std::unique_ptr<
+              drake::systems::EventCollection<
+                  drake::systems::UnrestrictedUpdateEvent<::drake::AutoDiffXd>>,
+              std::default_delete<drake::systems::EventCollection<
+                  drake::systems::UnrestrictedUpdateEvent<
+                      ::drake::AutoDiffXd>>>> (System<T_0>::*)() const>(
+              &System<T_0>::AllocateForcedUnrestrictedUpdateEventCollection))
+      .def(
+          "AllocateImplicitTimeDerivativesResidual",
+          static_cast<::Eigen::Matrix<Eigen::AutoDiffScalar<Eigen::VectorXd>,
+                                      -1, 1, 0, -1, 1> (System<T_0>::*)()
+                          const>(
+              &System<T_0>::AllocateImplicitTimeDerivativesResidual),
+          R"""(/** Returns an Eigen VectorX suitable for use as the output argument to 
+the CalcImplicitTimeDerivativesResidual() method. The returned VectorX 
+will have size implicit_time_derivatives_residual_size() with the 
+elements uninitialized. This is just a convenience method -- you are free 
+to use any properly-sized mutable Eigen object as the residual vector. */)""")
+      .def("AllocateInputAbstract",
+           [](System<T_0> &self, InputPort<T_0> const &input_port) {
+             return self.AllocateInputAbstract(input_port);
+           })
+      .def("AllocateInputVector",
+           [](System<T_0> &self, InputPort<T_0> const &input_port) {
+             return self.AllocateInputVector(input_port);
+           })
+      .def(
+          "AllocateOutput",
+          static_cast<::std::unique_ptr<
+              drake::systems::SystemOutput<::drake::AutoDiffXd>,
+              std::default_delete<drake::systems::SystemOutput<
+                  ::drake::AutoDiffXd>>> (System<T_0>::*)() const>(
+              &System<T_0>::AllocateOutput),
+          R"""(/** Returns a container that can hold the values of all of this System's 
+output ports. It is sized with the number of output ports and uses each 
+output port's allocation method to provide an object of the right type 
+for that port. */)""")
+      .def(
+          "AllocateTimeDerivatives",
+          static_cast<::std::unique_ptr<
+              drake::systems::ContinuousState<::drake::AutoDiffXd>,
+              std::default_delete<drake::systems::ContinuousState<
+                  ::drake::AutoDiffXd>>> (System<T_0>::*)() const>(
+              &System<T_0>::AllocateTimeDerivatives),
+          R"""(/** Returns a ContinuousState of the same size as the continuous_state 
+allocated in CreateDefaultContext. The simulator will provide this state 
+as the output argument to EvalTimeDerivatives. */)""")
+      .def("ApplyDiscreteVariableUpdate",
+           [](System<T_0> &self,
+              EventCollection<drake::systems::DiscreteUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              DiscreteValues<T_0> *discrete_state, Context<T_0> *context) {
+             return self.ApplyDiscreteVariableUpdate(events, discrete_state,
+                                                     context);
+           })
+      .def("ApplyUnrestrictedUpdate",
+           [](System<T_0> &self,
+              EventCollection<drake::systems::UnrestrictedUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              State<T_0> *state, Context<T_0> *context) {
+             return self.ApplyUnrestrictedUpdate(events, state, context);
+           })
+      .def("CalcConservativePower",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.CalcConservativePower(context);
+           })
+      .def("CalcDiscreteVariableUpdates",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<drake::systems::DiscreteUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              DiscreteValues<T_0> *discrete_state) {
+             return self.CalcDiscreteVariableUpdates(context, events,
+                                                     discrete_state);
+           })
+      .def("CalcDiscreteVariableUpdates",
+           [](System<T_0> &self, Context<T_0> const &context,
+              DiscreteValues<T_0> *discrete_state) {
+             return self.CalcDiscreteVariableUpdates(context, discrete_state);
+           })
+      .def("CalcImplicitTimeDerivativesResidual",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ContinuousState<T_0> const &proposed_derivatives,
+              Eigen::Ref<
+                  ::drake::EigenPtr<Eigen::Matrix<
+                      Eigen::AutoDiffScalar<Eigen::VectorXd>, -1, 1, 0, -1, 1>>,
+                  0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>
+                  residual) {
+             return self.CalcImplicitTimeDerivativesResidual(
+                 context, proposed_derivatives, residual);
+           })
+      .def("CalcKineticEnergy",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.CalcKineticEnergy(context);
+           })
+      .def("CalcNextUpdateTime",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events) {
+             return self.CalcNextUpdateTime(context, events);
+           })
+      .def("CalcNonConservativePower",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.CalcNonConservativePower(context);
+           })
+      .def("CalcOutput",
+           [](System<T_0> &self, Context<T_0> const &context,
+              SystemOutput<T_0> *outputs) {
+             return self.CalcOutput(context, outputs);
+           })
+      .def("CalcPotentialEnergy",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.CalcPotentialEnergy(context);
+           })
+      .def("CalcTimeDerivatives",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ContinuousState<T_0> *derivatives) {
+             return self.CalcTimeDerivatives(context, derivatives);
+           })
+      .def("CalcUnrestrictedUpdate",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<drake::systems::UnrestrictedUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              State<T_0> *state) {
+             return self.CalcUnrestrictedUpdate(context, events, state);
+           })
+      .def("CalcUnrestrictedUpdate",
+           [](System<T_0> &self, Context<T_0> const &context,
+              State<T_0> *state) {
+             return self.CalcUnrestrictedUpdate(context, state);
+           })
+      .def("CalcWitnessValue",
+           [](System<T_0> &self, Context<T_0> const &context,
+              WitnessFunction<T_0> const &witness_func) {
+             return self.CalcWitnessValue(context, witness_func);
+           })
+      .def("CheckSystemConstraintsSatisfied",
+           [](System<T_0> &self, Context<T_0> const &context, double tol) {
+             return self.CheckSystemConstraintsSatisfied(context, tol);
+           })
+      .def("CheckValidOutput",
+           [](System<T_0> &self, SystemOutput<T_0> const *output) {
+             return self.CheckValidOutput(output);
+           })
+      .def("CopyContinuousStateVector",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.CopyContinuousStateVector(context);
+           })
+      .def(
+          "CreateDefaultContext",
+          static_cast<
+              ::std::unique_ptr<drake::systems::Context<::drake::AutoDiffXd>,
+                                std::default_delete<drake::systems::Context<
+                                    ::drake::AutoDiffXd>>> (System<T_0>::*)()
+                  const>(&System<T_0>::CreateDefaultContext),
+          R"""(/** This convenience method allocates a context using AllocateContext() and 
+sets its default values using SetDefaultContext(). */)""")
+      .def(
+          "DeclareInputPort",
+          static_cast<InputPort<T_0> &(
+              System<T_0>::*)(::std::variant<std::basic_string<
+                                                 char, std::char_traits<char>,
+                                                 std::allocator<char>>,
+                                             drake::systems::UseDefaultName>,
+                              PortDataType, int,
+                              ::std::optional<drake::RandomDistribution>)>(
+              &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                  DeclareInputPort),
+          py::arg("name"), py::arg("type"), py::arg("size"),
+          py::arg("random_type") =
+              ::std::optional<drake::RandomDistribution>(std::nullopt),
+          R"""(/** Adds a port with the specified @p type and @p size to the input topology. 
+ 
+Input port names must be unique for this system (passing in a duplicate 
+@p name will throw std::logic_error). If @p name is given as 
+kUseDefaultName, then a default value of e.g. "u2", where 2 
+is the input number will be provided. An empty @p name is not permitted. 
+ 
+If the port is intended to model a random noise or disturbance input, 
+@p random_type can (optionally) be used to label it as such; doing so 
+enables algorithms for design and analysis (e.g. state estimation) to 
+reason explicitly about randomness at the system level.  All random input 
+ports are assumed to be statistically independent. 
+@pre @p name must not be empty. 
+@throws std::logic_error for a duplicate port name. 
+@returns the declared port. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "DeclareInputPort",
+          static_cast<InputPort<T_0> &(
+              System<T_0>::*)(PortDataType, int,
+                              ::std::optional<drake::RandomDistribution>)>(
+              &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                  DeclareInputPort),
+          py::arg("type"), py::arg("size"),
+          py::arg("random_type") =
+              ::std::optional<drake::RandomDistribution>(std::nullopt),
+          R"""(/** See the nearly identical signature with an additional (first) argument 
+specifying the port name.  This version will be deprecated as discussed 
+in #9447. */)""",
+          py::return_value_policy::reference_internal)
+      .def("DispatchDiscreteVariableUpdateHandler",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<drake::systems::DiscreteUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              DiscreteValues<T_0> *discrete_state) {
+             return self.DispatchDiscreteVariableUpdateHandler(context, events,
+                                                               discrete_state);
+           })
+      .def("DispatchPublishHandler",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<drake::systems::PublishEvent<
+                  ::drake::AutoDiffXd>> const &events) {
+             return self.DispatchPublishHandler(context, events);
+           })
+      .def("DispatchUnrestrictedUpdateHandler",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<drake::systems::UnrestrictedUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              State<T_0> *state) {
+             return self.DispatchUnrestrictedUpdateHandler(context, events,
+                                                           state);
+           })
+      .def("DoApplyDiscreteVariableUpdate",
+           [](System<T_0> &self,
+              EventCollection<drake::systems::DiscreteUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              DiscreteValues<T_0> *discrete_state, Context<T_0> *context) {
+             return self.DoApplyDiscreteVariableUpdate(events, discrete_state,
+                                                       context);
+           })
+      .def("DoApplyUnrestrictedUpdate",
+           [](System<T_0> &self,
+              EventCollection<drake::systems::UnrestrictedUpdateEvent<
+                  ::drake::AutoDiffXd>> const &events,
+              State<T_0> *state, Context<T_0> *context) {
+             return self.DoApplyUnrestrictedUpdate(events, state, context);
+           })
+      .def("DoCalcConservativePower",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.DoCalcConservativePower(context);
+           })
+      .def("DoCalcImplicitTimeDerivativesResidual",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ContinuousState<T_0> const &proposed_derivatives,
+              Eigen::Ref<
+                  ::drake::EigenPtr<Eigen::Matrix<
+                      Eigen::AutoDiffScalar<Eigen::VectorXd>, -1, 1, 0, -1, 1>>,
+                  0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>
+                  residual) {
+             return self.DoCalcImplicitTimeDerivativesResidual(
+                 context, proposed_derivatives, residual);
+           })
+      .def("DoCalcKineticEnergy",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.DoCalcKineticEnergy(context);
+           })
+      .def("DoCalcNextUpdateTime",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events,
+              Eigen::Ref<::Eigen::AutoDiffScalar<
+                             Eigen::Matrix<double, -1, 1, 0, -1, 1>> *,
+                         0, Eigen::Stride<Eigen::Dynamic, Eigen::Dynamic>>
+                  time) {
+             return self.DoCalcNextUpdateTime(context, events, time);
+           })
+      .def("DoCalcNonConservativePower",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.DoCalcNonConservativePower(context);
+           })
+      .def("DoCalcPotentialEnergy",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.DoCalcPotentialEnergy(context);
+           })
+      .def("DoCalcTimeDerivatives",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ContinuousState<T_0> *derivatives) {
+             return self.DoCalcTimeDerivatives(context, derivatives);
+           })
+      .def("DoCalcWitnessValue",
+           [](System<T_0> &self, Context<T_0> const &context,
+              WitnessFunction<T_0> const &witness_func) {
+             return self.DoCalcWitnessValue(context, witness_func);
+           })
+      .def("DoGetInitializationEvents",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events) {
+             return self.DoGetInitializationEvents(context, events);
+           })
+      .def(
+          "DoGetMutableTargetSystemCompositeEventCollection",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             CompositeEventCollection<T_0> *events) {
+            return self.DoGetMutableTargetSystemCompositeEventCollection(
+                target_system, events);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "DoGetMutableTargetSystemState",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             State<T_0> *state) {
+            return self.DoGetMutableTargetSystemState(target_system, state);
+          },
+          py::return_value_policy::reference_internal)
+      .def("DoGetPerStepEvents",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events) {
+             return self.DoGetPerStepEvents(context, events);
+           })
+      .def(
+          "DoGetPeriodicEvents",
+          static_cast<::std::map<
+              drake::systems::PeriodicEventData,
+              std::vector<const drake::systems::Event<::drake::AutoDiffXd> *,
+                          std::allocator<const drake::systems::Event<
+                              ::drake::AutoDiffXd> *>>,
+              drake::systems::PeriodicEventDataComparator,
+              std::allocator<std::pair<
+                  const drake::systems::PeriodicEventData,
+                  std::vector<
+                      const drake::systems::Event<::drake::AutoDiffXd> *,
+                      std::allocator<const drake::systems::Event<
+                          ::drake::AutoDiffXd> *>>>>> (System<T_0>::*)() const>(
+              &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                  DoGetPeriodicEvents),
+          R"""(/** Implement this method to return all periodic triggered events. 
+@see GetPeriodicEvents() for a detailed description of the returned 
+     variable. 
+@note The default implementation returns an empty map. */)""")
+      .def(
+          "DoGetTargetSystemCompositeEventCollection",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             CompositeEventCollection<T_0> const *events) {
+            return self.DoGetTargetSystemCompositeEventCollection(target_system,
+                                                                  events);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "DoGetTargetSystemContext",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             Context<T_0> const *context) {
+            return self.DoGetTargetSystemContext(target_system, context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "DoGetTargetSystemContinuousState",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             ContinuousState<T_0> const *xc) {
+            return self.DoGetTargetSystemContinuousState(target_system, xc);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "DoGetTargetSystemState",
+          [](System<T_0> &self, System<T_0> const &target_system,
+             State<T_0> const *state) {
+            return self.DoGetTargetSystemState(target_system, state);
+          },
+          py::return_value_policy::reference_internal)
+      .def("DoGetWitnessFunctions",
+           [](System<T_0> &self, Context<T_0> const &arg0,
+              ::std::vector<
+                  const drake::systems::WitnessFunction<::drake::AutoDiffXd> *,
+                  std::allocator<const drake::systems::WitnessFunction<
+                      ::drake::AutoDiffXd> *>> *arg1) {
+             return self.DoGetWitnessFunctions(arg0, arg1);
+           })
+      .def("DoMapQDotToVelocity",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ::Eigen::Ref<
+                  const Eigen::Matrix<Eigen::AutoDiffScalar<Eigen::VectorXd>,
+                                      -1, 1, 0, -1, 1>,
+                  0, Eigen::InnerStride<1>> const &qdot,
+              VectorBase<T_0> *generalized_velocity) {
+             return self.DoMapQDotToVelocity(context, qdot,
+                                             generalized_velocity);
+           })
+      .def("DoMapVelocityToQDot",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ::Eigen::Ref<
+                  const Eigen::Matrix<Eigen::AutoDiffScalar<Eigen::VectorXd>,
+                                      -1, 1, 0, -1, 1>,
+                  0, Eigen::InnerStride<1>> const &generalized_velocity,
+              VectorBase<T_0> *qdot) {
+             return self.DoMapVelocityToQDot(context, generalized_velocity,
+                                             qdot);
+           })
+      .def(
+          "EvalConservativePower",
+          [](System<T_0> &self, Context<T_0> const &context) {
+            return self.EvalConservativePower(context);
+          },
+          py::return_value_policy::reference_internal)
+      .def("EvalEigenVectorInput",
+           [](System<T_0> &self, Context<T_0> const &context, int port_index) {
+             return self.EvalEigenVectorInput(context, port_index);
+           })
+      .def(
+          "EvalKineticEnergy",
+          [](System<T_0> &self, Context<T_0> const &context) {
+            return self.EvalKineticEnergy(context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "EvalNonConservativePower",
+          [](System<T_0> &self, Context<T_0> const &context) {
+            return self.EvalNonConservativePower(context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "EvalPotentialEnergy",
+          [](System<T_0> &self, Context<T_0> const &context) {
+            return self.EvalPotentialEnergy(context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "EvalTimeDerivatives",
+          [](System<T_0> &self, Context<T_0> const &context) {
+            return self.EvalTimeDerivatives(context);
+          },
+          py::return_value_policy::reference_internal)
+      .def("FixInputPortsFrom",
+           [](System<T_0> &self, System<double> const &other_system,
+              Context<double> const &other_context,
+              Context<T_0> *target_context) {
+             return self.FixInputPortsFrom(other_system, other_context,
+                                           target_context);
+           })
+      .def(
+          "GetGraphvizFragment",
+          static_cast<void (System<T_0>::*)(int, ::std::stringstream *) const>(
+              &System<T_0>::GetGraphvizFragment),
+          py::arg("max_depth"), py::arg("dot"),
+          R"""(/** Appends a Graphviz fragment to the @p dot stream.  The fragment must be 
+valid Graphviz when wrapped in a `digraph` or `subgraph` stanza.  Does 
+nothing by default. 
+ 
+@param max_depth Sets a limit to the depth of nested diagrams to 
+visualize.  Set to zero to render a diagram as a single system block. */)""")
+      .def(
+          "GetGraphvizId",
+          static_cast<::int64_t (System<T_0>::*)() const>(
+              &System<T_0>::GetGraphvizId),
+          R"""(/** Returns an opaque integer that uniquely identifies this system in the 
+Graphviz output. */)""")
+      .def("GetGraphvizInputPortToken",
+           [](System<T_0> &self, InputPort<T_0> const &port, int max_depth,
+              ::std::stringstream *dot) {
+             return self.GetGraphvizInputPortToken(port, max_depth, dot);
+           })
+      .def("GetGraphvizOutputPortToken",
+           [](System<T_0> &self, OutputPort<T_0> const &port, int max_depth,
+              ::std::stringstream *dot) {
+             return self.GetGraphvizOutputPortToken(port, max_depth, dot);
+           })
+      .def(
+          "GetGraphvizString",
+          static_cast<::std::string (System<T_0>::*)(int) const>(
+              &System<T_0>::GetGraphvizString),
+          py::arg("max_depth") = int(std::numeric_limits<int>::max()),
+          R"""(/** Returns a Graphviz string describing this System.  To render the string, 
+use the Graphviz tool, ``dot``. http://www.graphviz.org/ 
+ 
+@param max_depth Sets a limit to the depth of nested diagrams to 
+visualize.  Set to zero to render a diagram as a single system block. 
+ 
+@see GenerateHtml 
+*/)""")
+      .def("GetInitializationEvents",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events) {
+             return self.GetInitializationEvents(context, events);
+           })
+      .def(
+          "GetInputPort",
+          static_cast<InputPort<T_0> const &(
+              System<T_0>::*)(::std::string const &)const>(
+              &System<T_0>::GetInputPort),
+          py::arg("port_name"),
+          R"""(/** Returns the typed input port with the unique name @p port_name. 
+The current implementation performs a linear search over strings; prefer 
+get_input_port() when performance is a concern. 
+@throws std::logic_error if port_name is not found. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "GetMemoryObjectName",
+          static_cast<::std::string (System<T_0>::*)() const>(
+              &System<T_0>::GetMemoryObjectName),
+          R"""(/** Returns a name for this %System based on a stringification of its type 
+name and memory address.  This is intended for use in diagnostic output 
+and should not be used for behavioral logic, because the stringification 
+of the type name may produce differing results across platforms and 
+because the address can vary from run to run. */)""")
+      .def("GetMutableOutputVector",
+           [](System<T_0> &self, SystemOutput<T_0> *output, int port_index) {
+             return self.GetMutableOutputVector(output, port_index);
+           })
+      .def(
+          "GetMutableSubsystemContext",
+          [](System<T_0> &self, System<T_0> const &subsystem,
+             Context<T_0> *context) {
+            return self.GetMutableSubsystemContext(subsystem, context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "GetMyContextFromRoot",
+          [](System<T_0> &self, Context<T_0> const &root_context) {
+            return self.GetMyContextFromRoot(root_context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "GetMyMutableContextFromRoot",
+          [](System<T_0> &self, Context<T_0> *root_context) {
+            return self.GetMyMutableContextFromRoot(root_context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "GetOutputPort",
+          static_cast<OutputPort<T_0> const &(
+              System<T_0>::*)(::std::string const &)const>(
+              &System<T_0>::GetOutputPort),
+          py::arg("port_name"),
+          R"""(/** Returns the typed output port with the unique name @p port_name. 
+The current implementation performs a linear search over strings; prefer 
+get_output_port() when performance is a concern. 
+@throws std::logic_error if port_name is not found. */)""",
+          py::return_value_policy::reference_internal)
+      .def("GetPerStepEvents",
+           [](System<T_0> &self, Context<T_0> const &context,
+              CompositeEventCollection<T_0> *events) {
+             return self.GetPerStepEvents(context, events);
+           })
+      .def(
+          "GetPeriodicEvents",
+          static_cast<::std::map<
+              drake::systems::PeriodicEventData,
+              std::vector<const drake::systems::Event<::drake::AutoDiffXd> *,
+                          std::allocator<const drake::systems::Event<
+                              ::drake::AutoDiffXd> *>>,
+              drake::systems::PeriodicEventDataComparator,
+              std::allocator<std::pair<
+                  const drake::systems::PeriodicEventData,
+                  std::vector<
+                      const drake::systems::Event<::drake::AutoDiffXd> *,
+                      std::allocator<const drake::systems::Event<
+                          ::drake::AutoDiffXd> *>>>>> (System<T_0>::*)() const>(
+              &System<T_0>::GetPeriodicEvents),
+          R"""(/** Gets all periodic triggered events for a system. Each periodic attribute 
+(offset and period, in seconds) is mapped to one or more update events 
+that are to be triggered at the proper times. */)""")
+      .def(
+          "GetSubsystemContext",
+          [](System<T_0> &self, System<T_0> const &subsystem,
+             Context<T_0> const &context) {
+            return self.GetSubsystemContext(subsystem, context);
+          },
+          py::return_value_policy::reference_internal)
+      .def(
+          "GetUniquePeriodicDiscreteUpdateAttribute",
+          static_cast<::std::optional<drake::systems::PeriodicEventData> (
+              System<T_0>::*)() const>(
+              &System<T_0>::GetUniquePeriodicDiscreteUpdateAttribute),
+          R"""(/** Gets whether there exists a unique periodic attribute that triggers 
+one or more discrete update events (and, if so, returns that unique 
+periodic attribute). Thus, this method can be used (1) as a test to 
+determine whether a system's dynamics are at least partially governed by 
+difference equations and (2) to obtain the difference equation update 
+times. 
+@returns optional<PeriodicEventData> Contains the periodic trigger 
+attributes if the unique periodic attribute exists, otherwise `nullopt`. */)""")
+      .def("GetWitnessFunctions",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ::std::vector<
+                  const drake::systems::WitnessFunction<::drake::AutoDiffXd> *,
+                  std::allocator<const drake::systems::WitnessFunction<
+                      ::drake::AutoDiffXd> *>> *w) {
+             return self.GetWitnessFunctions(context, w);
+           })
+      .def(
+          "HasAnyDirectFeedthrough",
+          static_cast<bool (System<T_0>::*)() const>(
+              &System<T_0>::HasAnyDirectFeedthrough),
+          R"""(/** Returns `true` if any of the inputs to the system might be directly 
+fed through to any of its outputs and `false` otherwise. */)""")
+      .def(
+          "HasDirectFeedthrough",
+          static_cast<bool (System<T_0>::*)(int) const>(
+              &System<T_0>::HasDirectFeedthrough),
+          py::arg("output_port"),
+          R"""(/** Returns true if there might be direct-feedthrough from any input port to 
+the given @p output_port, and false otherwise. */)""")
+      .def(
+          "HasDirectFeedthrough",
+          static_cast<bool (System<T_0>::*)(int, int) const>(
+              &System<T_0>::HasDirectFeedthrough),
+          py::arg("input_port"), py::arg("output_port"),
+          R"""(/** Returns true if there might be direct-feedthrough from the given 
+@p input_port to the given @p output_port, and false otherwise. */)""")
+      .def(
+          "HasInputPort",
+          static_cast<bool (System<T_0>::*)(::std::string const &) const>(
+              &System<T_0>::HasInputPort),
+          py::arg("port_name"),
+          R"""(/** Returns true iff the system has an InputPort of the given @p 
+ port_name. */)""")
+      .def(
+          "HasOutputPort",
+          static_cast<bool (System<T_0>::*)(::std::string const &) const>(
+              &System<T_0>::HasOutputPort),
+          py::arg("port_name"),
+          R"""(/** Returns true iff the system has an OutputPort of the given @p 
+ port_name. */)""")
+      .def(
+          "IsDifferenceEquationSystem",
+          static_cast<bool (System<T_0>::*)(double *) const>(
+              &System<T_0>::IsDifferenceEquationSystem),
+          py::arg("time_period") = (double *)nullptr,
+          R"""(/** Returns true iff the state dynamics of this system are governed 
+exclusively by a difference equation on a single discrete state group 
+and with a unique periodic update (having zero offset).  E.g., it is 
+amenable to analysis of the form: 
+  x[n+1] = f(x[n], u[n]) 
+Note that we do NOT consider the number of input ports here, because 
+in practice many systems of interest (e.g. MultibodyPlant) have input 
+ports that are safely treated as constant during the analysis. 
+Consider using get_input_port_selection() to choose one. 
+ 
+@param[out] time_period if non-null, then iff the function 
+returns `true`, then time_period is set to the period data 
+returned from GetUniquePeriodicDiscreteUpdateAttribute().  If the 
+function returns `false` (the system is not a difference equation 
+system), then `time_period` does not receive a value. */)""")
+      .def("MapQDotToVelocity",
+           [](System<T_0> &self, Context<T_0> const &context,
+              VectorBase<T_0> const &qdot,
+              VectorBase<T_0> *generalized_velocity) {
+             return self.MapQDotToVelocity(context, qdot, generalized_velocity);
+           })
+      .def("MapQDotToVelocity",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ::Eigen::Ref<
+                  const Eigen::Matrix<Eigen::AutoDiffScalar<Eigen::VectorXd>,
+                                      -1, 1, 0, -1, 1>,
+                  0, Eigen::InnerStride<1>> const &qdot,
+              VectorBase<T_0> *generalized_velocity) {
+             return self.MapQDotToVelocity(context, qdot, generalized_velocity);
+           })
+      .def("MapVelocityToQDot",
+           [](System<T_0> &self, Context<T_0> const &context,
+              VectorBase<T_0> const &generalized_velocity,
+              VectorBase<T_0> *qdot) {
+             return self.MapVelocityToQDot(context, generalized_velocity, qdot);
+           })
+      .def("MapVelocityToQDot",
+           [](System<T_0> &self, Context<T_0> const &context,
+              ::Eigen::Ref<
+                  const Eigen::Matrix<Eigen::AutoDiffScalar<Eigen::VectorXd>,
+                                      -1, 1, 0, -1, 1>,
+                  0, Eigen::InnerStride<1>> const &generalized_velocity,
+              VectorBase<T_0> *qdot) {
+             return self.MapVelocityToQDot(context, generalized_velocity, qdot);
+           })
+      .def("Publish",
+           [](System<T_0> &self, Context<T_0> const &context,
+              EventCollection<
+                  drake::systems::PublishEvent<::drake::AutoDiffXd>> const
+                  &events) { return self.Publish(context, events); })
+      .def("Publish",
+           [](System<T_0> &self, Context<T_0> const &context) {
+             return self.Publish(context);
+           })
+      .def("SetDefaultContext",
+           [](System<T_0> &self, Context<T_0> *context) {
+             return self.SetDefaultContext(context);
+           })
+      .def("SetDefaultParameters",
+           [](System<T_0> &self, Context<T_0> const &context,
+              Parameters<T_0> *parameters) {
+             return self.SetDefaultParameters(context, parameters);
+           })
+      .def("SetDefaultState",
+           [](System<T_0> &self, Context<T_0> const &context,
+              State<T_0> *state) {
+             return self.SetDefaultState(context, state);
+           })
+      .def("SetRandomContext",
+           [](System<T_0> &self, Context<T_0> *context,
+              ::drake::RandomGenerator *generator) {
+             return self.SetRandomContext(context, generator);
+           })
+      .def("SetRandomParameters",
+           [](System<T_0> &self, Context<T_0> const &context,
+              Parameters<T_0> *parameters,
+              ::drake::RandomGenerator *generator) {
+             return self.SetRandomParameters(context, parameters, generator);
+           })
+      .def("SetRandomState",
+           [](System<T_0> &self, Context<T_0> const &context, State<T_0> *state,
+              ::drake::RandomGenerator *generator) {
+             return self.SetRandomState(context, state, generator);
+           })
+      .def(
+          "ToAutoDiffXd",
+          static_cast<
+              ::std::unique_ptr<drake::systems::System<::drake::AutoDiffXd>,
+                                std::default_delete<drake::systems::System<
+                                    ::drake::AutoDiffXd>>> (System<T_0>::*)()
+                  const>(&System<T_0>::ToAutoDiffXd),
+          R"""(/** Creates a deep copy of this System, transmogrified to use the autodiff 
+scalar type, with a dynamic-sized vector of partial derivatives.  The 
+result is never nullptr. 
+@throws std::exception if this System does not support autodiff 
+ 
+See @ref system_scalar_conversion for detailed background and examples 
+related to scalar-type conversion support. */)""")
+      .def(
+          "ToAutoDiffXdMaybe",
+          static_cast<
+              ::std::unique_ptr<drake::systems::System<::drake::AutoDiffXd>,
+                                std::default_delete<drake::systems::System<
+                                    ::drake::AutoDiffXd>>> (System<T_0>::*)()
+                  const>(&System<T_0>::ToAutoDiffXdMaybe),
+          R"""(/** Creates a deep copy of this system exactly like ToAutoDiffXd(), but 
+returns nullptr if this System does not support autodiff, instead of 
+throwing an exception. */)""")
+      .def(
+          "ToSymbolic",
+          static_cast<::std::unique_ptr<
+              drake::systems::System<::drake::symbolic::Expression>,
+              std::default_delete<drake::systems::System<
+                  ::drake::symbolic::Expression>>> (System<T_0>::*)() const>(
+              &System<T_0>::ToSymbolic),
+          R"""(/** Creates a deep copy of this System, transmogrified to use the symbolic 
+scalar type. The result is never nullptr. 
+@throws std::exception if this System does not support symbolic 
+ 
+See @ref system_scalar_conversion for detailed background and examples 
+related to scalar-type conversion support. */)""")
+      .def(
+          "ToSymbolicMaybe",
+          static_cast<::std::unique_ptr<
+              drake::systems::System<::drake::symbolic::Expression>,
+              std::default_delete<drake::systems::System<
+                  ::drake::symbolic::Expression>>> (System<T_0>::*)() const>(
+              &System<T_0>::ToSymbolicMaybe),
+          R"""(/** Creates a deep copy of this system exactly like ToSymbolic(), but returns 
+nullptr if this System does not support symbolic, instead of throwing an 
+exception. */)""")
+      .def("forced_discrete_update_events_exist",
+           static_cast<bool (System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   forced_discrete_update_events_exist))
+      .def("forced_publish_events_exist",
+           static_cast<bool (System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   forced_publish_events_exist))
+      .def("forced_unrestricted_update_events_exist",
+           static_cast<bool (System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   forced_unrestricted_update_events_exist))
+      .def("get_constraint",
+           static_cast<SystemConstraint<T_0> const &(
+               System<T_0>::*)(SystemConstraintIndex) const>(
+               &System<T_0>::get_constraint),
+           py::arg("constraint_index"),
+           R"""(/** Returns the constraint at index @p constraint_index. 
+@throws std::out_of_range for an invalid constraint_index. */)""",
+           py::return_value_policy::reference_internal)
+      .def("get_forced_discrete_update_events",
+           static_cast<EventCollection<drake::systems::DiscreteUpdateEvent<
+               ::drake::AutoDiffXd>> const &(System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_forced_discrete_update_events))
+      .def("get_forced_publish_events",
+           static_cast<EventCollection<drake::systems::PublishEvent<
+               ::drake::AutoDiffXd>> const &(System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_forced_publish_events))
+      .def("get_forced_unrestricted_update_events",
+           static_cast<EventCollection<drake::systems::UnrestrictedUpdateEvent<
+               ::drake::AutoDiffXd>> const &(System<T_0>::*)() const>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_forced_unrestricted_update_events))
+      .def("get_input_port",
+           static_cast<InputPort<T_0> const &(System<T_0>::*)(int)const>(
+               &System<T_0>::get_input_port),
+           py::arg("port_index"),
+           R"""(/** Returns the typed input port at index @p port_index. */)""",
+           py::return_value_policy::reference_internal)
+      .def(
+          "get_input_port",
+          static_cast<InputPort<T_0> const &(System<T_0>::*)() const>(
+              &System<T_0>::get_input_port),
+          R"""(/** Convenience method for the case of exactly one input port. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "get_input_port_selection",
+          static_cast<InputPort<T_0> const *(
+              System<T_0>::*)(::std::variant<drake::systems::InputPortSelection,
+                                             drake::TypeSafeIndex<
+                                                 drake::systems::InputPortTag>>)
+                          const>(&System<T_0>::get_input_port_selection),
+          py::arg("port_index"),
+          R"""(/** Returns the typed input port specified by the InputPortSelection or by 
+the InputPortIndex.  Returns nullptr if no port is selected.  This is 
+provided as a convenience method since many algorithms provide the same 
+common default or optional port semantics. */)""",
+          py::return_value_policy::reference_internal)
+      .def("get_mutable_forced_discrete_update_events",
+           static_cast<EventCollection<drake::systems::DiscreteUpdateEvent<
+               ::drake::AutoDiffXd>> &(System<T_0>::*)()>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_mutable_forced_discrete_update_events))
+      .def("get_mutable_forced_publish_events",
+           static_cast<EventCollection<drake::systems::PublishEvent<
+               ::drake::AutoDiffXd>> &(System<T_0>::*)()>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_mutable_forced_publish_events))
+      .def("get_mutable_forced_unrestricted_update_events",
+           static_cast<EventCollection<drake::systems::UnrestrictedUpdateEvent<
+               ::drake::AutoDiffXd>> &(System<T_0>::*)()>(
+               &System_Eigen_AutoDiffScalar_Eigen_VectorXd_publicist::
+                   get_mutable_forced_unrestricted_update_events))
+      .def(
+          "get_output_port",
+          static_cast<OutputPort<T_0> const &(System<T_0>::*)(int)const>(
+              &System<T_0>::get_output_port),
+          py::arg("port_index"),
+          R"""(/** Returns the typed output port at index @p port_index. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "get_output_port",
+          static_cast<OutputPort<T_0> const &(System<T_0>::*)() const>(
+              &System<T_0>::get_output_port),
+          R"""(/** Convenience method for the case of exactly one output port. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "get_output_port_selection",
+          static_cast<OutputPort<T_0> const *(
+              System<T_0>::*)(::std::variant<
+                              drake::systems::OutputPortSelection,
+                              drake::TypeSafeIndex<
+                                  drake::systems::OutputPortTag>>)const>(
+              &System<T_0>::get_output_port_selection),
+          py::arg("port_index"),
+          R"""(/** Returns the typed output port specified by the OutputPortSelection or by 
+the OutputPortIndex.  Returns nullptr if no port is selected. This is 
+provided as a convenience method since many algorithms provide the same 
+common default or optional port semantics. */)""",
+          py::return_value_policy::reference_internal)
+      .def(
+          "get_system_scalar_converter",
+          static_cast<SystemScalarConverter const &(System<T_0>::*)() const>(
+              &System<T_0>::get_system_scalar_converter),
+          R"""(/** (Advanced) Returns the SystemScalarConverter for this object.  This is an 
+expert-level API intended for framework authors.  Most users should 
+prefer the convenience helpers such as System::ToAutoDiffXd. */)""")
+      .def(
+          "get_time_derivatives_cache_entry",
+          static_cast<CacheEntry const &(System<T_0>::*)() const>(
+              &System<T_0>::get_time_derivatives_cache_entry),
+          R"""(/** (Advanced) Returns the CacheEntry used to cache time derivatives for 
+EvalTimeDerivatives(). */)""")
+      .def(
+          "num_constraints",
+          static_cast<int (System<T_0>::*)() const>(
+              &System<T_0>::num_constraints),
+          R"""(/** Returns the number of constraints specified for the system. */)""")
+      .def("set_forced_discrete_update_events",
+           [](System<T_0> &self,
+              drake::systems::EventCollection<
+                  drake::systems::DiscreteUpdateEvent<::drake::AutoDiffXd>>
+                  forced) {
+             self.set_forced_discrete_update_events(
+                 std::make_unique<drake::systems::EventCollection<
+                     drake::systems::DiscreteUpdateEvent<::drake::AutoDiffXd>>>(
+                     forced));
+           })
+      .def("set_forced_publish_events",
+           [](System<T_0> &self,
+              drake::systems::EventCollection<
+                  drake::systems::PublishEvent<::drake::AutoDiffXd>>
+                  forced) {
+             self.set_forced_publish_events(
+                 std::make_unique<drake::systems::EventCollection<
+                     drake::systems::PublishEvent<::drake::AutoDiffXd>>>(
+                     forced));
+           })
+      .def("set_forced_unrestricted_update_events",
+           [](System<T_0> &self,
+              drake::systems::EventCollection<
+                  drake::systems::UnrestrictedUpdateEvent<::drake::AutoDiffXd>>
+                  forced) {
+             self.set_forced_unrestricted_update_events(
+                 std::make_unique<drake::systems::EventCollection<
+                     drake::systems::UnrestrictedUpdateEvent<
+                         ::drake::AutoDiffXd>>>(forced));
            })
 
       ;

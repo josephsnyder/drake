@@ -5,7 +5,8 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_symbolic_py_register(py::module &m) {
-  py::module symbolic = m.def_submodule("symbolic", "");
 
-  return symbolic;
+  py::module Pysymbolic = m.def_submodule("symbolic", "");
+
+  return Pysymbolic;
 }

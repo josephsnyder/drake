@@ -17,44 +17,36 @@ void apb11_pydrake_SystemMessageInterface_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::systems::internal::SystemMessageInterface>
-      SystemMessageInterface(m, "SystemMessageInterface");
+  using namespace drake::systems::internal;
 
-  SystemMessageInterface
+  py::class_<SystemMessageInterface> PySystemMessageInterface(
+      m, "SystemMessageInterface");
+
+  PySystemMessageInterface
       .def_static(
           "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
           static_cast<void (*)()>(&SystemMessageInterface_publicist::
                                       DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
-      .def("GetSystemName",
-           static_cast<::std::string const &(
-               ::drake::systems::internal::SystemMessageInterface::*)() const>(
-               &::drake::systems::internal::SystemMessageInterface::
-                   GetSystemName))
+      .def(
+          "GetSystemName",
+          static_cast<::std::string const &(SystemMessageInterface::*)() const>(
+              &SystemMessageInterface::GetSystemName))
       .def("GetSystemPathname",
-           static_cast<::std::string (
-               ::drake::systems::internal::SystemMessageInterface::*)() const>(
-               &::drake::systems::internal::SystemMessageInterface::
-                   GetSystemPathname))
+           static_cast<::std::string (SystemMessageInterface::*)() const>(
+               &SystemMessageInterface::GetSystemPathname))
       .def("GetSystemType",
-           static_cast<::std::string (
-               ::drake::systems::internal::SystemMessageInterface::*)() const>(
-               &::drake::systems::internal::SystemMessageInterface::
-                   GetSystemType))
+           static_cast<::std::string (SystemMessageInterface::*)() const>(
+               &SystemMessageInterface::GetSystemType))
       .def("ValidateContext",
-           static_cast<void (
-               ::drake::systems::internal::SystemMessageInterface::*)(
+           static_cast<void (SystemMessageInterface::*)(
                ::drake::systems::ContextBase const &) const>(
-               &::drake::systems::internal::SystemMessageInterface::
-                   ValidateContext),
+               &SystemMessageInterface::ValidateContext),
            py::arg("context"))
-      .def_static(
-          "no_name",
-          static_cast<::std::string const &(*)()>(
-              &::drake::systems::internal::SystemMessageInterface::no_name))
+      .def_static("no_name", static_cast<::std::string const &(*)()>(
+                                 &SystemMessageInterface::no_name))
       .def_static("path_separator",
                   static_cast<::std::string const &(*)()>(
-                      &::drake::systems::internal::SystemMessageInterface::
-                          path_separator))
+                      &SystemMessageInterface::path_separator))
 
       ;
 }

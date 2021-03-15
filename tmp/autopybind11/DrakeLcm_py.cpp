@@ -35,44 +35,42 @@ void apb11_pydrake_DrakeLcm_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::lcm::DrakeLcm, ::drake::lcm::DrakeLcmInterface,
-             DrakeLcm_trampoline>
-      DrakeLcm(m, "DrakeLcm",
-               R"""(/** 
+  using namespace drake::lcm;
+
+  py::class_<DrakeLcm, DrakeLcmInterface, DrakeLcm_trampoline> PyDrakeLcm(
+      m, "DrakeLcm",
+      R"""(/** 
  * A wrapper around a *real* LCM instance. 
  */)""");
 
-  DrakeLcm.def(py::init<>())
+  PyDrakeLcm.def(py::init<>())
       .def(py::init<::std::string>(), py::arg("lcm_url"))
       .def("HandleSubscriptions",
-           static_cast<int (::drake::lcm::DrakeLcm::*)(int)>(
-               &::drake::lcm::DrakeLcm::HandleSubscriptions),
+           static_cast<int (DrakeLcm::*)(int)>(&DrakeLcm::HandleSubscriptions),
            py::arg("timeout_millis"))
       .def("Publish",
-           static_cast<void (::drake::lcm::DrakeLcm::*)(
-               ::std::string const &, void const *, int,
-               ::std::optional<double>)>(&::drake::lcm::DrakeLcm::Publish),
+           static_cast<void (DrakeLcm::*)(::std::string const &, void const *,
+                                          int, ::std::optional<double>)>(
+               &DrakeLcm::Publish),
            py::arg("channel"), py::arg("data"), py::arg("data_size"),
            py::arg("time_sec"))
       .def("Subscribe",
-           static_cast<
-               ::std::shared_ptr<drake::lcm::DrakeSubscriptionInterface> (
-                   ::drake::lcm::DrakeLcm::*)(
-                   ::std::string const &,
-                   ::drake::lcm::DrakeLcmInterface::HandlerFunction)>(
-               &::drake::lcm::DrakeLcm::Subscribe),
+           static_cast<::std::shared_ptr<
+               drake::lcm::DrakeSubscriptionInterface> (DrakeLcm::*)(
+               ::std::string const &, DrakeLcmInterface::HandlerFunction)>(
+               &DrakeLcm::Subscribe),
            py::arg("channel"), py::arg("arg1"))
-      .def("get_lcm_instance",
-           static_cast<::lcm::LCM *(::drake::lcm::DrakeLcm::*)()>(
-               &::drake::lcm::DrakeLcm::get_lcm_instance),
-           R"""(/** 
+      .def(
+          "get_lcm_instance",
+          static_cast<::lcm::LCM *(DrakeLcm::*)()>(&DrakeLcm::get_lcm_instance),
+          R"""(/** 
  * (Advanced.) An accessor to the underlying LCM instance. The returned 
  * pointer is guaranteed to be valid for the duration of this object's 
  * lifetime. 
  */)""")
       .def("get_lcm_url",
-           static_cast<::std::string (::drake::lcm::DrakeLcm::*)() const>(
-               &::drake::lcm::DrakeLcm::get_lcm_url),
+           static_cast<::std::string (DrakeLcm::*)() const>(
+               &DrakeLcm::get_lcm_url),
            R"""(/** 
  * Returns the LCM URL. 
  */)""")

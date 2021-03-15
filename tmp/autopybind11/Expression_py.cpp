@@ -12,7 +12,9 @@ void apb11_pydrake_Expression_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::symbolic::Expression> Expression(
+  using namespace drake::symbolic;
+
+  py::class_<Expression> PyExpression(
       m, "Expression",
       R"""(/** Represents a symbolic form of an expression. 
  
@@ -99,34 +101,27 @@ Regarding NaN, we have the following rules:
 symbolic::Expression can be used as a scalar type of Eigen types. 
 */)""");
 
-  Expression
-      .def(py::init<::drake::symbolic::Expression const &>(), py::arg("arg0"))
+  PyExpression.def(py::init<Expression const &>(), py::arg("arg0"))
       .def(py::init<>())
       .def(py::init<double>(), py::arg("d"))
-      .def(py::init<::drake::symbolic::Variable const &>(), py::arg("var"))
-      .def_static(
-          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-          static_cast<void (*)()>(&::drake::symbolic::Expression::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def(py::init<Variable const &>(), py::arg("var"))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &Expression::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
       .def(
           "Differentiate",
-          static_cast<::drake::symbolic::Expression (
-              ::drake::symbolic::Expression::*)(
-              ::drake::symbolic::Variable const &) const>(
-              &::drake::symbolic::Expression::Differentiate),
+          static_cast<Expression (Expression::*)(Variable const &) const>(
+              &Expression::Differentiate),
           py::arg("x"),
           R"""(/** Differentiates this symbolic expression with respect to the variable @p 
  * var. 
  * @throws std::runtime_error if it is not differentiable. 
  */)""")
-      .def_static("E",
-                  static_cast<::drake::symbolic::Expression (*)()>(
-                      &::drake::symbolic::Expression::E),
+      .def_static("E", static_cast<Expression (*)()>(&Expression::E),
                   R"""(/** Return e, the base of natural logarithms. */)""")
       .def("EqualTo",
-           static_cast<bool (::drake::symbolic::Expression::*)(
-               ::drake::symbolic::Expression const &) const>(
-               &::drake::symbolic::Expression::EqualTo),
+           static_cast<bool (Expression::*)(Expression const &) const>(
+               &Expression::EqualTo),
            py::arg("e"),
            R"""(/** Checks structural equality. 
  * 
@@ -157,12 +152,10 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  */)""")
       .def(
           "Evaluate",
-          static_cast<double (::drake::symbolic::Expression::*)(
-              ::drake::symbolic::Environment const &,
-              ::drake::RandomGenerator *) const>(
-              &::drake::symbolic::Expression::Evaluate),
-          py::arg("env") =
-              (::drake::symbolic::Environment)drake::symbolic::Environment{},
+          static_cast<double (Expression::*)(Environment const &,
+                                             ::drake::RandomGenerator *) const>(
+              &Expression::Evaluate),
+          py::arg("env") = (Environment)drake::symbolic::Environment{},
           py::arg("random_generator") = (::drake::RandomGenerator *)nullptr,
           R"""(/** Evaluates using a given environment (by default, an empty environment) and 
  * a random number generator. If there is a random variable in this expression 
@@ -179,9 +172,8 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  */)""")
       .def(
           "Evaluate",
-          static_cast<double (::drake::symbolic::Expression::*)(
-              ::drake::RandomGenerator *) const>(
-              &::drake::symbolic::Expression::Evaluate),
+          static_cast<double (Expression::*)(::drake::RandomGenerator *) const>(
+              &Expression::Evaluate),
           py::arg("random_generator"),
           R"""(/** Evaluates using an empty environment and a random number generator. It 
  * uses @p random_generator to sample values for the random variables in this 
@@ -190,10 +182,8 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  * See the above overload for the exceptions that it might throw. 
  */)""")
       .def("EvaluatePartial",
-           static_cast<::drake::symbolic::Expression (
-               ::drake::symbolic::Expression::*)(
-               ::drake::symbolic::Environment const &) const>(
-               &::drake::symbolic::Expression::EvaluatePartial),
+           static_cast<Expression (Expression::*)(Environment const &) const>(
+               &Expression::EvaluatePartial),
            py::arg("env"),
            R"""(/** Partially evaluates this expression using an environment @p 
  * env. Internally, this method promotes @p env into a substitution 
@@ -203,9 +193,7 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  */)""")
       .def(
           "Expand",
-          static_cast<::drake::symbolic::Expression (
-              ::drake::symbolic::Expression::*)() const>(
-              &::drake::symbolic::Expression::Expand),
+          static_cast<Expression (Expression::*)() const>(&Expression::Expand),
           R"""(/** Expands out products and positive integer powers in expression. For 
  * example, `(x + 1) * (x - 1)` is expanded to `x^2 - 1` and `(x + y)^2` is 
  * expanded to `x^2 + 2xy + y^2`. Note that Expand applies recursively to 
@@ -216,45 +204,35 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  * @throws std::runtime_error if NaN is detected during expansion. 
  */)""")
       .def("GetVariables",
-           static_cast<::drake::symbolic::Variables (
-               ::drake::symbolic::Expression::*)() const>(
-               &::drake::symbolic::Expression::GetVariables),
+           static_cast<Variables (Expression::*)() const>(
+               &Expression::GetVariables),
            R"""(/** Collects variables in expression. */)""")
       .def("Jacobian",
-           [](::drake::symbolic::Expression &self,
+           [](Expression &self,
               ::Eigen::Ref<const Eigen::Matrix<drake::symbolic::Variable, -1, 1,
                                                0, -1, 1>,
                            0, Eigen::InnerStride<1>> const &vars) {
              return self.Jacobian(vars);
            })
       .def("Less",
-           static_cast<bool (::drake::symbolic::Expression::*)(
-               ::drake::symbolic::Expression const &) const>(
-               &::drake::symbolic::Expression::Less),
+           static_cast<bool (Expression::*)(Expression const &) const>(
+               &Expression::Less),
            py::arg("e"),
            R"""(/** Provides lexicographical ordering between expressions. 
     This function is used as a compare function in map<Expression> and 
     set<Expression> via std::less<drake::symbolic::Expression>. */)""")
-      .def_static("NaN",
-                  static_cast<::drake::symbolic::Expression (*)()>(
-                      &::drake::symbolic::Expression::NaN),
+      .def_static("NaN", static_cast<Expression (*)()>(&Expression::NaN),
                   R"""(/** Returns NaN (Not-a-Number). */)""")
-      .def_static("One",
-                  static_cast<::drake::symbolic::Expression (*)()>(
-                      &::drake::symbolic::Expression::One),
+      .def_static("One", static_cast<Expression (*)()>(&Expression::One),
                   R"""(/** Returns one. */)""")
       .def_static(
-          "Pi",
-          static_cast<::drake::symbolic::Expression (*)()>(
-              &::drake::symbolic::Expression::Pi),
+          "Pi", static_cast<Expression (*)()>(&Expression::Pi),
           R"""(/** Returns Pi, the ratio of a circle’s circumference to its diameter. */)""")
       .def(
           "Substitute",
-          static_cast<::drake::symbolic::Expression (
-              ::drake::symbolic::Expression::*)(
-              ::drake::symbolic::Variable const &,
-              ::drake::symbolic::Expression const &) const>(
-              &::drake::symbolic::Expression::Substitute),
+          static_cast<Expression (Expression::*)(Variable const &,
+                                                 Expression const &) const>(
+              &Expression::Substitute),
           py::arg("var"), py::arg("e"),
           R"""(/** Returns a copy of this expression replacing all occurrences of @p var 
  * with @p e. 
@@ -262,10 +240,8 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  */)""")
       .def(
           "Substitute",
-          static_cast<::drake::symbolic::Expression (
-              ::drake::symbolic::Expression::*)(
-              ::drake::symbolic::Substitution const &) const>(
-              &::drake::symbolic::Expression::Substitute),
+          static_cast<Expression (Expression::*)(Substitution const &) const>(
+              &Expression::Substitute),
           py::arg("s"),
           R"""(/** Returns a copy of this expression replacing all occurrences of the 
  * variables in @p s with corresponding expressions in @p s. Note that the 
@@ -273,18 +249,14 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  * y}, {y, x}}) gets (y / x). 
  * @throws std::runtime_error if NaN is detected during substitution. 
  */)""")
-      .def_static("Zero",
-                  static_cast<::drake::symbolic::Expression (*)()>(
-                      &::drake::symbolic::Expression::Zero),
+      .def_static("Zero", static_cast<Expression (*)()>(&Expression::Zero),
                   R"""(/** Returns zero. */)""")
       .def("get_kind",
-           static_cast<::drake::symbolic::ExpressionKind (
-               ::drake::symbolic::Expression::*)() const>(
-               &::drake::symbolic::Expression::get_kind),
+           static_cast<ExpressionKind (Expression::*)() const>(
+               &Expression::get_kind),
            R"""(/** Returns expression kind. */)""")
       .def("is_expanded",
-           static_cast<bool (::drake::symbolic::Expression::*)() const>(
-               &::drake::symbolic::Expression::is_expanded),
+           static_cast<bool (Expression::*)() const>(&Expression::is_expanded),
            R"""(/** Returns true if this symbolic expression is already 
  * expanded. Expression::Expand() uses this flag to avoid calling 
  * ExpressionCell::Expand() on an pre-expanded expressions. 
@@ -296,75 +268,59 @@ symbolic::Expression can be used as a scalar type of Eigen types.
  */)""")
       .def(
           "is_polynomial",
-          static_cast<bool (::drake::symbolic::Expression::*)() const>(
-              &::drake::symbolic::Expression::is_polynomial),
+          static_cast<bool (Expression::*)() const>(&Expression::is_polynomial),
           R"""(/** Checks if this symbolic expression is convertible to Polynomial. */)""")
-      .def(
-          "to_string",
-          static_cast<::std::string (::drake::symbolic::Expression::*)() const>(
-              &::drake::symbolic::Expression::to_string),
-          R"""(/** Returns string representation of Expression. */)""")
+      .def("to_string",
+           static_cast<::std::string (Expression::*)() const>(
+               &Expression::to_string),
+           R"""(/** Returns string representation of Expression. */)""")
 
       .def(
           "__mul__",
-          +[](::drake::symbolic::Expression lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs * rhs; })
+          +[](Expression lhs, Expression const &rhs) { return lhs * rhs; })
       .def(
           "__imul__",
-          +[](::drake::symbolic::Expression &lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs *= rhs; })
+          +[](Expression &lhs, Expression const &rhs) { return lhs *= rhs; })
       .def(
           "__add__",
-          +[](::drake::symbolic::Expression lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs + rhs; })
+          +[](Expression lhs, Expression const &rhs) { return lhs + rhs; })
       .def(
-          "__add__", +[](::drake::symbolic::Expression const &e) { return e; })
+          "__add__", +[](Expression const &e) { return e; })
       .def("__add__",
-           static_cast<::drake::symbolic::Expression &(
-               ::drake::symbolic::Expression::*)()>(
-               &::drake::symbolic::Expression::operator++),
+           static_cast<Expression &(Expression::*)()>(&Expression::operator++),
            R"""(/** Provides prefix increment operator (i.e. ++x). */)""")
-      .def("__add__",
-           static_cast<::drake::symbolic::Expression (
-               ::drake::symbolic::Expression::*)(int)>(
-               &::drake::symbolic::Expression::operator++),
-           py::arg("arg0"),
-           R"""(/** Provides postfix increment operator (i.e. x++). */)""")
+      .def(
+          "__add__",
+          static_cast<Expression (Expression::*)(int)>(&Expression::operator++),
+          py::arg("arg0"),
+          R"""(/** Provides postfix increment operator (i.e. x++). */)""")
       .def(
           "__iadd__",
-          +[](::drake::symbolic::Expression &lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs += rhs; })
+          +[](Expression &lhs, Expression const &rhs) { return lhs += rhs; })
       .def(
           "__sub__",
-          +[](::drake::symbolic::Expression lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs - rhs; })
+          +[](Expression lhs, Expression const &rhs) { return lhs - rhs; })
       .def(
-          "__sub__", +[](::drake::symbolic::Expression const &e) { return e; })
+          "__sub__", +[](Expression const &e) { return e; })
       .def("__sub__",
-           static_cast<::drake::symbolic::Expression &(
-               ::drake::symbolic::Expression::*)()>(
-               &::drake::symbolic::Expression::operator--),
+           static_cast<Expression &(Expression::*)()>(&Expression::operator--),
            R"""(/** Provides prefix decrement operator (i.e. --x). */)""")
-      .def("__sub__",
-           static_cast<::drake::symbolic::Expression (
-               ::drake::symbolic::Expression::*)(int)>(
-               &::drake::symbolic::Expression::operator--),
-           py::arg("arg0"),
-           R"""(/** Provides postfix decrement operator (i.e. x--). */)""")
+      .def(
+          "__sub__",
+          static_cast<Expression (Expression::*)(int)>(&Expression::operator--),
+          py::arg("arg0"),
+          R"""(/** Provides postfix decrement operator (i.e. x--). */)""")
       .def(
           "__isub__",
-          +[](::drake::symbolic::Expression &lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs -= rhs; })
+          +[](Expression &lhs, Expression const &rhs) { return lhs -= rhs; })
       .def(
           "__truediv__",
-          +[](::drake::symbolic::Expression lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs / rhs; })
+          +[](Expression lhs, Expression const &rhs) { return lhs / rhs; })
       .def(
           "__itruediv__",
-          +[](::drake::symbolic::Expression &lhs,
-              ::drake::symbolic::Expression const &rhs) { return lhs /= rhs; })
+          +[](Expression &lhs, Expression const &rhs) { return lhs /= rhs; })
       .def(
-          "__str__", +[](::drake::symbolic::Expression const &e) {
+          "__str__", +[](Expression const &e) {
             std::ostringstream oss;
             oss << e;
             std::string s(oss.str());

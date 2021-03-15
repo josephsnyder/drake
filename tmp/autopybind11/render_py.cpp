@@ -5,7 +5,8 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_render_py_register(py::module &m) {
-  py::module render = m.def_submodule("render", "");
 
-  return render;
+  py::module Pyrender = m.def_submodule("render", "");
+
+  return Pyrender;
 }
