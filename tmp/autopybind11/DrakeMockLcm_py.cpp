@@ -41,18 +41,18 @@ void apb11_pydrake_DrakeMockLcm_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::lcm::DrakeMockLcm, ::drake::lcm::DrakeLcm,
-             DrakeMockLcm_trampoline>
-      DrakeMockLcm(
-          m, "DrakeMockLcm",
-          R"""(/** An implementation of DrakeLcmInterface that manipulates LCM messages in 
+  using namespace drake::lcm;
+
+  py::class_<DrakeMockLcm, DrakeLcm, DrakeMockLcm_trampoline> PyDrakeMockLcm(
+      m, "DrakeMockLcm",
+      R"""(/** An implementation of DrakeLcmInterface that manipulates LCM messages in 
 memory, not on the wire. Other than the class name, it is identical to a 
 `DrakeLcm("memq://")`, i.e., an object constructed with the <a 
 href="https://lcm-proj.github.io/group__LcmC__lcm__t.html#gaf29963ef43edadf45296d5ad82c18d4b">memq 
 provider</a>. 
 */)""");
 
-  DrakeMockLcm.def(py::init<>())
+  PyDrakeMockLcm.def(py::init<>())
 
       ;
 }

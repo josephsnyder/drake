@@ -5,7 +5,8 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_internal_py_register(py::module &m) {
-  py::module internal = m.def_submodule("internal", "");
 
-  return internal;
+  py::module Pyinternal = m.def_submodule("internal", "");
+
+  return Pyinternal;
 }

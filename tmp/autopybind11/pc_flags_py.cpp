@@ -6,14 +6,15 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_pc_flags_py_register(py::module &m) {
-  py::module pc_flags = m.def_submodule("pc_flags", "");
-  py::enum_<::drake::perception::pc_flags::BaseField>(
-      pc_flags, "BaseField", py::arithmetic(),
-      R"""(/// Indicates the data the point cloud stores.)""")
-      .value("kInherit", ::drake::perception::pc_flags::BaseField::kInherit, "")
-      .value("kNone", ::drake::perception::pc_flags::BaseField::kNone, "")
-      .value("kNormals", ::drake::perception::pc_flags::BaseField::kNormals, "")
-      .value("kRGBs", ::drake::perception::pc_flags::BaseField::kRGBs, "")
-      .value("kXYZs", ::drake::perception::pc_flags::BaseField::kXYZs, "");
-  return pc_flags;
+  using namespace drake::perception::pc_flags;
+
+  py::module Pypc_flags = m.def_submodule("pc_flags", "");
+  py::enum_<BaseField>(Pypc_flags, "BaseField", py::arithmetic(),
+                       R"""(/// Indicates the data the point cloud stores.)""")
+      .value("kInherit", BaseField::kInherit, "")
+      .value("kNone", BaseField::kNone, "")
+      .value("kNormals", BaseField::kNormals, "")
+      .value("kRGBs", BaseField::kRGBs, "")
+      .value("kXYZs", BaseField::kXYZs, "");
+  return Pypc_flags;
 }

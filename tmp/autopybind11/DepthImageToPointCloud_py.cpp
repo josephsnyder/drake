@@ -10,10 +10,12 @@ void apb11_pydrake_DepthImageToPointCloud_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::perception::DepthImageToPointCloud,
-             ::drake::systems::LeafSystem<double>>
-      DepthImageToPointCloud(m, "DepthImageToPointCloud",
-                             R"""(/// Converts a depth image to a point cloud. 
+  using namespace drake::perception;
+
+  py::class_<DepthImageToPointCloud, ::drake::systems::LeafSystem<double>>
+      PyDepthImageToPointCloud(
+          m, "DepthImageToPointCloud",
+          R"""(/// Converts a depth image to a point cloud. 
 /// 
 /// @system 
 /// name: DepthImageToPointCloud 
@@ -42,16 +44,16 @@ void apb11_pydrake_DepthImageToPointCloud_py_register(py::module &m) {
 /// 
 /// @ingroup perception_systems)""");
 
-  DepthImageToPointCloud
+  PyDepthImageToPointCloud
       .def(py::init<::drake::systems::sensors::CameraInfo const &,
                     ::drake::systems::sensors::PixelType, float,
-                    ::drake::perception::pc_flags::BaseFieldT>(),
+                    pc_flags::BaseFieldT>(),
            py::arg("camera_info"),
            py::arg("depth_pixel_type") = ::drake::systems::sensors::PixelType(
                ::drake::systems::sensors::PixelType::kDepth32F),
            py::arg("scale") = float(1.),
-           py::arg("fields") = ::drake::perception::pc_flags::BaseFieldT(
-               drake::perception::pc_flags::kXYZs))
+           py::arg("fields") =
+               pc_flags::BaseFieldT(drake::perception::pc_flags::kXYZs))
       .def_static(
           "Convert",
           static_cast<void (*)(
@@ -60,9 +62,8 @@ void apb11_pydrake_DepthImageToPointCloud_py_register(py::module &m) {
               ::drake::systems::sensors::ImageDepth32F const &,
               ::std::optional<drake::systems::sensors::Image<
                   drake::systems::sensors::PixelType::kRgba8U>> const &,
-              ::std::optional<float> const &,
-              ::drake::perception::PointCloud *)>(
-              &::drake::perception::DepthImageToPointCloud::Convert),
+              ::std::optional<float> const &, PointCloud *)>(
+              &DepthImageToPointCloud::Convert),
           py::arg("camera_info"), py::arg("camera_pose"),
           py::arg("depth_image"), py::arg("color_image"), py::arg("scale"),
           py::arg("cloud"),
@@ -76,33 +77,29 @@ void apb11_pydrake_DepthImageToPointCloud_py_register(py::module &m) {
       .def(
           "camera_pose_input_port",
           static_cast<::drake::systems::InputPort<double> const &(
-              ::drake::perception::DepthImageToPointCloud::*)() const>(
-              &::drake::perception::DepthImageToPointCloud::
-                  camera_pose_input_port),
+              DepthImageToPointCloud::*)() const>(
+              &DepthImageToPointCloud::camera_pose_input_port),
           R"""(/// Returns the abstract valued input port that expects X_PC as a 
 /// RigidTransformd.  (This input port does not necessarily need to be 
 /// connected; refer to the class overview for details.))""")
       .def(
           "color_image_input_port",
           static_cast<::drake::systems::InputPort<double> const &(
-              ::drake::perception::DepthImageToPointCloud::*)() const>(
-              &::drake::perception::DepthImageToPointCloud::
-                  color_image_input_port),
+              DepthImageToPointCloud::*)() const>(
+              &DepthImageToPointCloud::color_image_input_port),
           R"""(/// Returns the abstract valued input port that expects an ImageRgba8U.)""")
       .def(
           "depth_image_input_port",
           static_cast<::drake::systems::InputPort<double> const &(
-              ::drake::perception::DepthImageToPointCloud::*)() const>(
-              &::drake::perception::DepthImageToPointCloud::
-                  depth_image_input_port),
+              DepthImageToPointCloud::*)() const>(
+              &DepthImageToPointCloud::depth_image_input_port),
           R"""(/// Returns the abstract valued input port that expects either an 
 /// ImageDepth16U or ImageDepth32F (depending on the constructor argument).)""")
       .def(
           "point_cloud_output_port",
           static_cast<::drake::systems::OutputPort<double> const &(
-              ::drake::perception::DepthImageToPointCloud::*)() const>(
-              &::drake::perception::DepthImageToPointCloud::
-                  point_cloud_output_port),
+              DepthImageToPointCloud::*)() const>(
+              &DepthImageToPointCloud::point_cloud_output_port),
           R"""(/// Returns the abstract valued output port that provides a PointCloud. 
 /// Only the channels passed into the constructor argument "fields" are 
 /// present.)""")

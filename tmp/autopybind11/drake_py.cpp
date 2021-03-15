@@ -6,9 +6,11 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_drake_py_register(py::module &m) {
-  py::module drake = m.def_submodule("drake", "");
-  py::enum_<::drake::ToleranceType>(drake, "ToleranceType", py::arithmetic())
-      .value("kAbsolute", ::drake::ToleranceType::kAbsolute, "")
-      .value("kRelative", ::drake::ToleranceType::kRelative, "");
-  return drake;
+  using namespace drake;
+
+  py::module Pydrake = m.def_submodule("drake", "");
+  py::enum_<ToleranceType>(Pydrake, "ToleranceType", py::arithmetic())
+      .value("kAbsolute", ToleranceType::kAbsolute, "")
+      .value("kRelative", ToleranceType::kRelative, "");
+  return Pydrake;
 }

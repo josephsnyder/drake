@@ -10,7 +10,9 @@ void apb11_pydrake_RandomGenerator_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::RandomGenerator> RandomGenerator(
+  using namespace drake;
+
+  py::class_<RandomGenerator> PyRandomGenerator(
       m, "RandomGenerator",
       R"""(/// Defines Drake's canonical implementation of the UniformRandomBitGenerator 
 /// C++ concept (as well as a few conventional extras beyond the concept, e.g., 
@@ -18,23 +20,18 @@ void apb11_pydrake_RandomGenerator_py_register(py::module &m) {
 /// Nishimura, 1998.  For more information, see 
 /// https://en.cppreference.com/w/cpp/numeric/random/mersenne_twister_engine)""");
 
-  RandomGenerator
-      .def(py::init<::drake::RandomGenerator const &>(), py::arg("arg0"))
+  PyRandomGenerator.def(py::init<RandomGenerator const &>(), py::arg("arg0"))
       .def(py::init<>())
-      .def(py::init<::drake::RandomGenerator::result_type>(), py::arg("value"))
-      .def_static(
-          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-          static_cast<void (*)()>(&::drake::RandomGenerator::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
-      .def_static("max",
-                  static_cast<::drake::RandomGenerator::result_type (*)()>(
-                      &::drake::RandomGenerator::max))
-      .def_static("min",
-                  static_cast<::drake::RandomGenerator::result_type (*)()>(
-                      &::drake::RandomGenerator::min))
-      .def_readonly_static("default_seed",
-                           &::drake::RandomGenerator::default_seed)
-      .def("__call__", static_cast<::drake::RandomGenerator::result_type (
-                           ::drake::RandomGenerator::*)()>(
-                           &::drake::RandomGenerator::operator()));
+      .def(py::init<RandomGenerator::result_type>(), py::arg("value"))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &RandomGenerator::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def_static("max", static_cast<RandomGenerator::result_type (*)()>(
+                             &RandomGenerator::max))
+      .def_static("min", static_cast<RandomGenerator::result_type (*)()>(
+                             &RandomGenerator::min))
+      .def_readonly_static("default_seed", &RandomGenerator::default_seed)
+      .def("__call__",
+           static_cast<RandomGenerator::result_type (RandomGenerator::*)()>(
+               &RandomGenerator::operator()));
 }

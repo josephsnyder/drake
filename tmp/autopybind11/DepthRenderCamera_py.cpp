@@ -10,34 +10,32 @@ void apb11_pydrake_DepthRenderCamera_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::geometry::render::DepthRenderCamera> DepthRenderCamera(
+  using namespace drake::geometry::render;
+
+  py::class_<DepthRenderCamera> PyDepthRenderCamera(
       m, "DepthRenderCamera",
       R"""(/** Collection of camera properties for cameras to be used with depth images. 
  */)""");
 
-  DepthRenderCamera
-      .def(py::init<::drake::geometry::render::DepthRenderCamera const &>(),
-           py::arg("arg0"))
-      .def(py::init<::drake::geometry::render::DepthCameraProperties const &,
+  PyDepthRenderCamera
+      .def(py::init<DepthRenderCamera const &>(), py::arg("arg0"))
+      .def(py::init<DepthCameraProperties const &,
                     ::drake::math::RigidTransformd>(),
            py::arg("camera"),
            py::arg("X_BD") = ::drake::math::RigidTransformd({}))
-      .def(py::init<::drake::geometry::render::RenderCameraCore,
-                    ::drake::geometry::render::DepthRange>(),
-           py::arg("core"), py::arg("depth_range"))
-      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-                  static_cast<void (*)()>(
-                      &::drake::geometry::render::DepthRenderCamera::
-                          DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def(py::init<RenderCameraCore, DepthRange>(), py::arg("core"),
+           py::arg("depth_range"))
+      .def_static(
+          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+          static_cast<void (*)()>(
+              &DepthRenderCamera::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
       .def("core",
-           static_cast<::drake::geometry::render::RenderCameraCore const &(
-               ::drake::geometry::render::DepthRenderCamera::*)() const>(
-               &::drake::geometry::render::DepthRenderCamera::core),
+           static_cast<RenderCameraCore const &(DepthRenderCamera::*)() const>(
+               &DepthRenderCamera::core),
            R"""(/** This camera's core render properties.  */)""")
       .def("depth_range",
-           static_cast<::drake::geometry::render::DepthRange const &(
-               ::drake::geometry::render::DepthRenderCamera::*)() const>(
-               &::drake::geometry::render::DepthRenderCamera::depth_range),
+           static_cast<DepthRange const &(DepthRenderCamera::*)() const>(
+               &DepthRenderCamera::depth_range),
            R"""(/** The range of valid values for the depth camera.  */)""")
 
       ;

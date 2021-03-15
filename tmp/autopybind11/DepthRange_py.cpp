@@ -10,7 +10,9 @@ void apb11_pydrake_DepthRange_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::geometry::render::DepthRange> DepthRange(
+  using namespace drake::geometry::render;
+
+  py::class_<DepthRange> PyDepthRange(
       m, "DepthRange",
       R"""(/** Defines a depth sensor's functional range. Only points that lie within the 
  range `[min_depth, max_depth]` will register meaningful values. 
@@ -28,20 +30,15 @@ void apb11_pydrake_DepthRange_py_register(py::module &m) {
  plane should be slightly closer than that. When in doubt, some very small 
  value (e.g., 1 mm) is typically safe.  */)""");
 
-  DepthRange
-      .def(py::init<::drake::geometry::render::DepthRange const &>(),
-           py::arg("arg0"))
+  PyDepthRange.def(py::init<DepthRange const &>(), py::arg("arg0"))
       .def(py::init<double, double>(), py::arg("min_in"), py::arg("max_in"))
-      .def_static(
-          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-          static_cast<void (*)()>(&::drake::geometry::render::DepthRange::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
-      .def("max_depth", static_cast<double (
-                            ::drake::geometry::render::DepthRange::*)() const>(
-                            &::drake::geometry::render::DepthRange::max_depth))
-      .def("min_depth", static_cast<double (
-                            ::drake::geometry::render::DepthRange::*)() const>(
-                            &::drake::geometry::render::DepthRange::min_depth))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &DepthRange::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def("max_depth",
+           static_cast<double (DepthRange::*)() const>(&DepthRange::max_depth))
+      .def("min_depth",
+           static_cast<double (DepthRange::*)() const>(&DepthRange::min_depth))
 
       ;
 }

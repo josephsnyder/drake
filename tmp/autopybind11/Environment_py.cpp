@@ -12,7 +12,9 @@ void apb11_pydrake_Environment_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::symbolic::Environment> Environment(
+  using namespace drake::symbolic;
+
+  py::class_<Environment> PyEnvironment(
       m, "Environment",
       R"""(/** Represents a symbolic environment (mapping from a variable to a value). 
  * 
@@ -53,54 +55,103 @@ void apb11_pydrake_Environment_py_register(py::module &m) {
  * 
  */)""");
 
-  Environment.def(py::init<::drake::symbolic::Environment const &>(),py::arg("arg0"))
-    .def(py::init<>())
-    .def(py::init<::std::initializer_list<std::pair<const drake::symbolic::Variable, double>>>(),py::arg("init"))
-    .def(py::init<::std::initializer_list<drake::symbolic::Variable>>(),py::arg("vars"))
-    .def(py::init<::drake::symbolic::Environment::map>(),py::arg("m"))
-    .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE", static_cast<void (*)(  )>(&::drake::symbolic::Environment::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
-    .def("begin", static_cast<::drake::symbolic::Environment::iterator ( ::drake::symbolic::Environment::* )(  )>(&::drake::symbolic::Environment::begin), 
-R"""(/** Returns an iterator to the beginning. */)""")
-    .def("begin", static_cast<::drake::symbolic::Environment::const_iterator ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::begin), 
-R"""(/** Returns a const iterator to the beginning. */)""")
-    .def("cbegin", static_cast<::drake::symbolic::Environment::const_iterator ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::cbegin), 
-R"""(/** Returns a const iterator to the beginning. */)""")
-    .def("cend", static_cast<::drake::symbolic::Environment::const_iterator ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::cend), 
-R"""(/** Returns a const iterator to the end. */)""")
-    .def("domain", static_cast<::drake::symbolic::Variables ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::domain), 
-R"""(/** Returns the domain of this environment. */)""")
-    .def("empty", static_cast<bool ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::empty), 
-R"""(/** Checks whether the container is empty.  */)""")
-    .def("end", static_cast<::drake::symbolic::Environment::iterator ( ::drake::symbolic::Environment::* )(  )>(&::drake::symbolic::Environment::end), 
-R"""(/** Returns an iterator to the end. */)""")
-    .def("end", static_cast<::drake::symbolic::Environment::const_iterator ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::end), 
-R"""(/** Returns a const iterator to the end. */)""")
-    .def("find", static_cast<::drake::symbolic::Environment::iterator ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )>(&::drake::symbolic::Environment::find), py::arg("key"), 
-R"""(/** Finds element with specific key. */)""")
-    .def("find", static_cast<::drake::symbolic::Environment::const_iterator ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )const>(&::drake::symbolic::Environment::find), py::arg("key"), 
-R"""(/** Finds element with specific key. */)""")
-    .def("insert", static_cast<void ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const &,::drake::symbolic::Environment::mapped_type const & )>(&::drake::symbolic::Environment::insert), py::arg("key"), py::arg("elem"), 
-R"""(/** Inserts a pair (@p key, @p elem). */)""")
-    .def("insert", [](::drake::symbolic::Environment &self, ::Eigen::Ref<const Eigen::Matrix<drake::symbolic::Variable, -1, -1, 0, -1, -1>, 0, Eigen::OuterStride<-1>> const & keys, ::Eigen::Ref<const Eigen::Matrix<double, -1, -1, 0, -1, -1>, 0, Eigen::OuterStride<-1>> const & elements)
-{
-  return self.insert(keys, elements);
-})
-    .def("size", static_cast<::size_t ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::size), 
-R"""(/** Returns the number of elements. */)""")
-    .def("to_string", static_cast<::std::string ( ::drake::symbolic::Environment::* )(  )const>(&::drake::symbolic::Environment::to_string), 
-R"""(/** Returns string representation. */)""")
-    
-    .def("__str__", +[](::drake::symbolic::Environment const & env) {
-        std::ostringstream oss;
-        oss << env;
-        std::string s(oss.str());
+  PyEnvironment.def(py::init<Environment const &>(), py::arg("arg0"))
+      .def(py::init<>())
+      .def(py::init<::std::initializer_list<
+               std::pair<const drake::symbolic::Variable, double>>>(),
+           py::arg("init"))
+      .def(py::init<::std::initializer_list<drake::symbolic::Variable>>(),
+           py::arg("vars"))
+      .def(py::init<Environment::map>(), py::arg("m"))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &Environment::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def("begin",
+           static_cast<Environment::iterator (Environment::*)()>(
+               &Environment::begin),
+           R"""(/** Returns an iterator to the beginning. */)""")
+      .def("begin",
+           static_cast<Environment::const_iterator (Environment::*)() const>(
+               &Environment::begin),
+           R"""(/** Returns a const iterator to the beginning. */)""")
+      .def("cbegin",
+           static_cast<Environment::const_iterator (Environment::*)() const>(
+               &Environment::cbegin),
+           R"""(/** Returns a const iterator to the beginning. */)""")
+      .def("cend",
+           static_cast<Environment::const_iterator (Environment::*)() const>(
+               &Environment::cend),
+           R"""(/** Returns a const iterator to the end. */)""")
+      .def(
+          "domain",
+          static_cast<Variables (Environment::*)() const>(&Environment::domain),
+          R"""(/** Returns the domain of this environment. */)""")
+      .def("empty",
+           static_cast<bool (Environment::*)() const>(&Environment::empty),
+           R"""(/** Checks whether the container is empty.  */)""")
+      .def("end",
+           static_cast<Environment::iterator (Environment::*)()>(
+               &Environment::end),
+           R"""(/** Returns an iterator to the end. */)""")
+      .def("end",
+           static_cast<Environment::const_iterator (Environment::*)() const>(
+               &Environment::end),
+           R"""(/** Returns a const iterator to the end. */)""")
+      .def("find",
+           static_cast<Environment::iterator (Environment::*)(
+               Environment::key_type const &)>(&Environment::find),
+           py::arg("key"), R"""(/** Finds element with specific key. */)""")
+      .def("find",
+           static_cast<Environment::const_iterator (Environment::*)(
+               Environment::key_type const &) const>(&Environment::find),
+           py::arg("key"), R"""(/** Finds element with specific key. */)""")
+      .def("insert",
+           static_cast<void (Environment::*)(Environment::key_type const &,
+                                             Environment::mapped_type const &)>(
+               &Environment::insert),
+           py::arg("key"), py::arg("elem"),
+           R"""(/** Inserts a pair (@p key, @p elem). */)""")
+      .def("insert",
+           [](Environment &self,
+              ::Eigen::Ref<const Eigen::Matrix<drake::symbolic::Variable, -1,
+                                               -1, 0, -1, -1>,
+                           0, Eigen::OuterStride<-1>> const &keys,
+              ::Eigen::Ref<const Eigen::Matrix<double, -1, -1, 0, -1, -1>, 0,
+                           Eigen::OuterStride<-1>> const &elements) {
+             return self.insert(keys, elements);
+           })
+      .def("size",
+           static_cast<::size_t (Environment::*)() const>(&Environment::size),
+           R"""(/** Returns the number of elements. */)""")
+      .def("to_string",
+           static_cast<::std::string (Environment::*)() const>(
+               &Environment::to_string),
+           R"""(/** Returns string representation. */)""")
 
-        return s;})        .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
-R"""(/** Returns a reference to the value that is mapped to a key equivalent to 
+      .def(
+          "__str__",
+          +[](Environment const &env) {
+            std::ostringstream oss;
+            oss << env;
+            std::string s(oss.str());
+
+            return s;
+          })
+      .def(
+          "__getitem__",
+          static_cast<Environment::mapped_type &(
+              Environment::*)(Environment::key_type const &)>(
+              &Environment::operator[]),
+          py::arg("key"),
+          R"""(/** Returns a reference to the value that is mapped to a key equivalent to 
  *  @p key, performing an insertion if such key does not already exist. 
  */)""")
-    .def("__getitem__", static_cast<::drake::symbolic::Environment::mapped_type const & ( ::drake::symbolic::Environment::* )( ::drake::symbolic::Environment::key_type const & )const>(&::drake::symbolic::Environment::operator[]), py::arg("key"), 
-R"""(/** As above, but returns a constref and does not perform an insertion 
- * (throwing a runtime error instead) if the key does not exist. */)""")
-    ;
+      .def(
+          "__getitem__",
+          static_cast<Environment::mapped_type const &(
+              Environment::*)(Environment::key_type const &)const>(
+              &Environment::operator[]),
+          py::arg("key"),
+          R"""(/** As above, but returns a constref and does not perform an insertion 
+ * (throwing a runtime error instead) if the key does not exist. */)""");
 }

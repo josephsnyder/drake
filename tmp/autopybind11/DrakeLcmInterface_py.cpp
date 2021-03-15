@@ -10,9 +10,10 @@ void apb11_pydrake_DrakeLcmInterface_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::lcm::DrakeLcmInterface> DrakeLcmInterface(
-      m, "DrakeLcmInterface",
-      R"""(/** 
+  using namespace drake::lcm;
+
+  py::class_<DrakeLcmInterface> PyDrakeLcmInterface(m, "DrakeLcmInterface",
+                                                    R"""(/** 
  * A pure virtual interface that enables LCM to be mocked. 
  * 
  * Because it must be pure, in general it will receive breaking API changes 
@@ -24,10 +25,10 @@ void apb11_pydrake_DrakeLcmInterface_py_register(py::module &m) {
  * drake::lcm::Publish() or drake::lcm::Subscribe() instead. 
  */)""");
 
-  DrakeLcmInterface
+  PyDrakeLcmInterface
       .def("HandleSubscriptions",
-           static_cast<int (::drake::lcm::DrakeLcmInterface::*)(int)>(
-               &::drake::lcm::DrakeLcmInterface::HandleSubscriptions),
+           static_cast<int (DrakeLcmInterface::*)(int)>(
+               &DrakeLcmInterface::HandleSubscriptions),
            py::arg("timeout_millis"),
            R"""(/** 
  * Invokes the HandlerFunction callbacks for all subscriptions' pending 
@@ -37,10 +38,9 @@ void apb11_pydrake_DrakeLcmInterface_py_register(py::module &m) {
  * @throw std::exception when a subscribed handler throws. 
  */)""")
       .def("Publish",
-           static_cast<void (::drake::lcm::DrakeLcmInterface::*)(
+           static_cast<void (DrakeLcmInterface::*)(
                ::std::string const &, void const *, int,
-               ::std::optional<double>)>(
-               &::drake::lcm::DrakeLcmInterface::Publish),
+               ::std::optional<double>)>(&DrakeLcmInterface::Publish),
            py::arg("channel"), py::arg("data"), py::arg("data_size"),
            py::arg("time_sec"),
            R"""(/** 
@@ -61,12 +61,10 @@ void apb11_pydrake_DrakeLcmInterface_py_register(py::module &m) {
  * If unknown, use nullopt or a default-constructed optional. 
  */)""")
       .def("Subscribe",
-           static_cast<
-               ::std::shared_ptr<drake::lcm::DrakeSubscriptionInterface> (
-                   ::drake::lcm::DrakeLcmInterface::*)(
-                   ::std::string const &,
-                   ::drake::lcm::DrakeLcmInterface::HandlerFunction)>(
-               &::drake::lcm::DrakeLcmInterface::Subscribe),
+           static_cast<::std::shared_ptr<
+               drake::lcm::DrakeSubscriptionInterface> (DrakeLcmInterface::*)(
+               ::std::string const &, DrakeLcmInterface::HandlerFunction)>(
+               &DrakeLcmInterface::Subscribe),
            py::arg("channel"), py::arg("arg1"),
            R"""(/** 
  * Most users should use the drake::lcm::Subscribe() free function or the 

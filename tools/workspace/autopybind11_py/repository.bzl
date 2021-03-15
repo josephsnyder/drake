@@ -9,8 +9,8 @@ def autopybind11_py_repository(
         name = name,
         # Temporary branch
         repository = "autopybind11/autopybind11",
-        commit = "71bb87a912514abff6309f56e20e81981927e34a",
-        sha256 = "fcf6f653f4892fd8a261455dcd2c5def4b0b9a6db868e7c59efb5799b4eb4439",  # noqa
+        commit = "6d03a79aea57f281f5625c10e0bb1c0dff734f0f",
+        sha256 = "4c8d7e9d13d60f12d98464c711fb87144ed8fd9d44462c91f1ad2bb765ffa499",  # noqa
         build_file = "@drake//tools/workspace/autopybind11_py:package.BUILD.bazel",  # noqa
         mirrors = {
             "github": ["https://gitlab.kitware.com/{repository}/-/archive/{commit}/autopybind11-{commit}.tar.gz"],  # noqa

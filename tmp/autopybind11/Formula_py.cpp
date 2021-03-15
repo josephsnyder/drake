@@ -11,7 +11,9 @@ void apb11_pydrake_Formula_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::symbolic::Formula> Formula(
+  using namespace drake::symbolic;
+
+  py::class_<Formula> PyFormula(
       m, "Formula",
       R"""(/** Represents a symbolic form of a first-order logic formula. 
  
@@ -60,29 +62,25 @@ Drake for readability.
  
 */)""");
 
-  Formula.def(py::init<::drake::symbolic::Formula const &>(), py::arg("arg0"))
+  PyFormula.def(py::init<Formula const &>(), py::arg("arg0"))
       .def(py::init<>())
       .def(py::init<bool>(), py::arg("value"))
       .def(py::init<::std::shared_ptr<const drake::symbolic::FormulaCell>>(),
            py::arg("ptr"))
-      .def(py::init<::drake::symbolic::Variable const &>(), py::arg("var"))
-      .def_static(
-          "DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
-          static_cast<void (*)()>(&::drake::symbolic::Formula::
-                                      DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
+      .def(py::init<Variable const &>(), py::arg("var"))
+      .def_static("DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE",
+                  static_cast<void (*)()>(
+                      &Formula::DRAKE_COPYABLE_DEMAND_COPY_CAN_COMPILE))
       .def("EqualTo",
-           static_cast<bool (::drake::symbolic::Formula::*)(
-               ::drake::symbolic::Formula const &) const>(
-               &::drake::symbolic::Formula::EqualTo),
+           static_cast<bool (Formula::*)(Formula const &) const>(
+               &Formula::EqualTo),
            py::arg("f"), R"""(/** Checks structural equality. */)""")
       .def(
           "Evaluate",
-          static_cast<bool (::drake::symbolic::Formula::*)(
-              ::drake::symbolic::Environment const &,
-              ::drake::RandomGenerator *) const>(
-              &::drake::symbolic::Formula::Evaluate),
-          py::arg("env") =
-              (::drake::symbolic::Environment)drake::symbolic::Environment{},
+          static_cast<bool (Formula::*)(Environment const &,
+                                        ::drake::RandomGenerator *) const>(
+              &Formula::Evaluate),
+          py::arg("env") = (Environment)drake::symbolic::Environment{},
           py::arg("random_generator") = (::drake::RandomGenerator *)nullptr,
           R"""(/** Evaluates using a given environment (by default, an empty environment) and 
  * a random number generator. If there is a random variable in this formula 
@@ -97,27 +95,23 @@ Drake for readability.
  */)""")
       .def(
           "Evaluate",
-          static_cast<bool (::drake::symbolic::Formula::*)(
-              ::drake::RandomGenerator *) const>(
-              &::drake::symbolic::Formula::Evaluate),
+          static_cast<bool (Formula::*)(::drake::RandomGenerator *) const>(
+              &Formula::Evaluate),
           py::arg("random_generator"),
           R"""(/** Evaluates using an empty environment and a random number generator. 
  * 
  * See the above overload for the exceptions that it might throw. 
  */)""")
-      .def_static("False", static_cast<::drake::symbolic::Formula (*)()>(
-                               &::drake::symbolic::Formula::False))
+      .def_static("False", static_cast<Formula (*)()>(&Formula::False))
       .def("GetFreeVariables",
-           static_cast<::drake::symbolic::Variables (
-               ::drake::symbolic::Formula::*)() const>(
-               &::drake::symbolic::Formula::GetFreeVariables),
+           static_cast<Variables (Formula::*)() const>(
+               &Formula::GetFreeVariables),
            R"""(/** Gets free variables (unquantified variables). */)""")
-      .def("Less",
-           static_cast<bool (::drake::symbolic::Formula::*)(
-               ::drake::symbolic::Formula const &) const>(
-               &::drake::symbolic::Formula::Less),
-           py::arg("f"),
-           R"""(/** Checks lexicographical ordering between this and @p e. 
+      .def(
+          "Less",
+          static_cast<bool (Formula::*)(Formula const &) const>(&Formula::Less),
+          py::arg("f"),
+          R"""(/** Checks lexicographical ordering between this and @p e. 
  * 
  * If the two formulas f1 and f2 have different kinds k1 and k2 respectively, 
  * f1.Less(f2) is equal to k1 < k2. If f1 and f2 are expressions of the same 
@@ -141,11 +135,8 @@ Drake for readability.
  * std::less<symbolic::Formula>. */)""")
       .def(
           "Substitute",
-          static_cast<::drake::symbolic::Formula (
-              ::drake::symbolic::Formula::*)(
-              ::drake::symbolic::Variable const &,
-              ::drake::symbolic::Expression const &) const>(
-              &::drake::symbolic::Formula::Substitute),
+          static_cast<Formula (Formula::*)(Variable const &, Expression const &)
+                          const>(&Formula::Substitute),
           py::arg("var"), py::arg("e"),
           R"""(/** Returns a copy of this formula replacing all occurrences of @p var 
  * with @p e. 
@@ -153,10 +144,8 @@ Drake for readability.
  */)""")
       .def(
           "Substitute",
-          static_cast<::drake::symbolic::Formula (
-              ::drake::symbolic::Formula::*)(
-              ::drake::symbolic::Substitution const &) const>(
-              &::drake::symbolic::Formula::Substitute),
+          static_cast<Formula (Formula::*)(Substitution const &) const>(
+              &Formula::Substitute),
           py::arg("s"),
           R"""(/** Returns a copy of this formula replacing all occurrences of the 
  * variables in @p s with corresponding expressions in @p s. Note that the 
@@ -164,22 +153,18 @@ Drake for readability.
  * 0).Substitute({{x, y}, {y, x}}) gets (y / x > 0). 
  * @throws std::runtime_error if NaN is detected during substitution. 
  */)""")
-      .def_static("True", static_cast<::drake::symbolic::Formula (*)()>(
-                              &::drake::symbolic::Formula::True))
-      .def("get_kind", static_cast<::drake::symbolic::FormulaKind (
-                           ::drake::symbolic::Formula::*)() const>(
-                           &::drake::symbolic::Formula::get_kind))
+      .def_static("True", static_cast<Formula (*)()>(&Formula::True))
+      .def("get_kind",
+           static_cast<FormulaKind (Formula::*)() const>(&Formula::get_kind))
       .def("to_string",
-           static_cast<::std::string (::drake::symbolic::Formula::*)() const>(
-               &::drake::symbolic::Formula::to_string),
+           static_cast<::std::string (Formula::*)() const>(&Formula::to_string),
            R"""(/** Returns string representation of Formula. */)""")
 
       .def("__bool__",
-           static_cast<bool (::drake::symbolic::Formula::*)() const>(
-               &::drake::symbolic::Formula::operator bool),
+           static_cast<bool (Formula::*)() const>(&Formula::operator bool),
            R"""(/** Conversion to bool. */)""")
       .def(
-          "__str__", +[](::drake::symbolic::Formula const &f) {
+          "__str__", +[](Formula const &f) {
             std::ostringstream oss;
             oss << f;
             std::string s(oss.str());

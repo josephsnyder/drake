@@ -5,7 +5,8 @@
 namespace py = pybind11;
 
 py::module apb11_pydrake_math_py_register(py::module &m) {
-  py::module math = m.def_submodule("math", "");
 
-  return math;
+  py::module Pymath = m.def_submodule("math", "");
+
+  return Pymath;
 }

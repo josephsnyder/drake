@@ -11,7 +11,9 @@ void apb11_pydrake_PointCloud_py_register(py::module &m) {
     return;
   }
   called = true;
-  py::class_<::drake::perception::PointCloud> PointCloud(
+  using namespace drake::perception;
+
+  py::class_<PointCloud> PyPointCloud(
       m, "PointCloud",
       R"""(/// Implements a point cloud (with contiguous storage), whose main goal is to 
 /// offer a convenient, synchronized interface to commonly used fields and 
@@ -64,20 +66,17 @@ void apb11_pydrake_PointCloud_py_register(py::module &m) {
 ///   point cloud registration algorithms for mobile robotics." Foundations and 
 ///   Trends® in Robotics 4.1 (2015): 1-104.)""");
 
-  PointCloud
-      .def(py::init<int, ::drake::perception::pc_flags::Fields, bool>(),
+  PyPointCloud
+      .def(py::init<int, pc_flags::Fields, bool>(),
            py::arg("new_size") = int(0),
-           py::arg("fields") = ::drake::perception::pc_flags::Fields(
-               drake::perception::pc_flags::kXYZs),
+           py::arg("fields") =
+               pc_flags::Fields(drake::perception::pc_flags::kXYZs),
            py::arg("skip_initialize") = bool(false))
-      .def(py::init<::drake::perception::PointCloud const &>(),
-           py::arg("other"))
-      .def(py::init<::drake::perception::PointCloud const &,
-                    ::drake::perception::pc_flags::Fields>(),
-           py::arg("other"), py::arg("copy_fields"))
+      .def(py::init<PointCloud const &>(), py::arg("other"))
+      .def(py::init<PointCloud const &, pc_flags::Fields>(), py::arg("other"),
+           py::arg("copy_fields"))
       .def("Expand",
-           static_cast<void (::drake::perception::PointCloud::*)(int, bool)>(
-               &::drake::perception::PointCloud::Expand),
+           static_cast<void (PointCloud::*)(int, bool)>(&PointCloud::Expand),
            py::arg("add_size"), py::arg("skip_initialization") = bool(false),
            R"""(/// Adds `add_size` default-initialized points. 
 /// @param add_size 
@@ -85,54 +84,49 @@ void apb11_pydrake_PointCloud_py_register(py::module &m) {
 /// @param skip_initialization 
 ///    Do not require that the new values be initialized.)""")
       .def("HasExactFields",
-           static_cast<bool (::drake::perception::PointCloud::*)(
-               ::drake::perception::pc_flags::Fields) const>(
-               &::drake::perception::PointCloud::HasExactFields),
+           static_cast<bool (PointCloud::*)(pc_flags::Fields) const>(
+               &PointCloud::HasExactFields),
            py::arg("fields_in"),
            R"""(/// Returns if a point cloud has exactly a given set of fields. 
 /// @see HasFields for preconditions.)""")
       .def("HasFields",
-           static_cast<bool (::drake::perception::PointCloud::*)(
-               ::drake::perception::pc_flags::Fields) const>(
-               &::drake::perception::PointCloud::HasFields),
+           static_cast<bool (PointCloud::*)(pc_flags::Fields) const>(
+               &PointCloud::HasFields),
            py::arg("fields_in"),
            R"""(/// Returns if a point cloud has a given set of fields.)""")
-      .def_static("IsDefaultValue",
-                  static_cast<bool (*)(::drake::perception::PointCloud::T)>(
-                      &::drake::perception::PointCloud::IsDefaultValue),
-                  py::arg("value"))
-      .def_static("IsInvalidValue",
-                  static_cast<bool (*)(::drake::perception::PointCloud::T)>(
-                      &::drake::perception::PointCloud::IsInvalidValue),
-                  py::arg("value"))
+      .def_static(
+          "IsDefaultValue",
+          static_cast<bool (*)(PointCloud::T)>(&PointCloud::IsDefaultValue),
+          py::arg("value"))
+      .def_static(
+          "IsInvalidValue",
+          static_cast<bool (*)(PointCloud::T)>(&PointCloud::IsInvalidValue),
+          py::arg("value"))
       .def("RequireExactFields",
-           static_cast<void (::drake::perception::PointCloud::*)(
-               ::drake::perception::pc_flags::Fields) const>(
-               &::drake::perception::PointCloud::RequireExactFields),
+           static_cast<void (PointCloud::*)(pc_flags::Fields) const>(
+               &PointCloud::RequireExactFields),
            py::arg("field_set"),
            R"""(/// Requires the exact given set of fields. 
 /// @see HasFields for preconditions. 
 /// @throws std::runtime_error if this point cloud does not have exactly 
 /// these fields.)""")
       .def("RequireFields",
-           static_cast<void (::drake::perception::PointCloud::*)(
-               ::drake::perception::pc_flags::Fields) const>(
-               &::drake::perception::PointCloud::RequireFields),
+           static_cast<void (PointCloud::*)(pc_flags::Fields) const>(
+               &PointCloud::RequireFields),
            py::arg("fields_in"),
            R"""(/// Requires a given set of fields. 
 /// @see HasFields for preconditions. 
 /// @throws std::runtime_error if this point cloud does not have these 
 /// fields.)""")
-      .def("SetFrom",
-           static_cast<void (::drake::perception::PointCloud::*)(
-               ::drake::perception::PointCloud const &,
-               ::drake::perception::pc_flags::Fields, bool)>(
-               &::drake::perception::PointCloud::SetFrom),
-           py::arg("other"),
-           py::arg("fields_in") = ::drake::perception::pc_flags::Fields(
-               drake::perception::pc_flags::kInherit),
-           py::arg("allow_resize") = bool(true),
-           R"""(/// Copies all points from another point cloud. 
+      .def(
+          "SetFrom",
+          static_cast<void (PointCloud::*)(PointCloud const &, pc_flags::Fields,
+                                           bool)>(&PointCloud::SetFrom),
+          py::arg("other"),
+          py::arg("fields_in") =
+              pc_flags::Fields(drake::perception::pc_flags::kInherit),
+          py::arg("allow_resize") = bool(true),
+          R"""(/// Copies all points from another point cloud. 
 /// @param other 
 ///    Other point cloud. 
 /// @param fields_in 
@@ -142,141 +136,126 @@ void apb11_pydrake_PointCloud_py_register(py::module &m) {
 /// @param allow_resize 
 ///    Permit resizing to the other cloud's size.)""")
       .def("descriptor",
-           static_cast<::Eigen::Matrix<float, -1, 1, 0, -1, 1> (
-               ::drake::perception::PointCloud::*)(int) const>(
-               &::drake::perception::PointCloud::descriptor),
+           static_cast<::Eigen::Matrix<float, -1, 1, 0, -1, 1> (PointCloud::*)(
+               int) const>(&PointCloud::descriptor),
            py::arg("i"),
            R"""(/// Returns access to a descriptor value. 
 /// @pre `has_descriptors()` must be true.)""")
       .def("descriptor_type",
-           static_cast<::drake::perception::pc_flags::DescriptorType const &(
-               ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::descriptor_type),
+           static_cast<pc_flags::DescriptorType const &(PointCloud::*)() const>(
+               &PointCloud::descriptor_type),
            R"""(/// Returns the descriptor type.)""")
       .def("descriptors",
            static_cast<
                ::Eigen::Ref<const Eigen::Matrix<float, -1, -1, 0, -1, -1>, 0,
-                            Eigen::OuterStride<-1>> (
-                   ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::descriptors),
+                            Eigen::OuterStride<-1>> (PointCloud::*)() const>(
+               &PointCloud::descriptors),
            R"""(/// Returns access to descriptor values. 
 /// @pre `has_descriptors()` must be true.)""",
            py::return_value_policy::reference_internal)
       .def("fields",
-           static_cast<::drake::perception::pc_flags::Fields (
-               ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::fields),
+           static_cast<pc_flags::Fields (PointCloud::*)() const>(
+               &PointCloud::fields),
            R"""(/// Returns the fields provided by this point cloud.)""")
       .def("has_descriptors",
-           static_cast<bool (::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::has_descriptors),
+           static_cast<bool (PointCloud::*)() const>(
+               &PointCloud::has_descriptors),
            R"""(/// Returns if this point cloud provides descriptor values.)""")
       .def(
           "has_descriptors",
-          static_cast<bool (::drake::perception::PointCloud::*)(
-              ::drake::perception::pc_flags::DescriptorType const &) const>(
-              &::drake::perception::PointCloud::has_descriptors),
+          static_cast<bool (PointCloud::*)(pc_flags::DescriptorType const &)
+                          const>(&PointCloud::has_descriptors),
           py::arg("descriptor_type"),
           R"""(/// Returns if the point cloud provides a specific descriptor.)""")
       .def("has_normals",
-           static_cast<bool (::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::has_normals),
+           static_cast<bool (PointCloud::*)() const>(&PointCloud::has_normals),
            R"""(/// Returns if this cloud provides normals.)""")
       .def("has_rgbs",
-           static_cast<bool (::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::has_rgbs),
+           static_cast<bool (PointCloud::*)() const>(&PointCloud::has_rgbs),
            R"""(/// Returns if this cloud provides RGB colors.)""")
       .def("has_xyzs",
-           static_cast<bool (::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::has_xyzs),
+           static_cast<bool (PointCloud::*)() const>(&PointCloud::has_xyzs),
            R"""(/// Returns if this cloud provides XYZ values.)""")
-      .def("mutable_descriptor",
-           static_cast<::Eigen::Ref<Eigen::Matrix<float, -1, 1, 0, -1, 1>, 0,
-                                    Eigen::InnerStride<1>> (
-               ::drake::perception::PointCloud::*)(int)>(
-               &::drake::perception::PointCloud::mutable_descriptor),
-           py::arg("i"),
-           R"""(/// Returns mutable access to a descriptor value. 
+      .def(
+          "mutable_descriptor",
+          static_cast<::Eigen::Ref<Eigen::Matrix<float, -1, 1, 0, -1, 1>, 0,
+                                   Eigen::InnerStride<1>> (PointCloud::*)(int)>(
+              &PointCloud::mutable_descriptor),
+          py::arg("i"),
+          R"""(/// Returns mutable access to a descriptor value. 
 /// @pre `has_descriptors()` must be true.)""",
-           py::return_value_policy::reference_internal)
+          py::return_value_policy::reference_internal)
       .def("mutable_descriptors",
            static_cast<::Eigen::Ref<Eigen::Matrix<float, -1, -1, 0, -1, -1>, 0,
-                                    Eigen::OuterStride<-1>> (
-               ::drake::perception::PointCloud::*)()>(
-               &::drake::perception::PointCloud::mutable_descriptors),
+                                    Eigen::OuterStride<-1>> (PointCloud::*)()>(
+               &PointCloud::mutable_descriptors),
            R"""(/// Returns mutable access to descriptor values. 
 /// @pre `has_descriptors()` must be true.)""",
            py::return_value_policy::reference_internal)
-      .def("mutable_normal",
-           static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, 1, 0, 3, 1>, 0,
-                                    Eigen::InnerStride<1>> (
-               ::drake::perception::PointCloud::*)(int)>(
-               &::drake::perception::PointCloud::mutable_normal),
-           py::arg("i"),
-           R"""(/// Returns mutable access to a normal. 
+      .def(
+          "mutable_normal",
+          static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, 1, 0, 3, 1>, 0,
+                                   Eigen::InnerStride<1>> (PointCloud::*)(int)>(
+              &PointCloud::mutable_normal),
+          py::arg("i"),
+          R"""(/// Returns mutable access to a normal. 
 /// @pre `has_normals()` must be true.)""",
-           py::return_value_policy::reference_internal)
+          py::return_value_policy::reference_internal)
       .def("mutable_normals",
            static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, -1, 0, 3, -1>, 0,
-                                    Eigen::OuterStride<-1>> (
-               ::drake::perception::PointCloud::*)()>(
-               &::drake::perception::PointCloud::mutable_normals),
+                                    Eigen::OuterStride<-1>> (PointCloud::*)()>(
+               &PointCloud::mutable_normals),
            R"""(/// Returns mutable access to normals. 
 /// @pre `has_normals()` must be true.)""",
            py::return_value_policy::reference_internal)
       .def("mutable_rgb",
            static_cast<::Eigen::Ref<Eigen::Matrix<unsigned char, 3, 1, 0, 3, 1>,
-                                    0, Eigen::InnerStride<1>> (
-               ::drake::perception::PointCloud::*)(int)>(
-               &::drake::perception::PointCloud::mutable_rgb),
+                                    0, Eigen::InnerStride<1>> (PointCloud::*)(
+               int)>(&PointCloud::mutable_rgb),
            py::arg("i"),
            R"""(/// Returns mutable access to an RGB color. 
 /// @pre `has_rgbs()` must be true.)""",
            py::return_value_policy::reference_internal)
       .def("mutable_rgbs",
-           static_cast<::Eigen::Ref<
-               Eigen::Matrix<unsigned char, 3, -1, 0, 3, -1>, 0,
-               Eigen::OuterStride<-1>> (::drake::perception::PointCloud::*)()>(
-               &::drake::perception::PointCloud::mutable_rgbs),
+           static_cast<
+               ::Eigen::Ref<Eigen::Matrix<unsigned char, 3, -1, 0, 3, -1>, 0,
+                            Eigen::OuterStride<-1>> (PointCloud::*)()>(
+               &PointCloud::mutable_rgbs),
            R"""(/// Returns mutable access to RGB colors. 
 /// @pre `has_rgbs()` must be true.)""",
            py::return_value_policy::reference_internal)
-      .def("mutable_xyz",
-           static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, 1, 0, 3, 1>, 0,
-                                    Eigen::InnerStride<1>> (
-               ::drake::perception::PointCloud::*)(int)>(
-               &::drake::perception::PointCloud::mutable_xyz),
-           py::arg("i"),
-           R"""(/// Returns mutable access to an XYZ value. 
+      .def(
+          "mutable_xyz",
+          static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, 1, 0, 3, 1>, 0,
+                                   Eigen::InnerStride<1>> (PointCloud::*)(int)>(
+              &PointCloud::mutable_xyz),
+          py::arg("i"),
+          R"""(/// Returns mutable access to an XYZ value. 
 /// @pre `has_xyzs()` must be true.)""",
-           py::return_value_policy::reference_internal)
+          py::return_value_policy::reference_internal)
       .def("mutable_xyzs",
            static_cast<::Eigen::Ref<Eigen::Matrix<float, 3, -1, 0, 3, -1>, 0,
-                                    Eigen::OuterStride<-1>> (
-               ::drake::perception::PointCloud::*)()>(
-               &::drake::perception::PointCloud::mutable_xyzs),
+                                    Eigen::OuterStride<-1>> (PointCloud::*)()>(
+               &PointCloud::mutable_xyzs),
            R"""(/// Returns mutable access to XYZ values. 
 /// @pre `has_xyzs()` must be true.)""",
            py::return_value_policy::reference_internal)
       .def("normal",
-           static_cast<::Eigen::Matrix<float, 3, 1, 0, 3, 1> (
-               ::drake::perception::PointCloud::*)(int) const>(
-               &::drake::perception::PointCloud::normal),
+           static_cast<::Eigen::Matrix<float, 3, 1, 0, 3, 1> (PointCloud::*)(
+               int) const>(&PointCloud::normal),
            py::arg("i"),
            R"""(/// Returns access to a normal. 
 /// @pre `has_normals()` must be true.)""")
       .def("normals",
            static_cast<::Eigen::Ref<const Eigen::Matrix<float, 3, -1, 0, 3, -1>,
-                                    0, Eigen::OuterStride<-1>> (
-               ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::normals),
+                                    0, Eigen::OuterStride<-1>> (PointCloud::*)()
+                           const>(&PointCloud::normals),
            R"""(/// Returns access to normals. 
 /// @pre `has_normals()` must be true.)""",
            py::return_value_policy::reference_internal)
       .def(
           "resize",
-          static_cast<void (::drake::perception::PointCloud::*)(int, bool)>(
-              &::drake::perception::PointCloud::resize),
+          static_cast<void (PointCloud::*)(int, bool)>(&PointCloud::resize),
           py::arg("new_size"), py::arg("skip_initialize") = bool(false),
           R"""(/// Conservative resize; will maintain existing data, and initialize new 
 /// data to their invalid values. 
@@ -289,43 +268,35 @@ void apb11_pydrake_PointCloud_py_register(py::module &m) {
 ///    Do not default-initialize new values.)""")
       .def("rgb",
            static_cast<::Eigen::Matrix<unsigned char, 3, 1, 0, 3, 1> (
-               ::drake::perception::PointCloud::*)(int) const>(
-               &::drake::perception::PointCloud::rgb),
+               PointCloud::*)(int) const>(&PointCloud::rgb),
            py::arg("i"),
            R"""(/// Returns access to an RGB color. 
 /// @pre `has_rgbs()` must be true.)""")
       .def("rgbs",
            static_cast<
                ::Eigen::Ref<const Eigen::Matrix<unsigned char, 3, -1, 0, 3, -1>,
-                            0, Eigen::OuterStride<-1>> (
-                   ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::rgbs),
+                            0, Eigen::OuterStride<-1>> (PointCloud::*)() const>(
+               &PointCloud::rgbs),
            R"""(/// Returns access to RGB colors. 
 /// @pre `has_rgbs()` must be true.)""",
            py::return_value_policy::reference_internal)
-      .def("size",
-           static_cast<int (::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::size),
+      .def("size", static_cast<int (PointCloud::*)() const>(&PointCloud::size),
            R"""(/// Returns the number of points in this point cloud.)""")
       .def("xyz",
-           static_cast<::Eigen::Matrix<float, 3, 1, 0, 3, 1> (
-               ::drake::perception::PointCloud::*)(int) const>(
-               &::drake::perception::PointCloud::xyz),
+           static_cast<::Eigen::Matrix<float, 3, 1, 0, 3, 1> (PointCloud::*)(
+               int) const>(&PointCloud::xyz),
            py::arg("i"),
            R"""(/// Returns access to an XYZ value. 
 /// @pre `has_xyzs()` must be true.)""")
       .def("xyzs",
            static_cast<::Eigen::Ref<const Eigen::Matrix<float, 3, -1, 0, 3, -1>,
-                                    0, Eigen::OuterStride<-1>> (
-               ::drake::perception::PointCloud::*)() const>(
-               &::drake::perception::PointCloud::xyzs),
+                                    0, Eigen::OuterStride<-1>> (PointCloud::*)()
+                           const>(&PointCloud::xyzs),
            R"""(/// Returns access to XYZ values. 
 /// @pre `has_xyzs()` must be true.)""",
            py::return_value_policy::reference_internal)
-      .def_readonly_static("kDefaultColor",
-                           &::drake::perception::PointCloud::kDefaultColor)
-      .def_readonly_static("kDefaultValue",
-                           &::drake::perception::PointCloud::kDefaultValue)
+      .def_readonly_static("kDefaultColor", &PointCloud::kDefaultColor)
+      .def_readonly_static("kDefaultValue", &PointCloud::kDefaultValue)
 
       ;
 }
